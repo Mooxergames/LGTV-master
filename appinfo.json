@@ -3,7 +3,7 @@
     "largeIcon": "logo.png",
     "icon": "logo.png",
     "main": "index.html",
-    "id": "flixiptv.lg",
+    "id": "flixiptv.player",
     "title": "FLIX IPTV",
     "type": "web",
     "resolution": "1920x1080",

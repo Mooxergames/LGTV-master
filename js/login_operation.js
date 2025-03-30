@@ -392,7 +392,7 @@ var login_page={
                     error:function(error){
 
                     },
-                    timeout:50000
+                    timeout:(60 * 2) * 1000 // 120 Seconds
                 })
             ).then(function () {
                 // that.hideLoadImage();
