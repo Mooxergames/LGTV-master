@@ -3,3 +3,9 @@ js/env.js
 *.wgt
 *.ipk
 *.zip
+.buildResult/
+node_modules/
+.DS_Store
+Build
+Debug
+Release
