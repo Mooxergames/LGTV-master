@@ -3,6 +3,8 @@ js/env.js
 *.wgt
 *.ipk
 *.zip
+.manifest
+.sign
 .buildResult/
 node_modules/
 .DS_Store
