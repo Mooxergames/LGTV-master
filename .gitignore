@@ -11,3 +11,5 @@ node_modules/
 Build
 Debug
 Release
+.gn
+Directory.Build.targets
