@@ -51,7 +51,7 @@ excludes:
   - Release
   - Debug
   - Certficate
-  - scripts/package-webos-app.js
+  - tools
   - lg-samsung-tv-apps.csproj
   - .project
   - .rds_delta

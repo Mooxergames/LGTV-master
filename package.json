@@ -4,8 +4,15 @@
   "description": "FLIX Iptv LGTV",
   "main": "index.js",
   "scripts": {
-    "lg:package": "node scripts/package-webos-app.js",
-    "sm:build": "tizen build-web -e 'node_modules/*' -e 'webOSTVjs-1.2.0/webOSTV-dev.js' -e '.vscode/*' -e '*.csproj' -e 'package*.json' -e '.targets' -e '*.md' -e '.git/*' -e 'scripts/*' -e 'Certficate/*' -e scripts -- .",
+    "version": "node tools/sync-version.cjs && git add assets/appinfo.json",
+
+    "lg:package": "node tools/package-webos-app.js",
+    "lg:deploy": "node tools/deploy.js",
+    "lg:inspect": "ares-inspect flixiptv.player",
+    "lg:launch": "ares-launch flixiptv.player",
+    "lg:manifest": "node tools/gen-manifest.js flixiptv.player.manifest.json",
+
+    "sm:build": "rimraf .buildResult && tizen build-web -e 'node_modules/*' -e 'webOSTVjs-1.2.0/webOSTV-dev.js' -e '.vscode/*' -e '*.csproj' -e 'package*.json' -e '.targets' -e '*.md' -e '.git/*' -e 'scripts/*' -e 'Certficate/*' -e scripts -- .",
     "sm:pack": "cd .buildResult && tizen package -t wgt -s flixiptv -- ."
   },
   "keywords": [],
@@ -14,5 +21,8 @@
   "dependencies": {
     "archiver": "^7.0.1",
     "rimraf": "^6.0.1"
+  },
+  "devDependencies": {
+    "@webos-tools/cli": "^3.2.1"
   }
 }

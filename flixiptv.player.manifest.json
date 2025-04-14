@@ -1,0 +1,13 @@
+{
+    "id": "flixiptv.player",
+    "version": "1.1.6",
+    "type": "web",
+    "title": "FLIX IPTV",
+    "iconUri": "https://raw.githubusercontent.com/webosbrew/youtube-webos/main/assets/largeIcon.png",
+    "sourceUrl": "https://github.com/webosbrew/youtube-webos",
+    "rootRequired": false,
+    "ipkUrl": "flixiptv.player_1.1.6_all.ipk",
+    "ipkHash": {
+        "sha256": "ce2f5798d913c16e59e0ae10c7f975d6a98829498b9c9740632177068f7fb85a"
+    }
+}
