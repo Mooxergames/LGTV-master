@@ -84,7 +84,7 @@ var login_page={
         if(!data.mac_registered) {
             $('#login-play-list-information').html(
                 'Your mac address is not registered yet.<br>\
-                -You can activate your mac address and try 7 days free trial in <a class="login-page-link">https://flixapp.net</a>\
+                -You can activate your mac address and try 7 days free trial in <a class="login-page-link">https://flixapp.net/activation</a>\
                 <br>-You can try with our demo playlist url without registering your playlist url.\
                 &nbsp;Demo url will be valid for 7 days since you logged in first time.'
             ).show();
@@ -96,19 +96,19 @@ var login_page={
                 saveData('mac_valid',false);
                 if(data.is_trial==1){
                     $('#login-play-list-information').html(
-                        'Your trial day is ended now, please try paid plan in <a class="login-page-link">https://flixapp.net/activation</a>'
+                        'Your trial has expired, please activate your device from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
                     ).show();
                 }
                 else{
                     $('#login-play-list-information').html(
-                        'Your account valid duration is ended now, please try extend expire date in <a class="login-page-link">https://flixapp.net/activation</a>'
+                        'Your account valid duration has expired, please try extend expire date from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
                     ).show();
                 }
             }
             else{
                 if(data.is_trial==1){  // will show tiral end message
                     $('#login-play-list-information').html(
-                        'Your trial day will be ended in '+data.expire_date+', please try paid plan in <a class="login-page-link">https://flixapp.net/activation</a>'
+                        'Your trial period will expire on '+data.expire_date+', please activate your device from <a class="login-page-link">https://flixapp.net/activation</a> <br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <br> <strong>Scan here to visit the activation page</strong>'
                     ).show();
                     that.login();
                 }
@@ -116,7 +116,7 @@ var login_page={
                     var date1=moment().add(7,'days').format('Y-MM-DD');
                     if(data.expire_date<date1)
                         $('#login-play-list-information').html(
-                            'Your account valid date will be ended in '+data.expire_date+', please try extend expire date in <a class="login-page-link">https://flixapp.net/activation</a>'
+                            'Your account valid date will be ended on '+data.expire_date+', please try extend expire date from <a class="login-page-link">https://flixapp.net/activation</a> <br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <br> <strong>Scan here to visit the activation page</strong>'
                         ).show();
                     that.login();
                 }
