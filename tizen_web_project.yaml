@@ -38,6 +38,7 @@ excludes:
   - webOSTVjs-1.2.0/webOSTV-dev.js
   - webOSTVjs-1.2.0/LICENSE-2.0.txt
   - README.md
+  - node_modules/*
   - package.json
   - package-lock.json
   - .settings/.jsdtscope
