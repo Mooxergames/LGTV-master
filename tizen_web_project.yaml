@@ -1,0 +1,71 @@
+# Project type [web_app, test_runner]
+project_type: web_app
+
+# Default profile, Tizen API version
+profile: tv-samsung
+api_version: "2.3"
+
+# Build type [Debug/ Release/ Test]
+build_type: Release
+
+# Output name for application
+output_name: FLIXIPTV
+
+# Output path for build
+output_path: null
+
+# Enable size optimization of wgt for web workspace
+opt: false
+
+# Signing profile to be used for Tizen package signing
+# If value is empty: "", active signing profile will be used
+# Else If value is ".", default signing profile will be used
+signing_profile: null
+
+# list of certs in web project (.trust-anchor)
+trust_anchor: []
+
+# list of files to exclude based on the matched patterns
+excludes:
+  - .vscode
+  - .git
+  - .sign
+  - ^.csproj$
+  - ^.externalToolBuilders$
+  - ^.gn$
+  - ^.obj$
+  - ^.package$
+  - webOSTVjs-1.2.0/webOSTV-dev.js
+  - webOSTVjs-1.2.0/LICENSE-2.0.txt
+  - README.md
+  - package.json
+  - package-lock.json
+  - .settings/.jsdtscope
+  - .settings/org.eclipse.wst.css.core.prefs
+  - .settings/org.eclipse.wst.jsdt.ui.superType.container
+  - .settings/org.eclipse.wst.jsdt.ui.superType.name
+  - .buildResult
+  - .wgt
+  - Build
+  - Release
+  - Debug
+  - Certficate
+  - scripts/package-webos-app.js
+  - lg-samsung-tv-apps.csproj
+  - .project
+  - .rds_delta
+  - .sdk_delta.info
+  - .rds_delta
+  - .tizen-ui-builder-tool.xml
+  - .tproject
+  - Directory.Build.targets
+  - webUnitTest
+
+# project dependencies
+deps: []
+
+# Source files matching these pattern will always be excluded from build
+src_file_patterns: []
+
+# Source files matching these patterns will only be included while building in test mode
+test_file_patterns: []
