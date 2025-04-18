@@ -25,10 +25,7 @@ const config = {
     'node_modules',
     'package.json',
     'package-lock.json',
-    '.settings/.jsdtscope',
-    '.settings/org.eclipse.wst.css.core.prefs',
-    '.settings/org.eclipse.wst.jsdt.ui.superType.container',
-    '.settings/org.eclipse.wst.jsdt.ui.superType.name',
+    '.settings',
     '.buildResult',
     '.wgt',
     'Build',
@@ -47,7 +44,7 @@ const config = {
     'webUnitTest',
   ],
   // Default output directory for the package
-  outputDir: 'dist',
+  outputDir: 'Release',
   // Default package name (will use package.json appname if available)
   defaultPackageName: 'flixiptv.player',
   // File extensions to include
