@@ -373,6 +373,14 @@ var vod_series_player={
                 $(element).data('action_type','pause');
             }catch(e){
             }
+        }else if(action_type==='stop'){
+            try{
+                media_player.stop();
+                $(element).removeClass('fa-play')
+                $(element).addClass('fa-pause');
+                $(element).data('action_type','pause');
+            }catch(e){
+            }
         }
     },
     seekTo:function(step){
@@ -1190,6 +1198,9 @@ var vod_series_player={
                 this.playPauseVideo("");
                 break;
             case tvKey.MediaPlayPause:
+                this.playPauseVideo("");
+                break;
+            case tvKey.MediaStop:
                 this.playPauseVideo("");
                 break;
             case tvKey.ENTER:
