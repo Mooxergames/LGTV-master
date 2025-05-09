@@ -187,6 +187,8 @@ function initPlayer() {
                 console.log(top_position,left_position,width,height);
                 // console.log(this.videoObj);
                 webapis.avplay.setDisplayRect(left_position,top_position,width,height);
+
+                channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
             toggleScreenRatio:function(){
                 if(this.full_screen_state==1){
@@ -537,7 +539,7 @@ function initPlayer() {
 
             },
             setDisplayArea:function(){
-
+                channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
             formatTime:function(seconds) {
                 var hh = Math.floor(seconds / 3600),

@@ -114,6 +114,19 @@ var channel_page={
         this.changeActiveChannel();
         current_route="channel-page";
     },
+    toggleFavoriteAndRecentBottomOptionVisbility: function () {
+        var category = current_category;
+
+        if (this.full_screen_video === false || media_player.full_screen_state === false) {
+            if (category.category_id === 'recent' || category.category_id === 'favourite') {
+                $('.bottom-label-item.' + category.category_id).show();
+            }
+        } else {
+            if (category.category_id === 'recent' || category.category_id === 'favourite') {
+                $('.bottom-label-item.' + category.category_id).hide();
+            }
+        }
+    },
     goBack:function(){
         var keys=this.keys;
         switch (keys.focused_part) {
