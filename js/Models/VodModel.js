@@ -324,8 +324,10 @@ var VodModel ={
             this.favourite_ids=movie_ids;
             // var domElement1=getDomElementFromData($('#movie-grids-container').find('.movie-item-container'),'channel_id',movie_id);
             // $(domElement1).find('.favourite-badge').remove();
+
             var domElement=home_page.movie_grid_doms[home_page.keys.grid_selection];
             $(domElement).find('.favourite-badge').remove();
+            $(domElement).remove();
 
         }
 
