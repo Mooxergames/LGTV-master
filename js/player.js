@@ -118,6 +118,10 @@ function initPlayer() {
                 // console.log((new Date).getTime()/1000);
             },
             play:function(){
+                if (this.state === this.STATES.STOPPED) {
+                    return this.playAsync(this.url)
+                }
+
                 this.state=this.STATES.PLAYING;
                 try{
                     webapis.avplay.play();

@@ -1192,16 +1192,16 @@ var vod_series_player={
                 this.handleMenuUpDown(-1);
                 break;
             case tvKey.MediaPause:
-                this.playPauseVideo("");
+                this.playPauseVideo("pause");
                 break;
             case tvKey.MediaPlay:
-                this.playPauseVideo("");
+                this.playPauseVideo("play");
                 break;
             case tvKey.MediaPlayPause:
                 this.playPauseVideo("");
                 break;
             case tvKey.MediaStop:
-                this.playPauseVideo("");
+                this.playPauseVideo("stop");
                 break;
             case tvKey.ENTER:
                 this.handleMenuClick();
