@@ -41,7 +41,7 @@ var platform='samsung', app_loading=false;
 var storage_id='qDXvQBVmtf_';
 var lock=0;
 var playlist_succeed=true;
-var samsung_version='1.1.6', lg_version='1.1.6';
+var samsung_version='1.1.7', lg_version='1.1.7';
 
 var youtube_playlists=[
     // {

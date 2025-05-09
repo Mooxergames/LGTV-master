@@ -1,16 +1,11 @@
 {
   "name": "lgtv-master",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "FLIX Iptv LGTV",
   "main": "index.js",
   "scripts": {
     "version": "node tools/sync-version.cjs && git add appinfo.json",
-
     "lg:package": "node tools/package-webos-app.js",
-    "lg:deploy": "node tools/deploy.js",
-    "lg:inspect": "ares-inspect flixiptv.player",
-    "lg:launch": "ares-launch flixiptv.player",
-    "lg:manifest": "node tools/gen-manifest.js flixiptv.player.manifest.json",
 
     "sm:build": "rimraf .buildResult && tizen build-web -e 'node_modules/*' -e 'webOSTVjs-1.2.0/webOSTV-dev.js' -e '.vscode/*' -e '*.csproj' -e 'package*.json' -e '.targets' -e '*.md' -e '.git/*' -e 'scripts/*' -e 'Certficate/*' -e scripts -- .",
     "sm:pack": "cd .buildResult && tizen package -t wgt -s flixiptv -- ."
