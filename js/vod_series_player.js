@@ -679,7 +679,7 @@ var vod_series_player={
                     }
                     $.ajax({
                         method:'post',
-                        url:'https://flixiptv.xyz/api/get-subtitles',
+                        url:'https://flixapp.net/subtitle-test',
                         data: subtitle_request_data,
                         dataType:'json',
                         success:function (result) {
