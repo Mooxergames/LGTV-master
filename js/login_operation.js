@@ -264,7 +264,21 @@ var login_page={
     getLgMacAddress: function() {
         var that = this;
         
-        // Check if webOS is available
+        // Better WebOS environment detection
+        var isWebOSEnvironment = (
+            typeof window.PalmServiceBridge !== 'undefined' ||
+            (typeof webOS !== 'undefined' && webOS.service) ||
+            window.navigator.userAgent.toLowerCase().includes('webos') ||
+            window.PalmSystem
+        );
+        
+        if (!isWebOSEnvironment) {
+            console.log('LG: Not running on WebOS environment, using hardcoded MAC');
+            that.getLgHardcodedMac();
+            return;
+        }
+        
+        // Check if webOS service is available
         if (typeof webOS === 'undefined' || !webOS.service) {
             console.log('LG: webOS service not available, using hardcoded MAC');
             that.getLgHardcodedMac();
@@ -308,7 +322,8 @@ var login_page={
     getLgEthernetMac: function() {
         var that = this;
         
-        if (typeof webOS === 'undefined' || !webOS.service) {
+        // Check environment again before proceeding
+        if (typeof webOS === 'undefined' || !webOS.service || typeof window.PalmServiceBridge === 'undefined') {
             console.log('LG: webOS service not available for Ethernet, using hardcoded MAC');
             that.getLgHardcodedMac();
             return;
