@@ -221,13 +221,13 @@ var login_page={
     hoverNetworkIssueBtn:function(index){
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
-        
+
         // Always refresh button references to include dynamically added buttons
         this.network_btn_doms = $('.network-issue-btn');
-        
+
         // Clear ONLY network issue button active states, not playlist items
         $('.network-issue-btn').removeClass('active');
-        
+
         // Ensure index is within bounds
         if(index >= 0 && index < this.network_btn_doms.length) {
             keys.network_issue_btn = index;
@@ -463,7 +463,7 @@ var login_page={
         );
 
         $('#network-issue-container').show();
-        
+
         // Refresh network button references after content update
         setTimeout(function() {
             that.network_btn_doms = $('.network-issue-btn');
@@ -508,14 +508,14 @@ var login_page={
                     (i === keys.playlist_selection ? ' (Current)' : '') +
                     '</div>';
             }
-            
+
             $('#playlist-modal-items').html(playlistOptionsHtml);
             $('#playlist-selection-modal').show();
-            
+
             // Set focus to playlist selection
             keys.focused_part = "playlist_modal";
             keys.playlist_modal_selection = keys.playlist_selection;
-            
+
             // Highlight current selection
             $('.playlist-modal-item').removeClass('active');
             $('.playlist-modal-item[data-playlist-index="' + keys.playlist_selection + '"]').addClass('active');
@@ -525,7 +525,7 @@ var login_page={
         var keys = this.keys;
         keys.focused_part = "playlist_modal";
         keys.playlist_modal_selection = index;
-        
+
         $('.playlist-modal-item').removeClass('active');
         $('.playlist-modal-item[data-playlist-index="' + index + '"]').addClass('active');
     },
@@ -595,16 +595,16 @@ var login_page={
         else if(keys.focused_part==="network_issue_btn"){
             // Refresh button references before navigation
             this.network_btn_doms = $('.network-issue-btn');
-            
+
             keys.network_issue_btn+=increment;
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=this.network_btn_doms.length-1;
             if(keys.network_issue_btn>=this.network_btn_doms.length)
                 keys.network_issue_btn=0;
-            
+
             // Clear all active states first
             $('.network-issue-btn').removeClass('active');
-            
+
             // Set active state only on the selected button
             if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
                 $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
@@ -617,10 +617,10 @@ var login_page={
                 keys.playlist_modal_selection=playlistItems.length-1;
             if(keys.playlist_modal_selection>=playlistItems.length)
                 keys.playlist_modal_selection=0;
-            
+
             // Clear all active states first
             playlistItems.removeClass('active');
-            
+
             // Set active state only on the selected item
             $(playlistItems[keys.playlist_modal_selection]).addClass('active');
         }
@@ -630,16 +630,16 @@ var login_page={
         if(keys.focused_part==="network_issue_btn"){
             // Refresh button references before navigation
             this.network_btn_doms = $('.network-issue-btn');
-            
+
             keys.network_issue_btn+=increment;
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=0;
             else if(keys.network_issue_btn>=this.network_btn_doms.length)
                 keys.network_issue_btn=this.network_btn_doms.length-1;
-            
+
             // Clear all active states first
             $('.network-issue-btn').removeClass('active');
-            
+
             // Set active state only on the selected button
             if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
                 $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
