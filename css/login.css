@@ -134,11 +134,7 @@
 }
 
 #network-issue-icon {
-    display: block;
-    height: 40px;
-    margin: 0 auto 12px auto;
-    filter: drop-shadow(0 4px 12px rgba(255, 100, 100, 0.4));
-    opacity: 1;
+    display: none;
 }
 
 #network-issue-title {
