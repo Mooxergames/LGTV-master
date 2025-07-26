@@ -101,23 +101,21 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    background: rgba(20, 25, 35, 0.95);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     transform: translate(-50%, -50%);
-    padding: 40px;
-    border-radius: 28px;
-    width: 620px;
-    max-width: 95vw;
-    border: 2px solid rgba(79, 172, 254, 0.3);
+    padding: 32px;
+    border-radius: 24px;
+    width: 580px;
+    max-width: 92vw;
+    border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 
-        0 40px 80px rgba(0, 0, 0, 0.6),
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        0 32px 64px rgba(0, 0, 0, 0.4),
+        0 8px 32px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     display: none;
-    animation: modernFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 10000;
+    animation: modernFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 @keyframes modernFadeIn {
@@ -143,30 +141,26 @@
 
 #network-issue-title {
     color: #ffffff;
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     letter-spacing: -0.02em;
     line-height: 1.2;
-    text-shadow: 
-        0 2px 4px rgba(0, 0, 0, 0.5),
-        0 0 20px rgba(79, 172, 254, 0.3);
 }
 
 #network-issue-text {
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 17px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
     text-align: left;
-    line-height: 1.7;
-    margin-bottom: 24px;
-    background: rgba(79, 172, 254, 0.08);
-    padding: 24px;
-    border-radius: 18px;
-    border: 1px solid rgba(79, 172, 254, 0.2);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 #network-issue-text::before {
@@ -190,26 +184,22 @@
 
 .network-issue-btn {
     color: #ffffff;
-    font-size: 17px;
-    font-weight: 600;
-    background: rgba(79, 172, 254, 0.12);
-    backdrop-filter: blur(16px);
-    padding: 14px 28px;
-    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    border-radius: 12px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid rgba(79, 172, 254, 0.3);
-    min-width: 140px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    min-width: 120px;
     position: relative;
     overflow: hidden;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.025em;
 }
 
 .network-issue-btn::before {
@@ -230,18 +220,16 @@
 
 .network-issue-btn:hover,
 .network-issue-btn.active {
-    background: rgba(79, 172, 254, 0.25);
-    border-color: rgba(79, 172, 254, 0.6);
-    transform: translateY(-3px) scale(1.02);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
     box-shadow: 
-        0 12px 32px rgba(0, 0, 0, 0.3),
-        0 6px 16px rgba(79, 172, 254, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .network-issue-btn:active {
-    transform: translateY(-1px) scale(1.01);
+    transform: translateY(0);
     transition: transform 0.1s ease;
 }
 
@@ -260,77 +248,13 @@
         0 4px 12px rgba(79, 172, 254, 0.1) !important;
 }
 
-/* Different playlist button colors */
-.playlist-option-btn.playlist-type-demo {
-    background: rgba(255, 193, 7, 0.15) !important;
-    border: 1px solid rgba(255, 193, 7, 0.3) !important;
-    color: #ffc107 !important;
-}
-
-.playlist-option-btn.playlist-type-demo:hover,
-.playlist-option-btn.playlist-type-demo.active {
-    background: rgba(255, 193, 7, 0.25) !important;
-    border-color: rgba(255, 193, 7, 0.5) !important;
-    box-shadow: 
-        0 8px 24px rgba(255, 193, 7, 0.2),
-        0 4px 12px rgba(255, 193, 7, 0.1) !important;
-}
-
-.playlist-option-btn.playlist-type-xtreme {
-    background: rgba(40, 167, 69, 0.15) !important;
-    border: 1px solid rgba(40, 167, 69, 0.3) !important;
-    color: #28a745 !important;
-}
-
-.playlist-option-btn.playlist-type-xtreme:hover,
-.playlist-option-btn.playlist-type-xtreme.active {
-    background: rgba(40, 167, 69, 0.25) !important;
-    border-color: rgba(40, 167, 69, 0.5) !important;
-    box-shadow: 
-        0 8px 24px rgba(40, 167, 69, 0.2),
-        0 4px 12px rgba(40, 167, 69, 0.1) !important;
-}
-
-.playlist-option-btn.playlist-type-m3u {
-    background: rgba(220, 53, 69, 0.15) !important;
-    border: 1px solid rgba(220, 53, 69, 0.3) !important;
-    color: #dc3545 !important;
-}
-
-.playlist-option-btn.playlist-type-m3u:hover,
-.playlist-option-btn.playlist-type-m3u.active {
-    background: rgba(220, 53, 69, 0.25) !important;
-    border-color: rgba(220, 53, 69, 0.5) !important;
-    box-shadow: 
-        0 8px 24px rgba(220, 53, 69, 0.2),
-        0 4px 12px rgba(220, 53, 69, 0.1) !important;
-}
-
-.playlist-option-btn.playlist-type-default {
-    background: rgba(108, 117, 125, 0.15) !important;
-    border: 1px solid rgba(108, 117, 125, 0.3) !important;
-    color: #6c757d !important;
-}
-
-.playlist-option-btn.playlist-type-default:hover,
-.playlist-option-btn.playlist-type-default.active {
-    background: rgba(108, 117, 125, 0.25) !important;
-    border-color: rgba(108, 117, 125, 0.5) !important;
-    box-shadow: 
-        0 8px 24px rgba(108, 117, 125, 0.2),
-        0 4px 12px rgba(108, 117, 125, 0.1) !important;
-}
-
 #playlist-selection-in-error {
-    margin-top: 24px;
-    padding: 24px;
-    background: rgba(79, 172, 254, 0.06);
-    border-radius: 20px;
-    border: 2px solid rgba(79, 172, 254, 0.15);
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     position: relative;
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 #playlist-selection-in-error::before {
@@ -339,21 +263,36 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(79, 172, 254, 0.5), transparent);
-    border-radius: 20px 20px 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 
 #playlist-selection-in-error strong {
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    font-weight: 500;
     display: block;
-    margin-bottom: 16px;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    margin-bottom: 12px;
+    letter-spacing: 0.025em;
 }
-    /* Removed duplicate styles */
+    padding: 12px 24px;
+    width: 180px;
+    border-radius: 8px;
+    background: #34495e;
+    display: inline-block;
+    vertical-align: middle;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    margin: 0 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.network-issue-btn:hover,
+.network-issue-btn.active{
+    background: #3498db;
+    border-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
 }
 #login-page-mac-address-container {
     color: #fff;
