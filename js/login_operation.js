@@ -220,10 +220,16 @@ var login_page={
     hoverNetworkIssueBtn:function(index){
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
-        keys.network_issue_btn=index;
-        this.network_btn_doms=$('.network-issue-btn');
-        $(this.network_btn_doms).removeClass('active');
-        $(this.network_btn_doms[index]).addClass('active');
+        
+        // Refresh button references to include dynamically added buttons
+        this.network_btn_doms = $('.network-issue-btn');
+        
+        // Ensure index is within bounds
+        if(index >= 0 && index < this.network_btn_doms.length) {
+            keys.network_issue_btn = index;
+            $(this.network_btn_doms).removeClass('active');
+            $(this.network_btn_doms[index]).addClass('active');
+        }
     },
     login:function(){
         var keys=this.keys;
@@ -437,13 +443,15 @@ var login_page={
 
         // Update network issue text to include playlist selection if multiple playlists exist
         if (playlist_urls && playlist_urls.length > 1) {
-            var playlistOptionsHtml = '<div id="playlist-selection-in-error"><br><strong>Or try a different playlist:</strong><br>';
+            var playlistOptionsHtml = '<div id="playlist-selection-in-error"><strong>Or try a different playlist:</strong><br>';
+            var buttonIndex = 2; // Start after Retry (0) and Continue Anyway (1)
             for (var i = 0; i < playlist_urls.length; i++) {
                 if (i !== keys.playlist_selection) { // Don't show current failing playlist
                     playlistOptionsHtml += '<div class="network-issue-btn playlist-option-btn" ' +
                         'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
-                        'onmouseenter="login_page.hoverNetworkIssueBtn(' + (3 + (i > keys.playlist_selection ? i - 1 : i)) + ')">' +
+                        'onmouseenter="login_page.hoverNetworkIssueBtn(' + buttonIndex + ')">' +
                         'Playlist ' + (i + 1) + '</div>';
+                    buttonIndex++;
                 }
             }
             playlistOptionsHtml += '</div>';
@@ -474,8 +482,15 @@ var login_page={
         }
 
         $('#network-issue-container').show();
-        keys.focused_part = "network_issue_btn";
-        that.hoverNetworkIssueBtn(0);
+        
+        // Refresh network button references after content update
+        setTimeout(function() {
+            that.network_btn_doms = $('.network-issue-btn');
+            keys.focused_part = "network_issue_btn";
+            keys.network_issue_btn = 0;
+            $(that.network_btn_doms).removeClass('active');
+            $(that.network_btn_doms[0]).addClass('active');
+        }, 100);
     },
     selectPlaylistFromError: function(playlistIndex) {
         var that = this;
