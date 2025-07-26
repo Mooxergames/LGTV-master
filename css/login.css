@@ -136,6 +136,33 @@
 .network-issue-btn {
     color: #fff;
     font-size: 26px;
+    background: #34495e;
+    padding: 12px 25px;
+    margin: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+.network-issue-btn:hover,
+.network-issue-btn.active {
+    background: #3498db;
+    border-color: #fff;
+}
+.playlist-option-btn {
+    background: #27ae60 !important;
+    font-size: 22px !important;
+}
+.playlist-option-btn:hover,
+.playlist-option-btn.active {
+    background: #2ecc71 !important;
+}
+#playlist-selection-in-error {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #4a90e2;
+}
     padding: 12px 24px;
     width: 180px;
     border-radius: 8px;
