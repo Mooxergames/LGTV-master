@@ -224,7 +224,7 @@ var login_page={
         // Always refresh button references to include dynamically added buttons
         this.network_btn_doms = $('.network-issue-btn');
         
-        // Clear all active states first to prevent multiple selections
+        // Clear ONLY network issue button active states, not playlist items
         $('.network-issue-btn').removeClass('active');
         
         // Ensure index is within bounds
@@ -505,9 +505,8 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Clear all active states first
+        // Only clear network issue button states, don't touch playlist items
         $('.network-issue-btn').removeClass('active');
-        $('.login-playlist-item-wrapper').removeClass('active');
 
         // Update selected playlist
         keys.playlist_selection = playlistIndex;
@@ -668,12 +667,14 @@ var login_page={
         var keys=this.keys;
         keys.focused_part="playlist_selection";
 
-        // Ensure we clear all active states first
-        $(this.playlist_doms).removeClass('active');
+        // Only clear playlist active states, not network issue buttons
+        $('.login-playlist-item-wrapper').removeClass('active');
 
         // Set the new selection
         keys.playlist_selection=index;
-        $(this.playlist_doms[index]).addClass('active');
+        if(this.playlist_doms && this.playlist_doms[index]) {
+            $(this.playlist_doms[index]).addClass('active');
+        }
     },
     tryPlaylistUrl: function(index) {
         var that = this;
