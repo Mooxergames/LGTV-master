@@ -359,6 +359,29 @@
     border-color: rgba(108, 92, 231, 0.7) !important;
     color: #ffffff !important;
 }
+
+.device-info-section {
+    margin: 15px 0;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    backdrop-filter: blur(10px);
+}
+
+.device-info-section strong {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.mac-address-display {
+    font-family: 'Courier New', monospace;
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
 #login-page-mac-address-container {
     color: #fff;
     font-size: 28px;

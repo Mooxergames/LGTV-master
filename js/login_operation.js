@@ -434,7 +434,7 @@ var login_page={
     showNetworkIssueWithPlaylistOptions: function() {
         var that = this;
         var keys = this.keys;
-        
+
         // Update network issue text to include playlist selection if multiple playlists exist
         if (playlist_urls && playlist_urls.length > 1) {
             var playlistOptionsHtml = '<div id="playlist-selection-in-error"><br><strong>Or try a different playlist:</strong><br>';
@@ -447,16 +447,32 @@ var login_page={
                 }
             }
             playlistOptionsHtml += '</div>';
-            
-            $('#network-issue-text').html(
-                'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
-                '🔌 Network issue – Please check your internet connection.<br>' +
-                '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
-                'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.' +
-                playlistOptionsHtml
-            );
+
+            // Update network issue text with MAC address
+        $('#network-issue-text').html(
+            'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
+            '🔌 Network issue – Please check your internet connection.<br>' +
+            '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+            '<div class="device-info-section">' +
+            '<strong>Device Information:</strong><br>' +
+            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
+            '</div>' +
+            'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'+ playlistOptionsHtml
+        );
+        }else{
+                // Update network issue text with MAC address
+        $('#network-issue-text').html(
+            'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
+            '🔌 Network issue – Please check your internet connection.<br>' +
+            '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+            '<div class="device-info-section">' +
+            '<strong>Device Information:</strong><br>' +
+            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
+            '</div>' +
+            'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
+        );
         }
-        
+
         $('#network-issue-container').show();
         keys.focused_part = "network_issue_btn";
         that.hoverNetworkIssueBtn(0);
@@ -464,13 +480,13 @@ var login_page={
     selectPlaylistFromError: function(playlistIndex) {
         var that = this;
         var keys = this.keys;
-        
+
         // Update selected playlist
         keys.playlist_selection = playlistIndex;
         settings.saveSettings('playlist_url', playlist_urls[playlistIndex], '');
         settings.saveSettings('playlist_url_index', playlistIndex, '');
         parseM3uUrl();
-        
+
         // Hide network issue dialog and try new playlist
         $('#network-issue-container').hide();
         that.showLoadImage();
