@@ -221,6 +221,7 @@ var login_page={
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
         keys.network_issue_btn=index;
+        this.network_btn_doms=$('.network-issue-btn');
         $(this.network_btn_doms).removeClass('active');
         $(this.network_btn_doms[index]).addClass('active');
     },
@@ -447,6 +448,7 @@ var login_page={
         var keys=this.keys;
         if(keys.focused_part==="network_issue_btn"){
             keys.network_issue_btn+=increment;
+            this.network_btn_doms=$('.network-issue-btn');
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=0;
             else if(keys.network_issue_btn>=this.network_btn_doms.length)
