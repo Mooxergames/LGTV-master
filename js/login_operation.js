@@ -426,11 +426,10 @@ var login_page={
                 that.goToHomePage();
 
             }).fail(function () {
-                // that.hideLoadImage();
-                // $('#login-page-error-playlists-container').show();
-                // if(that.keys.focused_part!=='turn_off_modal')
-                //     that.keys.focused_part="playlist_selection";
-                that.goHomePageWithPlaylistError();
+                that.hideLoadImage();
+                $('#network-issue-container').show();
+                that.keys.focused_part = "network_issue_btn";
+                that.hoverNetworkIssueBtn(0);
             })
         }
     },
