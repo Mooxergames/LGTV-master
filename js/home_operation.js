@@ -1052,8 +1052,8 @@ var home_page={
     },
     hoverSortKey:function(index){
         var keys=this.keys;
-        keys.focused_part="sort_selection";
         keys.sort_selection=index;
+        keys.focused_part='sort_selection';
         $(this.sort_selection_doms).removeClass('active');
         $(this.sort_selection_doms[index]).addClass('active');
     },
