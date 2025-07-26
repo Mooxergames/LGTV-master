@@ -101,42 +101,59 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    background: #ff6a00;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     transform: translate(-50%, -50%);
     padding: 40px;
-    border-radius: 10px;
-    width: 600px;
+    border-radius: 15px;
+    width: 700px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 2px solid #4a90e2;
     display: none;
 }
 #network-issue-icon {
     display: block;
-    height: 100px;
-    margin:0 auto;
+    height: 80px;
+    margin: 0 auto 20px auto;
+}
+#network-issue-title {
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
 }
 #network-issue-text {
-    color: #ffff00;
-    font-size: 30px;
-    text-align: justify;
-    margin-top: 30px;
+    color: #e8f4fd;
+    font-size: 24px;
+    text-align: left;
+    line-height: 1.5;
+    margin-bottom: 30px;
 }
 #network-issue-btns-container{
     text-align: center;
-    margin-top:25px;
+    margin-top: 25px;
 }
 .network-issue-btn {
     color: #fff;
-    font-size: 30px;
-    padding: 5px 30px;
-    width: 200px;
-    border-radius: 5px;
-    background: #444;
+    font-size: 26px;
+    padding: 12px 24px;
+    width: 180px;
+    border-radius: 8px;
+    background: #34495e;
     display: inline-block;
     vertical-align: middle;
     border: 3px solid transparent;
     background-clip: padding-box;
+    margin: 0 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+.network-issue-btn:hover,
 .network-issue-btn.active{
-    background: #42a5f5;
+    background: #3498db;
+    border-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
 }
 #login-page-mac-address-container {
     color: #fff;

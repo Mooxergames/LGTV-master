@@ -244,6 +244,33 @@ var login_page={
             showToast("Sorry","You can not use our service now, please extend your expire date by paying us")
         }
     },
+    fallbackToLocalDemo: function() {
+        var that = this;
+        console.log("Falling back to local demo playlist");
+
+        // Set up demo playlist configuration
+        settings.playlist_type = "type1";
+        settings.playlist_url = "demoo.m3u";
+        api_host_url = settings.playlist_url;
+
+        // Clear any existing data to force fresh load
+        localStorage.removeItem(storage_id+'api_data');
+
+        // Hide loading and network issue dialog
+        that.hideLoadImage();
+        $('#network-issue-container').hide();
+
+        // Show loading while processing demo playlist
+        that.showLoadImage();
+
+        // Proceed with login using demo playlist
+        that.proceed_login();
+
+        // Show a toast to inform user they're using demo content
+        setTimeout(function() {
+            showToast("Demo Mode", "You are now using demo content with limited functionality");
+        }, 2000);
+    },
     convertXtremeToM3u:function(){
         settings.playlist_type="type1";
         api_host_url=settings.playlist_url;
