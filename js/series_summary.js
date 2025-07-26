@@ -158,10 +158,23 @@ var series_summary_page={
                     SeriesModel.removeRecentOrFavouriteMovie(current_series.series_id,"favourite");
                     current_series.is_favourite=false;
                 }
+                this.updateFavoriteButton();
                 break;
             case tvKey.ENTER:
                 this.handleMenuClick();
                 break;
+        }
+    },
+    
+    updateFavoriteButton: function() {
+        if(current_series.is_favourite){
+            $(this.buttons[2]).data('action','remove');
+            $(this.buttons[2]).find('.vod-series-action-btn-txt').text('Remove Favourite');
+            $(this.buttons[2]).find('i').removeClass('fa-heart-o').addClass('fa-heart');
+        } else {
+            $(this.buttons[2]).data('action','add');
+            $(this.buttons[2]).find('.vod-series-action-btn-txt').text('Add Favourite');
+            $(this.buttons[2]).find('i').removeClass('fa-heart').addClass('fa-heart-o');
         }
     }
 }

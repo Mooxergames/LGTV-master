@@ -11,18 +11,24 @@ var vod_summary_page={
         this.prev_route=prev_route;
         this.min_btn_index=0;
         var that=this;
-        $('#vod-summary-image-wrapper img').attr('src','');
-        $('#vod-summary-name').text(current_movie.name);
+        
+        // Show loading states
+        this.showLoadingStates();
+        
+        // Set basic movie info
+        $('#vod-summary-name').text(current_movie.name || 'Unknown Title');
         $('#vod-watch-trailer-button').hide();
-        $('#vod-summary-release-date').text("");
-        $('#vod-summary-release-genre').text("");
-        $('#vod-summary-release-length').text("");
-        $('#vod-summary-release-country').text("");
+        
+        // Set poster image with fallback
+        var posterSrc = current_movie.stream_icon || 'images/movie_image.png';
+        $('#vod-summary-image-wrapper img').attr('src', posterSrc);
+        
+        // Clear background image initially
         $('.vod-series-background-img').attr('src','');
-        $('#vod-summary-release-director').text("");
-        $('#vod-summary-release-cast').text("");
-        $('#vod-summary-image-wrapper img').attr('src',current_movie.stream_icon);
-        $('#vod-summary-description').text("");
+        
+        // Clear detailed info initially
+        this.clearDetailedInfo();
+        
         that.hoverButtons(1);
         if(current_movie.is_favourite){
             $(this.buttons[2]).data('action','remove')
@@ -44,14 +50,11 @@ var vod_summary_page={
         current_movie.youtube_trailer="";
         current_route="vod-summary-page";
 
-        $('#current-vod-category').text('');
-        var categories=VodModel.categories;
-        for(var i=0;i<categories.length;i++){
-            if(categories[i].category_id==current_movie.category_id){
-                $('#current-vod-category').text(categories[i].category_name);
-                break;
-            }
-        }
+        // Set category with better styling
+        this.setCategoryInfo();
+        
+        // Enhanced button state management
+        this.updateFavoriteButton();
 
         home_page.Exit();
         $('#vod-summary-page').show();
@@ -63,31 +66,20 @@ var vod_summary_page={
                     function(response){
                         showLoader(false);
                         that.is_loading=false;
-                        var info=response.info;
-                        $('#vod-summary-release-date').text(info.releasedate);
-                        $('#vod-summary-release-genre').text(info.genre);
-                        $('#vod-summary-release-length').text(info.duration);
-                        $('#vod-summary-release-country').text(info.country ? info.country : '');
-                        $('#vod-summary-release-director').text(info.director);
-                        $('#vod-summary-release-cast').text(info.cast);
-                        $('#vod-summary-description').text(info.description);
+                        var info = response.info;
+                        
+                        // Use new helper method to populate detailed info
+                        that.populateDetailedInfo(info);
 
-                        var backdrop_image='';
-                        try{
-                            backdrop_image=info.backdrop_path[0];
-                        }catch (e) {
-                        }
-                        if(backdrop_image)
-                            $('.vod-series-background-img').attr('src',backdrop_image);
-
+                        // Handle trailer button visibility
                         if(typeof info.youtube_trailer!='undefined' && info.youtube_trailer!=null && info.youtube_trailer.trim()!==''){
                             that.min_btn_index=0;
                             $('#vod-watch-trailer-button').show();
-                        }else{
+                        } else {
                             that.min_btn_index=1;
                             $('#vod-watch-trailer-button').hide();
                         }
-                        current_movie.youtube_trailer=response.info.youtube_trailer;
+                        current_movie.youtube_trailer = response.info.youtube_trailer;
                     }
                 )
                 .fail(
@@ -193,11 +185,81 @@ var vod_summary_page={
                     VodModel.removeRecentOrFavouriteMovie(current_movie.stream_id,"favourite");
                     current_movie.is_favourite=false;
                 }
+                this.updateFavoriteButton();
                 break;
             case tvKey.BLUE:
                 this.Exit();
                 goHomePageWithMovieType('series');
                 break;
+        }
+    },
+    
+    showLoadingStates: function() {
+        // Add loading class to elements that will be populated
+        $('.vod-summary-item-text').addClass('detail-loading').text('Loading...');
+        $('#vod-summary-description').addClass('detail-loading').text('Loading description...');
+    },
+    
+    clearDetailedInfo: function() {
+        $('#vod-summary-release-date').text("");
+        $('#vod-summary-release-genre').text("");
+        $('#vod-summary-release-length').text("");
+        $('#vod-summary-release-country').text("");
+        $('#vod-summary-release-director').text("");
+        $('#vod-summary-release-cast').text("");
+        $('#vod-summary-description').text("");
+    },
+    
+    setCategoryInfo: function() {
+        $('#current-vod-category').text('');
+        var categories = VodModel.categories;
+        for(var i = 0; i < categories.length; i++){
+            if(categories[i].category_id == current_movie.category_id){
+                $('#current-vod-category').text(categories[i].category_name);
+                break;
+            }
+        }
+        
+        // If no category found, show default
+        if($('#current-vod-category').text() === '') {
+            $('#current-vod-category').text('Movies');
+        }
+    },
+    
+    updateFavoriteButton: function() {
+        if(current_movie.is_favourite){
+            $(this.buttons[2]).data('action','remove');
+            $(this.buttons[2]).find('.vod-series-action-btn-txt').text('Remove Favourite');
+            $(this.buttons[2]).find('i').removeClass('fa-heart-o').addClass('fa-heart');
+        } else {
+            $(this.buttons[2]).data('action','add');
+            $(this.buttons[2]).find('.vod-series-action-btn-txt').text('Add Favourite');
+            $(this.buttons[2]).find('i').removeClass('fa-heart').addClass('fa-heart-o');
+        }
+    },
+    
+    populateDetailedInfo: function(info) {
+        // Remove loading states
+        $('.vod-summary-item-text').removeClass('detail-loading');
+        $('#vod-summary-description').removeClass('detail-loading');
+        
+        // Populate with actual data or fallbacks
+        $('#vod-summary-release-date').text(info.releasedate || 'Unknown');
+        $('#vod-summary-release-genre').text(info.genre || 'Not specified');
+        $('#vod-summary-release-length').text(info.duration || 'Unknown duration');
+        $('#vod-summary-release-country').text(info.country || 'Unknown');
+        $('#vod-summary-release-director').text(info.director || 'Unknown');
+        $('#vod-summary-release-cast').text(info.cast || 'Not available');
+        $('#vod-summary-description').text(info.description || 'No description available.');
+        
+        // Set backdrop image if available
+        try {
+            var backdrop_image = info.backdrop_path && info.backdrop_path[0];
+            if(backdrop_image) {
+                $('.vod-series-background-img').attr('src', backdrop_image);
+            }
+        } catch (e) {
+            console.log('Error setting backdrop image:', e);
         }
     }
 }
