@@ -674,7 +674,22 @@ var login_page={
                 this.handleMenuClick();
                 break;
             case tvKey.RETURN:
-                if(this.keys.focused_part==="playlist_selection" || this.keys.focused_part==="network_issue_btn"){
+                if(this.keys.focused_part==="playlist_modal"){
+                    // When playlist modal is open, RETURN key should only close the modal
+                    $('#playlist-selection-modal').hide();
+                    this.keys.focused_part="network_issue_btn";
+                    // Refresh network button focus
+                    this.network_btn_doms = $('.network-issue-btn');
+                    $('.network-issue-btn').removeClass('active');
+                    if(this.network_btn_doms[this.keys.network_issue_btn]) {
+                        $(this.network_btn_doms[this.keys.network_issue_btn]).addClass('active');
+                    }
+                }
+                else if(this.keys.focused_part==="network_issue_btn"){
+                    // When network issue modal is open, RETURN key should trigger "Continue Anyway"
+                    this.fallbackToLocalDemo();
+                }
+                else if(this.keys.focused_part==="playlist_selection"){
                     $('#turn-off-modal').modal('show');
                     this.keys.focused_part="turn_off_modal";
                     this.keys.turn_off_modal=0;
@@ -689,16 +704,6 @@ var login_page={
                         this.keys.focused_part="playlist_selection";
                     else
                         this.keys.focused_part="network_issue_btn";
-                }
-                else if(this.keys.focused_part==="playlist_modal"){
-                    $('#playlist-selection-modal').hide();
-                    this.keys.focused_part="network_issue_btn";
-                    // Refresh network button focus
-                    this.network_btn_doms = $('.network-issue-btn');
-                    $('.network-issue-btn').removeClass('active');
-                    if(this.network_btn_doms[this.keys.network_issue_btn]) {
-                        $(this.network_btn_doms[this.keys.network_issue_btn]).addClass('active');
-                    }
                 }
                 break;
         }
