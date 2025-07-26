@@ -147,3 +147,18 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+.category-rating-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.category-rating-wrapper #current-vod-category,
+.category-rating-wrapper #current-series-category {
+    flex: 1;
+    margin-right: 20px;
+    margin-bottom: 0;
+}
