@@ -221,14 +221,22 @@ var login_page={
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
         
-        // Refresh button references to include dynamically added buttons
+        // Always refresh button references to include dynamically added buttons
         this.network_btn_doms = $('.network-issue-btn');
+        
+        // Clear all active states first to prevent multiple selections
+        $('.network-issue-btn').removeClass('active');
         
         // Ensure index is within bounds
         if(index >= 0 && index < this.network_btn_doms.length) {
             keys.network_issue_btn = index;
-            $(this.network_btn_doms).removeClass('active');
             $(this.network_btn_doms[index]).addClass('active');
+        } else {
+            // If index is out of bounds, default to first button
+            keys.network_issue_btn = 0;
+            if(this.network_btn_doms.length > 0) {
+                $(this.network_btn_doms[0]).addClass('active');
+            }
         }
     },
     login:function(){
@@ -444,10 +452,11 @@ var login_page={
         // Update network issue text to include playlist selection if multiple playlists exist
         if (playlist_urls && playlist_urls.length > 1) {
             var playlistOptionsHtml = '<div id="playlist-selection-in-error"><strong>Or try a different playlist:</strong><br>';
-            var buttonIndex = 2; // Start after Retry (0) and Continue Anyway (1)
+            var buttonIndex = 3; // Start after Retry (0), Continue Anyway (1), Exit (2)
             for (var i = 0; i < playlist_urls.length; i++) {
                 if (i !== keys.playlist_selection) { // Don't show current failing playlist
                     playlistOptionsHtml += '<div class="network-issue-btn playlist-option-btn" ' +
+                        'data-playlist-index="' + i + '" ' +
                         'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
                         'onmouseenter="login_page.hoverNetworkIssueBtn(' + buttonIndex + ')">' +
                         'Playlist ' + (i + 1) + '</div>';
@@ -495,6 +504,10 @@ var login_page={
     selectPlaylistFromError: function(playlistIndex) {
         var that = this;
         var keys = this.keys;
+
+        // Clear all active states first
+        $('.network-issue-btn').removeClass('active');
+        $('.login-playlist-item-wrapper').removeClass('active');
 
         // Update selected playlist
         keys.playlist_selection = playlistIndex;
@@ -565,26 +578,43 @@ var login_page={
             $(buttons[keys.turn_off_modal]).addClass('active');
         }
         else if(keys.focused_part==="network_issue_btn"){
+            // Refresh button references before navigation
+            this.network_btn_doms = $('.network-issue-btn');
+            
             keys.network_issue_btn+=increment;
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=this.network_btn_doms.length-1;
             if(keys.network_issue_btn>=this.network_btn_doms.length)
                 keys.network_issue_btn=0;
-            $(this.network_btn_doms).removeClass('active');
-            $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            
+            // Clear all active states first
+            $('.network-issue-btn').removeClass('active');
+            
+            // Set active state only on the selected button
+            if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
+                $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            }
         }
     },
     handleMenuLeftRight:function(increment){
         var keys=this.keys;
         if(keys.focused_part==="network_issue_btn"){
+            // Refresh button references before navigation
+            this.network_btn_doms = $('.network-issue-btn');
+            
             keys.network_issue_btn+=increment;
-            this.network_btn_doms=$('.network-issue-btn');
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=0;
             else if(keys.network_issue_btn>=this.network_btn_doms.length)
                 keys.network_issue_btn=this.network_btn_doms.length-1;
-            $(this.network_btn_doms).removeClass('active');
-            $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            
+            // Clear all active states first
+            $('.network-issue-btn').removeClass('active');
+            
+            // Set active state only on the selected button
+            if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
+                $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            }
         }
         if(keys.focused_part==="turn_off_modal"){
             keys.turn_off_modal+=increment;
