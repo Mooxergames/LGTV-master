@@ -248,6 +248,67 @@
         0 4px 12px rgba(79, 172, 254, 0.1) !important;
 }
 
+/* Different playlist button colors */
+.playlist-option-btn.playlist-type-demo {
+    background: rgba(255, 193, 7, 0.15) !important;
+    border: 1px solid rgba(255, 193, 7, 0.3) !important;
+    color: #ffc107 !important;
+}
+
+.playlist-option-btn.playlist-type-demo:hover,
+.playlist-option-btn.playlist-type-demo.active {
+    background: rgba(255, 193, 7, 0.25) !important;
+    border-color: rgba(255, 193, 7, 0.5) !important;
+    box-shadow: 
+        0 8px 24px rgba(255, 193, 7, 0.2),
+        0 4px 12px rgba(255, 193, 7, 0.1) !important;
+}
+
+.playlist-option-btn.playlist-type-xtreme {
+    background: rgba(40, 167, 69, 0.15) !important;
+    border: 1px solid rgba(40, 167, 69, 0.3) !important;
+    color: #28a745 !important;
+}
+
+.playlist-option-btn.playlist-type-xtreme:hover,
+.playlist-option-btn.playlist-type-xtreme.active {
+    background: rgba(40, 167, 69, 0.25) !important;
+    border-color: rgba(40, 167, 69, 0.5) !important;
+    box-shadow: 
+        0 8px 24px rgba(40, 167, 69, 0.2),
+        0 4px 12px rgba(40, 167, 69, 0.1) !important;
+}
+
+.playlist-option-btn.playlist-type-m3u {
+    background: rgba(220, 53, 69, 0.15) !important;
+    border: 1px solid rgba(220, 53, 69, 0.3) !important;
+    color: #dc3545 !important;
+}
+
+.playlist-option-btn.playlist-type-m3u:hover,
+.playlist-option-btn.playlist-type-m3u.active {
+    background: rgba(220, 53, 69, 0.25) !important;
+    border-color: rgba(220, 53, 69, 0.5) !important;
+    box-shadow: 
+        0 8px 24px rgba(220, 53, 69, 0.2),
+        0 4px 12px rgba(220, 53, 69, 0.1) !important;
+}
+
+.playlist-option-btn.playlist-type-default {
+    background: rgba(108, 117, 125, 0.15) !important;
+    border: 1px solid rgba(108, 117, 125, 0.3) !important;
+    color: #6c757d !important;
+}
+
+.playlist-option-btn.playlist-type-default:hover,
+.playlist-option-btn.playlist-type-default.active {
+    background: rgba(108, 117, 125, 0.25) !important;
+    border-color: rgba(108, 117, 125, 0.5) !important;
+    box-shadow: 
+        0 8px 24px rgba(108, 117, 125, 0.2),
+        0 4px 12px rgba(108, 117, 125, 0.1) !important;
+}
+
 #playlist-selection-in-error {
     margin-top: 20px;
     padding: 20px;
@@ -275,24 +336,7 @@
     margin-bottom: 12px;
     letter-spacing: 0.025em;
 }
-    padding: 12px 24px;
-    width: 180px;
-    border-radius: 8px;
-    background: #34495e;
-    display: inline-block;
-    vertical-align: middle;
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    margin: 0 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.network-issue-btn:hover,
-.network-issue-btn.active{
-    background: #3498db;
-    border-color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    /* Removed duplicate styles */
 }
 #login-page-mac-address-container {
     color: #fff;
