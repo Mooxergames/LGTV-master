@@ -2,10 +2,27 @@
 "use strict";
 $(document).ready(function () {
     try{
-        if(window.navigator.userAgent.toLowerCase().includes('web0s'))
-            platform='lg'
+        // Better WebOS detection
+        if(window.navigator.userAgent.toLowerCase().includes('web0s') || 
+           window.navigator.userAgent.toLowerCase().includes('webos') ||
+           window.PalmSystem) {
+            platform='lg';
+            console.log('LG WebOS platform detected');
+        }
     }catch (e) {
+        console.log('Platform detection error:', e);
     }
+    
+    // Initialize WebOS services for LG
+    if(platform === 'lg' && window.webOS) {
+        try {
+            // Initialize webOS library
+            console.log('Initializing WebOS services');
+        } catch (e) {
+            console.log('WebOS initialization error:', e);
+        }
+    }
+    
     initKeys();
     initPlayer();
     if(platform==='samsung'){

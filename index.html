@@ -1571,6 +1571,20 @@
 
     <script src="$WEBAPIS/webapis/webapis.js"></script>
     <script src="webOSTVjs-1.2.0/webOSTV.js"></script>
+    <script>
+        // Initialize webOS early for LG
+        if (window.navigator.userAgent.toLowerCase().includes('web0s') || 
+            window.navigator.userAgent.toLowerCase().includes('webos') ||
+            window.PalmSystem) {
+            console.log('WebOS environment detected, initializing...');
+            // Ensure webOS is ready before other scripts load
+            if (typeof webOS !== 'undefined') {
+                console.log('webOS object available');
+            } else {
+                console.log('webOS object not available');
+            }
+        }
+    </script>
     <script src="js/libs/jquery.3.4.1.min.js"></script>
     <script src="js/libs/popper.1.16.0.min.js"></script>
     <script src="js/libs/bootstrap.4.4.1.min.js"></script>

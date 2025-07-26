@@ -264,6 +264,13 @@ var login_page={
     getLgMacAddress: function() {
         var that = this;
         
+        // Check if webOS is available
+        if (typeof webOS === 'undefined' || !webOS.service) {
+            console.log('LG: webOS service not available, using hardcoded MAC');
+            that.getLgHardcodedMac();
+            return;
+        }
+        
         // Try LGUDID first (current primary method)
         try {
             webOS.service.request("luna://com.webos.service.sm", {
@@ -283,17 +290,17 @@ var login_page={
                         }
                         that.fetchPlaylistInformation();
                     } else {
-                        // Fallback to Ethernet
+                        console.log('LG: LGUDID response invalid, trying Ethernet');
                         that.getLgEthernetMac();
                     }
                 },
                 onFailure: function (inError) {
-                    console.log('LG: LGUDID failed, trying Ethernet');
+                    console.log('LG: LGUDID failed, trying Ethernet', inError);
                     that.getLgEthernetMac();
                 }
             });
         } catch (e) {
-            console.log('LG: LGUDID exception, trying Ethernet');
+            console.log('LG: LGUDID exception, trying Ethernet', e);
             that.getLgEthernetMac();
         }
     },
@@ -301,28 +308,39 @@ var login_page={
     getLgEthernetMac: function() {
         var that = this;
         
+        if (typeof webOS === 'undefined' || !webOS.service) {
+            console.log('LG: webOS service not available for Ethernet, using hardcoded MAC');
+            that.getLgHardcodedMac();
+            return;
+        }
+        
         try {
-            // Try to get ethernet info on LG
+            // Try to get ethernet info on LG - use different service paths
             webOS.service.request("luna://com.webos.service.connectionmanager", {
                 method: "getStatus",
                 parameters: {},
                 onSuccess: function (inResponse) {
+                    console.log('LG: Ethernet response:', inResponse);
                     if (inResponse && inResponse.wired && inResponse.wired.macAddress) {
                         console.log('LG: Using Ethernet MAC address');
                         mac_address = inResponse.wired.macAddress;
                         that.fetchPlaylistInformation();
+                    } else if (inResponse && inResponse.ethernet && inResponse.ethernet.macAddress) {
+                        console.log('LG: Using Ethernet MAC address (alternate path)');
+                        mac_address = inResponse.ethernet.macAddress;
+                        that.fetchPlaylistInformation();
                     } else {
-                        // Final fallback - hardcoded MAC
+                        console.log('LG: No MAC found in ethernet response, using hardcoded MAC');
                         that.getLgHardcodedMac();
                     }
                 },
                 onFailure: function (inError) {
-                    console.log('LG: Ethernet failed, using hardcoded MAC');
+                    console.log('LG: Ethernet failed, using hardcoded MAC', inError);
                     that.getLgHardcodedMac();
                 }
             });
         } catch (e) {
-            console.log('LG: Ethernet exception, using hardcoded MAC');
+            console.log('LG: Ethernet exception, using hardcoded MAC', e);
             that.getLgHardcodedMac();
         }
     },
@@ -342,11 +360,33 @@ var login_page={
         keys.focused_part="playlist_selection";
         mac_address='52:54:00:12:34:58'; // Default fallback
         
+        // Add timeout for MAC address retrieval
+        var macTimeout = setTimeout(function() {
+            console.log('MAC address retrieval timeout, using hardcoded MAC');
+            if (!mac_address || mac_address === '52:54:00:12:34:58') {
+                if (platform === 'lg') {
+                    mac_address = '52:54:00:12:34:59';
+                } else {
+                    mac_address = '52:54:00:12:34:58';
+                }
+                that.fetchPlaylistInformation();
+            }
+        }, 5000); // 5 second timeout
+        
         if(platform==='samsung'){
             that.getSamsungMacAddress();
         }
         else if(platform==='lg'){
+            // Clear timeout if MAC is retrieved successfully
+            var originalFetch = that.fetchPlaylistInformation;
+            that.fetchPlaylistInformation = function() {
+                clearTimeout(macTimeout);
+                originalFetch.call(that);
+            };
             that.getLgMacAddress();
+        } else {
+            clearTimeout(macTimeout);
+            that.fetchPlaylistInformation();
         }
     },
     hoverNetworkIssueBtn:function(index){
