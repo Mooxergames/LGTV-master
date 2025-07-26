@@ -463,7 +463,8 @@ var login_page={
         );
 
         // Hide or show Choose Playlist button based on playlist count
-        if (playlist_urls && playlist_urls.length > 1) {
+        var playlistCount = playlist_urls ? playlist_urls.length : 0;
+        if (playlistCount > 1) {
             // Show Choose Playlist button when multiple playlists exist
             $('#choose-playlist-btn').show();
         } else {
