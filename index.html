@@ -62,20 +62,31 @@
             <div id="network-issue-container">
                 <div id="network-issue-content-wrapper">
                     <img id="network-issue-icon" src="images/network-issue.png">
+                    <div id="network-issue-title">
+                        Playlist Connection Error
+                    </div>
                     <div id="network-issue-text">
-                        Sorry, network disconnected.
-                        Please check your network state and try again.
+                        We couldn't load your playlist. This may be due to one of the following reasons:<br>
+                        🔌 Network issue – Please check your internet connection.<br>
+                        🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>
+                        You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.
                     </div>
                     <div id="network-issue-btns-container">
                         <div class="network-issue-btn"
                              onclick="login_page.getPlayListDetail()"
                              onmouseenter="login_page.hoverNetworkIssueBtn(0)"
                         >
-                            Retry.
+                            Retry
+                        </div>
+                        <div class="network-issue-btn"
+                             onclick="login_page.fallbackToLocalDemo()"
+                             onmouseenter="login_page.hoverNetworkIssueBtn(1)"
+                        >
+                            Continue Anyway
                         </div>
                         <div class="network-issue-btn"
                              onclick="closeApp()"
-                             onmouseenter="login_page.hoverNetworkIssueBtn(1)"
+                             onmouseenter="login_page.hoverNetworkIssueBtn(2)"
                         >
                             Exit
                         </div>

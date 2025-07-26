@@ -221,6 +221,7 @@ var login_page={
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
         keys.network_issue_btn=index;
+        this.network_btn_doms=$('.network-issue-btn');
         $(this.network_btn_doms).removeClass('active');
         $(this.network_btn_doms[index]).addClass('active');
     },
@@ -242,6 +243,33 @@ var login_page={
         else{
             showToast("Sorry","You can not use our service now, please extend your expire date by paying us")
         }
+    },
+    fallbackToLocalDemo: function() {
+        var that = this;
+        console.log("Falling back to local demo playlist");
+
+        // Set up demo playlist configuration
+        settings.playlist_type = "type1";
+        settings.playlist_url = "demoo.m3u";
+        api_host_url = settings.playlist_url;
+
+        // Clear any existing data to force fresh load
+        localStorage.removeItem(storage_id+'api_data');
+
+        // Hide loading and network issue dialog
+        that.hideLoadImage();
+        $('#network-issue-container').hide();
+
+        // Show loading while processing demo playlist
+        that.showLoadImage();
+
+        // Proceed with login using demo playlist
+        that.proceed_login();
+
+        // Show a toast to inform user they're using demo content
+        setTimeout(function() {
+            showToast("Demo Mode", "You are now using demo content with limited functionality");
+        }, 2000);
     },
     convertXtremeToM3u:function(){
         settings.playlist_type="type1";
@@ -398,13 +426,55 @@ var login_page={
                 that.goToHomePage();
 
             }).fail(function () {
-                // that.hideLoadImage();
-                // $('#login-page-error-playlists-container').show();
-                // if(that.keys.focused_part!=='turn_off_modal')
-                //     that.keys.focused_part="playlist_selection";
-                that.goHomePageWithPlaylistError();
+                that.hideLoadImage();
+                that.showNetworkIssueWithPlaylistOptions();
             })
         }
+    },
+    showNetworkIssueWithPlaylistOptions: function() {
+        var that = this;
+        var keys = this.keys;
+        
+        // Update network issue text to include playlist selection if multiple playlists exist
+        if (playlist_urls && playlist_urls.length > 1) {
+            var playlistOptionsHtml = '<div id="playlist-selection-in-error"><br><strong>Or try a different playlist:</strong><br>';
+            for (var i = 0; i < playlist_urls.length; i++) {
+                if (i !== keys.playlist_selection) { // Don't show current failing playlist
+                    playlistOptionsHtml += '<div class="network-issue-btn playlist-option-btn" ' +
+                        'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
+                        'onmouseenter="login_page.hoverNetworkIssueBtn(' + (3 + (i > keys.playlist_selection ? i - 1 : i)) + ')">' +
+                        'Playlist ' + (i + 1) + '</div>';
+                }
+            }
+            playlistOptionsHtml += '</div>';
+            
+            $('#network-issue-text').html(
+                'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
+                '🔌 Network issue – Please check your internet connection.<br>' +
+                '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+                'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.' +
+                playlistOptionsHtml
+            );
+        }
+        
+        $('#network-issue-container').show();
+        keys.focused_part = "network_issue_btn";
+        that.hoverNetworkIssueBtn(0);
+    },
+    selectPlaylistFromError: function(playlistIndex) {
+        var that = this;
+        var keys = this.keys;
+        
+        // Update selected playlist
+        keys.playlist_selection = playlistIndex;
+        settings.saveSettings('playlist_url', playlist_urls[playlistIndex], '');
+        settings.saveSettings('playlist_url_index', playlistIndex, '');
+        parseM3uUrl();
+        
+        // Hide network issue dialog and try new playlist
+        $('#network-issue-container').hide();
+        that.showLoadImage();
+        that.proceed_login();
     },
     handleMenuClick:function(){
         var keys=this.keys;
@@ -447,6 +517,7 @@ var login_page={
         var keys=this.keys;
         if(keys.focused_part==="network_issue_btn"){
             keys.network_issue_btn+=increment;
+            this.network_btn_doms=$('.network-issue-btn');
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=0;
             else if(keys.network_issue_btn>=this.network_btn_doms.length)
