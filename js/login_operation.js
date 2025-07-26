@@ -464,12 +464,21 @@ var login_page={
 
         // Hide or show Choose Playlist button based on playlist count
         var playlistCount = playlist_urls ? playlist_urls.length : 0;
+        console.log("Playlist count:", playlistCount, "playlist_urls:", playlist_urls);
+        
+        // Find the Choose Playlist button by its onclick attribute
+        var choosePlaylistBtn = $('.network-issue-btn').filter(function() {
+            return $(this).attr('onclick') === 'login_page.showPlaylistSelectionModal()';
+        });
+        
         if (playlistCount > 1) {
             // Show Choose Playlist button when multiple playlists exist
-            $('#choose-playlist-btn').show();
+            choosePlaylistBtn.show();
+            console.log("Showing Choose Playlist button - multiple playlists available");
         } else {
             // Hide Choose Playlist button when only one or no playlist exists
-            $('#choose-playlist-btn').hide();
+            choosePlaylistBtn.hide();
+            console.log("Hiding Choose Playlist button - only one or no playlist available");
         }
 
         $('#network-issue-container').show();
