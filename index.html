@@ -1569,7 +1569,12 @@
         </div>
     </div>
 
-    <script src="$WEBAPIS/webapis/webapis.js"></script>
+    <script>
+        // Conditionally load WebOS APIs only if available
+        if (window.navigator.userAgent.toLowerCase().includes('web0s') && window.PalmSystem) {
+            document.write('<script src="$WEBAPIS/webapis/webapis.js"><\/script>');
+        }
+    </script>
     <script src="webOSTVjs-1.2.0/webOSTV.js"></script>
     <script src="js/libs/jquery.3.4.1.min.js"></script>
     <script src="js/libs/popper.1.16.0.min.js"></script>
@@ -1583,8 +1588,8 @@
     <script src="js/Models/LiveModel.js"></script>
     <script src="js/Models/SeriesModel.js"></script>
     <script src="js/settings.js"></script>
-    <script src="js/login_operation.js"></script>
     <script src="js/env.js"></script>
+    <script src="js/login_operation.js"></script>
     <script src="js/common.js"></script>
     <script src="js/home_operation.js"></script>
     <script src="js/catchup.js"></script>

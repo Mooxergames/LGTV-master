@@ -185,6 +185,13 @@ var login_page={
     getSamsungMacAddress: function() {
         var that = this;
         
+        // Check if we're actually in a Tizen environment
+        if (typeof tizen === 'undefined' || !tizen.systeminfo) {
+            console.log('Samsung: Not in Tizen environment, using hardcoded MAC');
+            that.getSamsungHardcodedMac();
+            return;
+        }
+        
         // Try Ethernet first (primary method)
         try {
             tizen.systeminfo.getPropertyValue('ETHERNET_NETWORK', function (data) {
@@ -263,6 +270,13 @@ var login_page={
     // LG fallback system: LGUDID -> Ethernet -> Hardcoded
     getLgMacAddress: function() {
         var that = this;
+        
+        // Check if we're actually in a WebOS environment
+        if (typeof webOS === 'undefined' || !webOS.service || typeof window.PalmServiceBridge === 'undefined') {
+            console.log('LG: Not in WebOS environment, using hardcoded MAC');
+            that.getLgHardcodedMac();
+            return;
+        }
         
         // Try LGUDID first (current primary method)
         try {
@@ -347,6 +361,12 @@ var login_page={
         }
         else if(platform==='lg'){
             that.getLgMacAddress();
+        }
+        else if(platform==='browser'){
+            // Browser environment - use hardcoded MAC and proceed
+            console.log('Browser: Using default MAC address');
+            mac_address = '52:54:00:12:34:60'; // Browser-specific MAC
+            that.fetchPlaylistInformation();
         }
     },
     hoverNetworkIssueBtn:function(index){
