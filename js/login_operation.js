@@ -428,7 +428,9 @@ var login_page={
 
             }).fail(function () {
                 that.hideLoadImage();
-                that.showNetworkIssueWithPlaylistOptions();
+                setTimeout(function() {
+                    that.showNetworkIssueWithPlaylistOptions();
+                }, 100);
             })
         }
     },
@@ -436,14 +438,23 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Update network issue text to include playlist selection if multiple playlists exist
+        // Remove any existing playlist selection
+        $('#playlist-selection-in-error').remove();
+
+        // Update network issue text
+        $('#network-issue-text').html(
+            'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
+            '🔌 Network issue – Please check your internet connection.<br>' +
+            '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+            'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
+        );
+
+        // Create playlist selection buttons if multiple playlists exist
         if (playlist_urls && playlist_urls.length > 1) {
-           // Create playlist selection buttons
-        if (playlist_urls && playlist_urls.length > 0) {
             var playlistHtml = '<div id="playlist-selection-in-error"><strong>Select Alternative Playlist:</strong><br>';
 
             playlist_urls.forEach(function(playlist, index) {
-                var displayName = playlist.name || `Playlist ${index + 1}`;
+                var displayName = playlist.name || 'Playlist ' + (index + 1);
                 var colorClass = '';
 
                 // Assign color classes based on playlist type or name
@@ -463,21 +474,14 @@ var login_page={
                     colorClass = 'playlist-type-default';
                 }
 
-                playlistHtml += `<button class="network-issue-btn playlist-option-btn ${colorClass}" onclick="login_page.selectPlaylistFromError(${index})">${displayName}</button>`;
+                playlistHtml += '<button class="network-issue-btn playlist-option-btn ' + colorClass + '" onclick="login_page.selectPlaylistFromError(' + index + ')">' + displayName + '</button>';
             });
 
             playlistHtml += '</div>';
-            $('#network-issue-container').before(playlistHtml);
+            $('#network-issue-btns-container').after(playlistHtml);
         }
 
-            $('#network-issue-text').html(
-                'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
-                '🔌 Network issue – Please check your internet connection.<br>' +
-                '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
-                'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
-            );
-        }
-
+        // Show the network issue container
         $('#network-issue-container').show();
         keys.focused_part = "network_issue_btn";
         that.hoverNetworkIssueBtn(0);
@@ -486,16 +490,23 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
+        console.log("Selecting playlist index:", playlistIndex);
+
         // Update selected playlist
         keys.playlist_selection = playlistIndex;
         settings.saveSettings('playlist_url', playlist_urls[playlistIndex], '');
         settings.saveSettings('playlist_url_index', playlistIndex, '');
         parseM3uUrl();
 
-        // Hide network issue dialog and try new playlist
+        // Hide network issue dialog and playlist selection
         $('#network-issue-container').hide();
+        $('#playlist-selection-in-error').remove();
+        
+        // Show loading and try new playlist
         that.showLoadImage();
-        that.proceed_login();
+        setTimeout(function() {
+            that.proceed_login();
+        }, 500);
     },
     handleMenuClick:function(){
         var keys=this.keys;
