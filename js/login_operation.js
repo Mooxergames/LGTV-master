@@ -481,16 +481,19 @@ var login_page={
             console.log("Hiding Choose Playlist button - only one or no playlist available");
         }
 
-        $('#network-issue-container').show();
+        // Show modal first, then handle focus after a brief delay to prevent freeze
+        $('#network-issue-container').hide().fadeIn(300);
 
-        // Refresh network button references after content update
+        // Refresh network button references after modal is fully shown
         setTimeout(function() {
-            that.network_btn_doms = $('.network-issue-btn');
+            that.network_btn_doms = $('.network-issue-btn:visible');
             keys.focused_part = "network_issue_btn";
             keys.network_issue_btn = 0;
             $(that.network_btn_doms).removeClass('active');
-            $(that.network_btn_doms[0]).addClass('active');
-        }, 100);
+            if(that.network_btn_doms.length > 0) {
+                $(that.network_btn_doms[0]).addClass('active');
+            }
+        }, 350);
     },
     selectPlaylistFromError: function(playlistIndex) {
         var that = this;
