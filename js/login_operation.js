@@ -4,7 +4,8 @@ var login_page={
         focused_part:"playlist_selection",
         playlist_selection:0,
         turn_off_modal:0,
-        network_issue_btn:0
+        network_issue_btn:0,
+        playlist_modal_selection:0
     },
     network_btn_doms:$('.network-issue-btn'),
     showLoadImage:function(){
@@ -449,35 +450,7 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Update network issue text to include playlist selection if multiple playlists exist
-        if (playlist_urls && playlist_urls.length > 1) {
-            var playlistOptionsHtml = '<div id="playlist-selection-in-error"><strong>Or try a different playlist:</strong><br>';
-            var buttonIndex = 3; // Start after Retry (0), Continue Anyway (1), Exit (2)
-            for (var i = 0; i < playlist_urls.length; i++) {
-                if (i !== keys.playlist_selection) { // Don't show current failing playlist
-                    playlistOptionsHtml += '<div class="network-issue-btn playlist-option-btn" ' +
-                        'data-playlist-index="' + i + '" ' +
-                        'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
-                        'onmouseenter="login_page.hoverNetworkIssueBtn(' + buttonIndex + ')">' +
-                        'Playlist ' + (i + 1) + '</div>';
-                    buttonIndex++;
-                }
-            }
-            playlistOptionsHtml += '</div>';
-
-            // Update network issue text with MAC address
-        $('#network-issue-text').html(
-            'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
-            '🔌 Network issue – Please check your internet connection.<br>' +
-            '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
-            '<div class="device-info-section">' +
-            '<strong>Device Information:</strong><br>' +
-            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
-            '</div>' +
-            'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'+ playlistOptionsHtml
-        );
-        }else{
-                // Update network issue text with MAC address
+        // Update network issue text with MAC address (no playlist options)
         $('#network-issue-text').html(
             'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
             '🔌 Network issue – Please check your internet connection.<br>' +
@@ -488,7 +461,6 @@ var login_page={
             '</div>' +
             'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
         );
-        }
 
         $('#network-issue-container').show();
         
@@ -514,10 +486,48 @@ var login_page={
         settings.saveSettings('playlist_url_index', playlistIndex, '');
         parseM3uUrl();
 
-        // Hide network issue dialog and try new playlist
+        // Hide playlist selection modal and network issue dialog
+        $('#playlist-selection-modal').hide();
         $('#network-issue-container').hide();
         that.showLoadImage();
         that.proceed_login();
+    },
+    showPlaylistSelectionModal: function() {
+        var that = this;
+        var keys = this.keys;
+
+        if (playlist_urls && playlist_urls.length > 1) {
+            var playlistOptionsHtml = '';
+            for (var i = 0; i < playlist_urls.length; i++) {
+                var isSelected = i === keys.playlist_selection ? ' playlist-selected' : '';
+                playlistOptionsHtml += '<div class="playlist-modal-item' + isSelected + '" ' +
+                    'data-playlist-index="' + i + '" ' +
+                    'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
+                    'onmouseenter="login_page.hoverPlaylistModalItem(' + i + ')">' +
+                    'Playlist ' + (i + 1) + 
+                    (i === keys.playlist_selection ? ' (Current)' : '') +
+                    '</div>';
+            }
+            
+            $('#playlist-modal-items').html(playlistOptionsHtml);
+            $('#playlist-selection-modal').show();
+            
+            // Set focus to playlist selection
+            keys.focused_part = "playlist_modal";
+            keys.playlist_modal_selection = keys.playlist_selection;
+            
+            // Highlight current selection
+            $('.playlist-modal-item').removeClass('active');
+            $('.playlist-modal-item[data-playlist-index="' + keys.playlist_selection + '"]').addClass('active');
+        }
+    },
+    hoverPlaylistModalItem: function(index) {
+        var keys = this.keys;
+        keys.focused_part = "playlist_modal";
+        keys.playlist_modal_selection = index;
+        
+        $('.playlist-modal-item').removeClass('active');
+        $('.playlist-modal-item[data-playlist-index="' + index + '"]').addClass('active');
     },
     handleMenuClick:function(){
         var keys=this.keys;
@@ -548,6 +558,12 @@ var login_page={
         }
         else if(keys.focused_part==="network_issue_btn"){
             $(this.network_btn_doms[keys.network_issue_btn]).trigger('click');
+        }
+        else if(keys.focused_part==="playlist_modal"){
+            var selectedItem = $('.playlist-modal-item')[keys.playlist_modal_selection];
+            if(selectedItem) {
+                $(selectedItem).trigger('click');
+            }
         }
     },
     handleMenuUpDown:function(increment){
@@ -593,6 +609,20 @@ var login_page={
             if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
                 $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
             }
+        }
+        else if(keys.focused_part==="playlist_modal"){
+            var playlistItems = $('.playlist-modal-item');
+            keys.playlist_modal_selection+=increment;
+            if(keys.playlist_modal_selection<0)
+                keys.playlist_modal_selection=playlistItems.length-1;
+            if(keys.playlist_modal_selection>=playlistItems.length)
+                keys.playlist_modal_selection=0;
+            
+            // Clear all active states first
+            playlistItems.removeClass('active');
+            
+            // Set active state only on the selected item
+            $(playlistItems[keys.playlist_modal_selection]).addClass('active');
         }
     },
     handleMenuLeftRight:function(increment){
@@ -659,6 +689,16 @@ var login_page={
                         this.keys.focused_part="playlist_selection";
                     else
                         this.keys.focused_part="network_issue_btn";
+                }
+                else if(this.keys.focused_part==="playlist_modal"){
+                    $('#playlist-selection-modal').hide();
+                    this.keys.focused_part="network_issue_btn";
+                    // Refresh network button focus
+                    this.network_btn_doms = $('.network-issue-btn');
+                    $('.network-issue-btn').removeClass('active');
+                    if(this.network_btn_doms[this.keys.network_issue_btn]) {
+                        $(this.network_btn_doms[this.keys.network_issue_btn]).addClass('active');
+                    }
                 }
                 break;
         }

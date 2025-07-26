@@ -85,11 +85,29 @@
                             Continue Anyway
                         </div>
                         <div class="network-issue-btn"
-                             onclick="closeApp()"
+                             onclick="login_page.showPlaylistSelectionModal()"
                              onmouseenter="login_page.hoverNetworkIssueBtn(2)"
+                        >
+                            Choose Playlist
+                        </div>
+                        <div class="network-issue-btn"
+                             onclick="closeApp()"
+                             onmouseenter="login_page.hoverNetworkIssueBtn(3)"
                         >
                             Exit
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlist Selection Modal -->
+            <div id="playlist-selection-modal">
+                <div id="playlist-modal-content">
+                    <div id="playlist-modal-title">
+                        Choose Playlist
+                    </div>
+                    <div id="playlist-modal-items">
+                        <!-- Playlist items will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
