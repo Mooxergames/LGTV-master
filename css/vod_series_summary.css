@@ -140,3 +140,10 @@
     border: 2px solid #f800b2;
     margin-top: 20px;
 }
+.vod-series-rating-container{
+    bottom: 20px;
+    right:20px;
+    position: fixed;
+    display: inline-block;
+    vertical-align: middle;
+}
