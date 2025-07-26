@@ -264,20 +264,6 @@ var login_page={
     getLgMacAddress: function() {
         var that = this;
         
-        // Check if we're in a real WebOS environment
-        var isRealWebOS = (
-            typeof window.PalmServiceBridge !== 'undefined' &&
-            typeof webOS !== 'undefined' && 
-            webOS.service &&
-            window.navigator.userAgent.toLowerCase().includes('webos')
-        );
-        
-        if (!isRealWebOS) {
-            console.log('LG: Not in real WebOS environment, using hardcoded MAC');
-            that.getLgHardcodedMac();
-            return;
-        }
-        
         // Try LGUDID first (current primary method)
         try {
             webOS.service.request("luna://com.webos.service.sm", {
@@ -314,13 +300,6 @@ var login_page={
 
     getLgEthernetMac: function() {
         var that = this;
-        
-        // Check if we're in a real WebOS environment
-        if (typeof window.PalmServiceBridge === 'undefined') {
-            console.log('LG: Not in real WebOS environment, using hardcoded MAC');
-            that.getLgHardcodedMac();
-            return;
-        }
         
         try {
             // Try to get ethernet info on LG
