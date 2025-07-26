@@ -160,6 +160,179 @@ var login_page={
             }
         });
     },
+    // Helper function to convert string to MAC format
+    stringToMacAddress: function(inputString) {
+        // Remove all non-alphanumeric characters and convert to uppercase
+        var cleanString = inputString.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        
+        // Take first 12 characters, pad with zeros if needed
+        while(cleanString.length < 12) {
+            cleanString += '0';
+        }
+        cleanString = cleanString.substring(0, 12);
+        
+        // Format as MAC address
+        var macAddress = '';
+        for(var i = 0; i < 12; i += 2) {
+            if(i > 0) macAddress += ':';
+            macAddress += cleanString.substring(i, i + 2);
+        }
+        
+        return macAddress;
+    },
+
+    // Samsung fallback system: Ethernet -> DUID -> Tizen ID -> Hardcoded
+    getSamsungMacAddress: function() {
+        var that = this;
+        
+        // Try Ethernet first (primary method)
+        try {
+            tizen.systeminfo.getPropertyValue('ETHERNET_NETWORK', function (data) {
+                if (data !== undefined && typeof data.macAddress !== 'undefined' && data.macAddress) {
+                    console.log('Samsung: Using Ethernet MAC address');
+                    mac_address = data.macAddress;
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Fallback to DUID
+                    that.getSamsungDuidMac();
+                }
+            }, function(error) {
+                console.log('Samsung: Ethernet failed, trying DUID');
+                that.getSamsungDuidMac();
+            });
+        } catch (e) {
+            console.log('Samsung: Ethernet exception, trying DUID');
+            that.getSamsungDuidMac();
+        }
+    },
+
+    getSamsungDuidMac: function() {
+        var that = this;
+        
+        try {
+            tizen.systeminfo.getPropertyValue('DUID', function (data) {
+                if (data !== undefined && typeof data.duid !== 'undefined' && data.duid) {
+                    console.log('Samsung: Using DUID for MAC address');
+                    var encodedDuid = btoa(data.duid); // Base64 encoding
+                    mac_address = that.stringToMacAddress(encodedDuid);
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Fallback to Tizen ID
+                    that.getSamsungTizenIdMac();
+                }
+            }, function(error) {
+                console.log('Samsung: DUID failed, trying Tizen ID');
+                that.getSamsungTizenIdMac();
+            });
+        } catch (e) {
+            console.log('Samsung: DUID exception, trying Tizen ID');
+            that.getSamsungTizenIdMac();
+        }
+    },
+
+    getSamsungTizenIdMac: function() {
+        var that = this;
+        
+        try {
+            tizen.systeminfo.getPropertyValue('BUILD', function (data) {
+                if (data !== undefined && typeof data.tizenID !== 'undefined' && data.tizenID) {
+                    console.log('Samsung: Using Tizen ID for MAC address');
+                    var encodedTizenId = btoa(data.tizenID); // Base64 encoding
+                    mac_address = that.stringToMacAddress(encodedTizenId);
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Final fallback - hardcoded MAC
+                    that.getSamsungHardcodedMac();
+                }
+            }, function(error) {
+                console.log('Samsung: Tizen ID failed, using hardcoded MAC');
+                that.getSamsungHardcodedMac();
+            });
+        } catch (e) {
+            console.log('Samsung: Tizen ID exception, using hardcoded MAC');
+            that.getSamsungHardcodedMac();
+        }
+    },
+
+    getSamsungHardcodedMac: function() {
+        console.log('Samsung: Using hardcoded MAC address');
+        mac_address = '52:54:00:12:34:58'; // Hardcoded fallback
+        this.fetchPlaylistInformation();
+    },
+
+    // LG fallback system: LGUDID -> Ethernet -> Hardcoded
+    getLgMacAddress: function() {
+        var that = this;
+        
+        // Try LGUDID first (current primary method)
+        try {
+            webOS.service.request("luna://com.webos.service.sm", {
+                method: "deviceid/getIDs",
+                parameters: {
+                    "idType": ["LGUDID"]
+                },
+                onSuccess: function (inResponse) {
+                    if (inResponse && inResponse.idList && inResponse.idList.length > 0 && inResponse.idList[0].idValue) {
+                        console.log('LG: Using LGUDID for MAC address');
+                        mac_address = "";
+                        var temp = inResponse.idList[0].idValue.replace(/['-]+/g, '');
+                        for(var i = 0; i <= 5; i++){
+                            mac_address += temp.substr(i*2, 2);
+                            if(i < 5)
+                                mac_address += ":";
+                        }
+                        that.fetchPlaylistInformation();
+                    } else {
+                        // Fallback to Ethernet
+                        that.getLgEthernetMac();
+                    }
+                },
+                onFailure: function (inError) {
+                    console.log('LG: LGUDID failed, trying Ethernet');
+                    that.getLgEthernetMac();
+                }
+            });
+        } catch (e) {
+            console.log('LG: LGUDID exception, trying Ethernet');
+            that.getLgEthernetMac();
+        }
+    },
+
+    getLgEthernetMac: function() {
+        var that = this;
+        
+        try {
+            // Try to get ethernet info on LG
+            webOS.service.request("luna://com.webos.service.connectionmanager", {
+                method: "getStatus",
+                parameters: {},
+                onSuccess: function (inResponse) {
+                    if (inResponse && inResponse.wired && inResponse.wired.macAddress) {
+                        console.log('LG: Using Ethernet MAC address');
+                        mac_address = inResponse.wired.macAddress;
+                        that.fetchPlaylistInformation();
+                    } else {
+                        // Final fallback - hardcoded MAC
+                        that.getLgHardcodedMac();
+                    }
+                },
+                onFailure: function (inError) {
+                    console.log('LG: Ethernet failed, using hardcoded MAC');
+                    that.getLgHardcodedMac();
+                }
+            });
+        } catch (e) {
+            console.log('LG: Ethernet exception, using hardcoded MAC');
+            that.getLgHardcodedMac();
+        }
+    },
+
+    getLgHardcodedMac: function() {
+        console.log('LG: Using hardcoded MAC address');
+        mac_address = '52:54:00:12:34:59'; // Different hardcoded MAC for LG
+        this.fetchPlaylistInformation();
+    },
+
     getPlayListDetail:function(){
         this.network_btn_doms=$('.network-issue-btn');
         this.showLoadImage();
@@ -167,55 +340,13 @@ var login_page={
         var that=this;
         var keys=this.keys;
         keys.focused_part="playlist_selection";
-        mac_address='52:54:00:12:34:58';
+        mac_address='52:54:00:12:34:58'; // Default fallback
+        
         if(platform==='samsung'){
-            try {
-                tizen.systeminfo.getPropertyValue('ETHERNET_NETWORK', function (data) {
-                    if (data !== undefined) {
-                        if (typeof data.macAddress != 'undefined') {
-                            mac_address = data.macAddress;
-                            that.fetchPlaylistInformation();
-                        } else {
-                            that.hideLoadImage();
-                            $('#network-issue-container').show();
-                            keys.focused_part = "network_issue_btn";
-                            keys.network_issue_btn = 0;
-                        }
-                    } else {
-                        that.hideLoadImage();
-                        $('#network-issue-container').show();
-                        keys.focused_part = "network_issue_btn";
-                        keys.network_issue_btn = 0;
-                    }
-                })
-            }catch (e) {
-                that.fetchPlaylistInformation();
-            }
+            that.getSamsungMacAddress();
         }
         else if(platform==='lg'){
-            webOS.service.request("luna://com.webos.service.sm", {
-                method: "deviceid/getIDs",
-                parameters: {
-                    "idType": ["LGUDID"]
-                },
-                onSuccess: function (inResponse) {
-                    mac_address="";
-                    var temp=inResponse.idList[0].idValue.replace(/['-]+/g, '');
-                    for(var i=0;i<=5;i++){
-                        mac_address+=temp.substr(i*2,2);
-                        if(i<5)
-                            mac_address+=":";
-                    }
-                    that.fetchPlaylistInformation();
-                },
-                onFailure: function (inError) {
-                    that.hideLoadImage();
-                    $('#network-issue-container').show();
-                    if(keys.focused_part!=='turn_off_modal')
-                        keys.focused_part="network_issue_btn";
-                    keys.network_issue_btn=0;
-                }
-            });
+            that.getLgMacAddress();
         }
     },
     hoverNetworkIssueBtn:function(index){
