@@ -450,7 +450,7 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Update network issue text with MAC address (no playlist options)
+        // Update network issue text with MAC address
         $('#network-issue-text').html(
             'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
             '🔌 Network issue – Please check your internet connection.<br>' +
@@ -461,6 +461,15 @@ var login_page={
             '</div>' +
             'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
         );
+
+        // Hide or show Choose Playlist button based on playlist count
+        if (playlist_urls && playlist_urls.length > 1) {
+            // Show Choose Playlist button when multiple playlists exist
+            $('#choose-playlist-btn').show();
+        } else {
+            // Hide Choose Playlist button when only one or no playlist exists
+            $('#choose-playlist-btn').hide();
+        }
 
         $('#network-issue-container').show();
 
