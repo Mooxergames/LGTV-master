@@ -103,7 +103,7 @@
     top: 50%;
     background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
     transform: translate(-50%, -50%);
-    padding: 50px;
+    padding: 30px;
     border-radius: 25px;
     width: 800px;
     max-width: 90vw;
@@ -128,29 +128,29 @@
 
 #network-issue-icon {
     display: block;
-    height: 90px;
-    margin: 0 auto 25px auto;
+    height: 70px;
+    margin: 0 auto 15px auto;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
 
 #network-issue-title {
     color: #ffffff;
-    font-size: 42px;
+    font-size: 36px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     letter-spacing: -0.5px;
 }
 
 #network-issue-text {
     color: #f0f6ff;
-    font-size: 26px;
+    font-size: 24px;
     text-align: left;
-    line-height: 1.6;
-    margin-bottom: 35px;
+    line-height: 1.5;
+    margin-bottom: 20px;
     background: rgba(255,255,255,0.1);
-    padding: 25px;
+    padding: 20px;
     border-radius: 15px;
     border-left: 4px solid #ffd700;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -158,16 +158,16 @@
 
 #network-issue-btns-container{
     text-align: center;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .network-issue-btn {
     color: #fff;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
     background: linear-gradient(135deg, #667eea, #764ba2);
-    padding: 18px 35px;
-    margin: 10px 8px;
+    padding: 12px 28px;
+    margin: 8px 6px;
     border-radius: 50px;
     cursor: pointer;
     display: inline-block;
@@ -215,20 +215,20 @@
 }
 
 #playlist-selection-in-error {
-    margin-top: 25px;
-    padding-top: 25px;
+    margin-top: 15px;
+    padding-top: 15px;
     border-top: 2px solid rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.05);
     border-radius: 15px;
-    padding: 25px;
+    padding: 20px;
 }
 
 #playlist-selection-in-error strong {
     color: #ffd700;
-    font-size: 28px;
+    font-size: 26px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
     padding: 12px 24px;
     width: 180px;
