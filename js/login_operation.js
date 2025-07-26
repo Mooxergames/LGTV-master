@@ -526,8 +526,38 @@ var login_page={
     handleMenuUpDown:function(increment){
         var keys=this.keys;
         if(keys.focused_part==="playlist_selection"){
-        }
+            // Remove active class from all playlist items first
+            $(this.playlist_doms).removeClass('active');
 
+            keys.playlist_selection+=increment;
+            if(keys.playlist_selection<0)
+                keys.playlist_selection=playlist_urls.length-1;
+            if(keys.playlist_selection>=playlist_urls.length)
+                keys.playlist_selection=0;
+
+            // Add active class only to the selected item
+            $(this.playlist_doms[keys.playlist_selection]).addClass('active');
+            moveScrollPosition($('#login-playlist-items-container'),this.playlist_doms[keys.playlist_selection],'vertical',false);
+        }
+        else if(keys.focused_part==="turn_off_modal"){
+            keys.turn_off_modal+=increment;
+            var buttons=$('#turn-off-modal').find('button');
+            if(keys.turn_off_modal<0)
+                keys.turn_off_modal=1;
+            if(keys.turn_off_modal>1)
+                keys.turn_off_modal=0;
+            $(buttons).removeClass('active');
+            $(buttons[keys.turn_off_modal]).addClass('active');
+        }
+        else if(keys.focused_part==="network_issue_btn"){
+            keys.network_issue_btn+=increment;
+            if(keys.network_issue_btn<0)
+                keys.network_issue_btn=this.network_btn_doms.length-1;
+            if(keys.network_issue_btn>=this.network_btn_doms.length)
+                keys.network_issue_btn=0;
+            $(this.network_btn_doms).removeClass('active');
+            $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+        }
     },
     handleMenuLeftRight:function(increment){
         var keys=this.keys;
@@ -588,5 +618,40 @@ var login_page={
                 }
                 break;
         }
-    }
+    },
+    hoverPlaylistItem:function(index){
+        var keys=this.keys;
+        keys.focused_part="playlist_selection";
+
+        // Ensure we clear all active states first
+        $(this.playlist_doms).removeClass('active');
+
+        // Set the new selection
+        keys.playlist_selection=index;
+        $(this.playlist_doms[index]).addClass('active');
+    },
+    tryPlaylistUrl: function(index) {
+        var that = this;
+        var keys = this.keys;
+
+        // Clear all active states first
+        $(this.network_btn_doms).removeClass('active');
+        $(this.playlist_doms).removeClass('active');
+
+        // Update selection to the clicked playlist
+        keys.playlist_selection = index;
+        keys.network_issue_btn = index;
+
+        // Update visual selection
+        $(this.network_btn_doms[index]).addClass('active');
+
+        // Update playlist URL
+        settings.playlist_url = playlist_urls[index];
+        parseM3uUrl();
+
+        // Hide network issue dialog and try new playlist
+        $('#network-issue-container').hide();
+        that.showLoadImage();
+        that.proceed_login();
+    },
 }
