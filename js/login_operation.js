@@ -187,7 +187,7 @@ var login_page={
         
         // Check if we're actually in a Tizen environment
         if (typeof tizen === 'undefined' || !tizen.systeminfo) {
-            console.log('Samsung: Not in Tizen environment, using hardcoded MAC');
+            console.log('Samsung: Not in Tizen environment (browser/web), using hardcoded MAC');
             that.getSamsungHardcodedMac();
             return;
         }
@@ -361,12 +361,6 @@ var login_page={
         }
         else if(platform==='lg'){
             that.getLgMacAddress();
-        }
-        else if(platform==='browser'){
-            // Browser environment - use hardcoded MAC and proceed
-            console.log('Browser: Using default MAC address');
-            mac_address = '52:54:00:12:34:60'; // Browser-specific MAC
-            that.fetchPlaylistInformation();
         }
     },
     hoverNetworkIssueBtn:function(index){

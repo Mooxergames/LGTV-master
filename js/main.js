@@ -11,13 +11,13 @@ $(document).ready(function () {
             platform='samsung';
             console.log('Samsung Tizen platform detected');
         } else {
-            // Browser environment - don't try TV-specific calls
-            platform='browser';
-            console.log('Browser environment detected');
+            // Everything else should be treated as samsung for compatibility
+            platform='samsung';
+            console.log('Browser/Other environment detected - using samsung compatibility mode');
         }
     }catch (e) {
         console.log('Platform detection error:', e);
-        platform='browser';
+        platform='samsung';
     }
     initKeys();
     initPlayer();
