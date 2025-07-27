@@ -2,22 +2,9 @@
 "use strict";
 $(document).ready(function () {
     try{
-        // Better platform detection - only set to LG if truly on WebOS
-        if(window.navigator.userAgent.toLowerCase().includes('web0s') && 
-           (window.PalmSystem || typeof window.PalmServiceBridge !== 'undefined')) {
-            platform='lg';
-            console.log('LG WebOS platform detected');
-        } else if (typeof tizen !== 'undefined' && tizen.systeminfo) {
-            platform='samsung';
-            console.log('Samsung Tizen platform detected');
-        } else {
-            // Everything else should be treated as samsung for compatibility
-            platform='samsung';
-            console.log('Browser/Other environment detected - using samsung compatibility mode');
-        }
+        if(window.navigator.userAgent.toLowerCase().includes('web0s'))
+            platform='lg'
     }catch (e) {
-        console.log('Platform detection error:', e);
-        platform='samsung';
     }
     initKeys();
     initPlayer();

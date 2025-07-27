@@ -37,8 +37,6 @@
 #vod-summary-image-wrapper,#series-summary-image-wrapper {
     position:relative;
     height: 100vh;
-    width: 100%;
-    max-width: 500px;
 }
 #current-vod-category, #current-series-category{
     font-size: 35px;
@@ -51,14 +49,13 @@
     box-shadow: 0 0 10px 0 #48278f, 0 2px 20px 0 #22222278;
     top:50%;
     left:0px;
-    width:480px;
-    max-width: 90%;
+    width:540px;
     position:absolute;
     transform: translateY(-50%);
 
 }
 .vod-summary-information-container {
-    padding-left: 60px;
+    padding-left: 50px;
     height: 100%;
     padding-top: 100px;
 }
@@ -139,26 +136,4 @@
     width: 400px;
     border: 2px solid #f800b2;
     margin-top: 20px;
-}
-.vod-series-rating-container{
-    bottom: 20px;
-    right:20px;
-    position: fixed;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.category-rating-wrapper{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.category-rating-wrapper #current-vod-category,
-.category-rating-wrapper #current-series-category {
-    flex: 1;
-    margin-right: 20px;
-    margin-bottom: 0;
 }
