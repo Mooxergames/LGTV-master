@@ -95,6 +95,8 @@ var login_page={
             if(data.expire_date<today){
                 this.hideLoadImage();
                 saveData('mac_valid',false);
+                // Ensure network issue dialog is hidden on expire screen
+                $('#network-issue-container').hide();
                 if(data.is_trial==1){
                     $('#login-play-list-information').html(
                         'Your trial has expired, please activate your device from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
@@ -105,6 +107,7 @@ var login_page={
                         'Your account valid duration has expired, please try extend expire date from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
                     ).show();
                 }
+                // Do NOT call that.login() when expired to prevent network issues
             }
             else{
                 if(data.is_trial==1){  // will show tiral end message
@@ -461,6 +464,13 @@ var login_page={
         home_page.handleMenuClick();
     },
     proceed_login:function(){
+        // Prevent proceed_login when account is expired
+        if(!mac_valid) {
+            console.log("Account expired - blocking proceed_login to prevent network errors");
+            this.hideLoadImage();
+            return;
+        }
+        
         $('#playlist-error').hide();
         playlist_succeed=true;
         var that=this;
@@ -587,7 +597,10 @@ var login_page={
 
             }).fail(function () {
                 that.hideLoadImage();
-                that.showNetworkIssueWithPlaylistOptions();
+                // Don't show network issue dialog if account is expired
+                if(mac_valid) {
+                    that.showNetworkIssueWithPlaylistOptions();
+                }
             })
         }
     },
