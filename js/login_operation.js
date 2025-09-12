@@ -452,6 +452,9 @@ var login_page={
 
         playlist_succeed=false;
         $('#turn-off-modal').modal('hide');
+        // Update MAC address in playlist error dialog with fallback
+        $('#playlist-error-mac').text(mac_address || 'N/A');
+        $('#playlist-modal').modal('show');
         $('#playlist-error').show();
         // this.hideLoadImage();
         this.goToHomePage();
