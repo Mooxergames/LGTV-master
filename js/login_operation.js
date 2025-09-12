@@ -4,7 +4,8 @@ var login_page={
         focused_part:"playlist_selection",
         playlist_selection:0,
         turn_off_modal:0,
-        network_issue_btn:0
+        network_issue_btn:0,
+        playlist_modal_selection:0
     },
     network_btn_doms:$('.network-issue-btn'),
     showLoadImage:function(){
@@ -94,6 +95,8 @@ var login_page={
             if(data.expire_date<today){
                 this.hideLoadImage();
                 saveData('mac_valid',false);
+                // Ensure network issue dialog is hidden on expire screen
+                $('#network-issue-container').hide();
                 if(data.is_trial==1){
                     $('#login-play-list-information').html(
                         'Your trial has expired, please activate your device from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
@@ -104,6 +107,7 @@ var login_page={
                         'Your account valid duration has expired, please try extend expire date from <a class="login-page-link">https://flixapp.net/activation</a> <br><br> <img style="min-width: 400px; max-width: 600px;" src="https://flixapp.net/images/activation-qr-code.svg"> <p> <p>Scan here to visit the activation page</p>'
                     ).show();
                 }
+                // Do NOT call that.login() when expired to prevent network issues
             }
             else{
                 if(data.is_trial==1){  // will show tiral end message
@@ -159,6 +163,193 @@ var login_page={
             }
         });
     },
+    // Helper function to convert string to MAC format
+    stringToMacAddress: function(inputString) {
+        // Remove all non-alphanumeric characters and convert to uppercase
+        var cleanString = inputString.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        
+        // Take first 12 characters, pad with zeros if needed
+        while(cleanString.length < 12) {
+            cleanString += '0';
+        }
+        cleanString = cleanString.substring(0, 12);
+        
+        // Format as MAC address
+        var macAddress = '';
+        for(var i = 0; i < 12; i += 2) {
+            if(i > 0) macAddress += ':';
+            macAddress += cleanString.substring(i, i + 2);
+        }
+        
+        return macAddress;
+    },
+
+    // Samsung fallback system: Ethernet -> DUID -> Tizen ID -> Hardcoded
+    getSamsungMacAddress: function() {
+        var that = this;
+        
+        // Check if we're actually in a Tizen environment
+        if (typeof tizen === 'undefined' || !tizen.systeminfo) {
+            console.log('Samsung: Not in Tizen environment (browser/web), using hardcoded MAC');
+            that.getSamsungHardcodedMac();
+            return;
+        }
+        
+        // Try Ethernet first (primary method)
+        try {
+            tizen.systeminfo.getPropertyValue('ETHERNET_NETWORK', function (data) {
+                if (data !== undefined && typeof data.macAddress !== 'undefined' && data.macAddress) {
+                    console.log('Samsung: Using Ethernet MAC address');
+                    mac_address = data.macAddress;
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Fallback to DUID
+                    that.getSamsungDuidMac();
+                }
+            }, function(error) {
+                console.log('Samsung: Ethernet failed, trying DUID');
+                that.getSamsungDuidMac();
+            });
+        } catch (e) {
+            console.log('Samsung: Ethernet exception, trying DUID');
+            that.getSamsungDuidMac();
+        }
+    },
+
+    getSamsungDuidMac: function() {
+        var that = this;
+        
+        try {
+            tizen.systeminfo.getPropertyValue('DUID', function (data) {
+                if (data !== undefined && typeof data.duid !== 'undefined' && data.duid) {
+                    console.log('Samsung: Using DUID for MAC address');
+                    var encodedDuid = btoa(data.duid); // Base64 encoding
+                    mac_address = that.stringToMacAddress(encodedDuid);
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Fallback to Tizen ID
+                    that.getSamsungTizenIdMac();
+                }
+            }, function(error) {
+                console.log('Samsung: DUID failed, trying Tizen ID');
+                that.getSamsungTizenIdMac();
+            });
+        } catch (e) {
+            console.log('Samsung: DUID exception, trying Tizen ID');
+            that.getSamsungTizenIdMac();
+        }
+    },
+
+    getSamsungTizenIdMac: function() {
+        var that = this;
+        
+        try {
+            tizen.systeminfo.getPropertyValue('BUILD', function (data) {
+                if (data !== undefined && typeof data.tizenID !== 'undefined' && data.tizenID) {
+                    console.log('Samsung: Using Tizen ID for MAC address');
+                    var encodedTizenId = btoa(data.tizenID); // Base64 encoding
+                    mac_address = that.stringToMacAddress(encodedTizenId);
+                    that.fetchPlaylistInformation();
+                } else {
+                    // Final fallback - hardcoded MAC
+                    that.getSamsungHardcodedMac();
+                }
+            }, function(error) {
+                console.log('Samsung: Tizen ID failed, using hardcoded MAC');
+                that.getSamsungHardcodedMac();
+            });
+        } catch (e) {
+            console.log('Samsung: Tizen ID exception, using hardcoded MAC');
+            that.getSamsungHardcodedMac();
+        }
+    },
+
+    getSamsungHardcodedMac: function() {
+        console.log('Samsung: Using hardcoded MAC address');
+        mac_address = '52:54:00:12:34:58'; // Hardcoded fallback
+        this.fetchPlaylistInformation();
+    },
+
+    // LG fallback system: LGUDID -> Ethernet -> Hardcoded
+    getLgMacAddress: function() {
+        var that = this;
+        
+        // Check if we're actually in a WebOS environment
+        if (typeof webOS === 'undefined' || !webOS.service || typeof window.PalmServiceBridge === 'undefined') {
+            console.log('LG: Not in WebOS environment, using hardcoded MAC');
+            that.getLgHardcodedMac();
+            return;
+        }
+        
+        // Try LGUDID first (current primary method)
+        try {
+            webOS.service.request("luna://com.webos.service.sm", {
+                method: "deviceid/getIDs",
+                parameters: {
+                    "idType": ["LGUDID"]
+                },
+                onSuccess: function (inResponse) {
+                    if (inResponse && inResponse.idList && inResponse.idList.length > 0 && inResponse.idList[0].idValue) {
+                        console.log('LG: Using LGUDID for MAC address');
+                        mac_address = "";
+                        var temp = inResponse.idList[0].idValue.replace(/['-]+/g, '');
+                        for(var i = 0; i <= 5; i++){
+                            mac_address += temp.substr(i*2, 2);
+                            if(i < 5)
+                                mac_address += ":";
+                        }
+                        that.fetchPlaylistInformation();
+                    } else {
+                        // Fallback to Ethernet
+                        that.getLgEthernetMac();
+                    }
+                },
+                onFailure: function (inError) {
+                    console.log('LG: LGUDID failed, trying Ethernet');
+                    that.getLgEthernetMac();
+                }
+            });
+        } catch (e) {
+            console.log('LG: LGUDID exception, trying Ethernet');
+            that.getLgEthernetMac();
+        }
+    },
+
+    getLgEthernetMac: function() {
+        var that = this;
+        
+        try {
+            // Try to get ethernet info on LG
+            webOS.service.request("luna://com.webos.service.connectionmanager", {
+                method: "getStatus",
+                parameters: {},
+                onSuccess: function (inResponse) {
+                    if (inResponse && inResponse.wired && inResponse.wired.macAddress) {
+                        console.log('LG: Using Ethernet MAC address');
+                        mac_address = inResponse.wired.macAddress;
+                        that.fetchPlaylistInformation();
+                    } else {
+                        // Final fallback - hardcoded MAC
+                        that.getLgHardcodedMac();
+                    }
+                },
+                onFailure: function (inError) {
+                    console.log('LG: Ethernet failed, using hardcoded MAC');
+                    that.getLgHardcodedMac();
+                }
+            });
+        } catch (e) {
+            console.log('LG: Ethernet exception, using hardcoded MAC');
+            that.getLgHardcodedMac();
+        }
+    },
+
+    getLgHardcodedMac: function() {
+        console.log('LG: Using hardcoded MAC address');
+        mac_address = '52:54:00:12:34:59'; // Different hardcoded MAC for LG
+        this.fetchPlaylistInformation();
+    },
+
     getPlayListDetail:function(){
         this.network_btn_doms=$('.network-issue-btn');
         this.showLoadImage();
@@ -166,64 +357,36 @@ var login_page={
         var that=this;
         var keys=this.keys;
         keys.focused_part="playlist_selection";
-        mac_address='52:54:00:12:34:58';
+        mac_address='52:54:00:12:34:58'; // Default fallback
+        
         if(platform==='samsung'){
-            try {
-                tizen.systeminfo.getPropertyValue('ETHERNET_NETWORK', function (data) {
-                    if (data !== undefined) {
-                        if (typeof data.macAddress != 'undefined') {
-                            mac_address = data.macAddress;
-                            that.fetchPlaylistInformation();
-                        } else {
-                            that.hideLoadImage();
-                            $('#network-issue-container').show();
-                            keys.focused_part = "network_issue_btn";
-                            keys.network_issue_btn = 0;
-                        }
-                    } else {
-                        that.hideLoadImage();
-                        $('#network-issue-container').show();
-                        keys.focused_part = "network_issue_btn";
-                        keys.network_issue_btn = 0;
-                    }
-                })
-            }catch (e) {
-                that.fetchPlaylistInformation();
-            }
+            that.getSamsungMacAddress();
         }
         else if(platform==='lg'){
-            webOS.service.request("luna://com.webos.service.sm", {
-                method: "deviceid/getIDs",
-                parameters: {
-                    "idType": ["LGUDID"]
-                },
-                onSuccess: function (inResponse) {
-                    mac_address="";
-                    var temp=inResponse.idList[0].idValue.replace(/['-]+/g, '');
-                    for(var i=0;i<=5;i++){
-                        mac_address+=temp.substr(i*2,2);
-                        if(i<5)
-                            mac_address+=":";
-                    }
-                    that.fetchPlaylistInformation();
-                },
-                onFailure: function (inError) {
-                    that.hideLoadImage();
-                    $('#network-issue-container').show();
-                    if(keys.focused_part!=='turn_off_modal')
-                        keys.focused_part="network_issue_btn";
-                    keys.network_issue_btn=0;
-                }
-            });
+            that.getLgMacAddress();
         }
     },
     hoverNetworkIssueBtn:function(index){
         var keys=this.keys;
         keys.focused_part='network_issue_btn';
-        keys.network_issue_btn=index;
-        this.network_btn_doms=$('.network-issue-btn');
-        $(this.network_btn_doms).removeClass('active');
-        $(this.network_btn_doms[index]).addClass('active');
+
+        // Always refresh button references to include dynamically added buttons
+        this.network_btn_doms = $('.network-issue-btn');
+
+        // Clear ONLY network issue button active states, not playlist items
+        $('.network-issue-btn').removeClass('active');
+
+        // Ensure index is within bounds
+        if(index >= 0 && index < this.network_btn_doms.length) {
+            keys.network_issue_btn = index;
+            $(this.network_btn_doms[index]).addClass('active');
+        } else {
+            // If index is out of bounds, default to first button
+            keys.network_issue_btn = 0;
+            if(this.network_btn_doms.length > 0) {
+                $(this.network_btn_doms[0]).addClass('active');
+            }
+        }
     },
     login:function(){
         var keys=this.keys;
@@ -289,6 +452,9 @@ var login_page={
 
         playlist_succeed=false;
         $('#turn-off-modal').modal('hide');
+        // Update MAC address in playlist error dialog with fallback
+        $('#playlist-error-mac').text(mac_address || 'N/A');
+        $('#playlist-modal').modal('show');
         $('#playlist-error').show();
         // this.hideLoadImage();
         this.goToHomePage();
@@ -301,6 +467,13 @@ var login_page={
         home_page.handleMenuClick();
     },
     proceed_login:function(){
+        // Prevent proceed_login when account is expired
+        if(!mac_valid) {
+            console.log("Account expired - blocking proceed_login to prevent network errors");
+            this.hideLoadImage();
+            return;
+        }
+        
         $('#playlist-error').hide();
         playlist_succeed=true;
         var that=this;
@@ -427,54 +600,117 @@ var login_page={
 
             }).fail(function () {
                 that.hideLoadImage();
-                that.showNetworkIssueWithPlaylistOptions();
+                // Don't show network issue dialog if account is expired
+                if(mac_valid) {
+                    that.showNetworkIssueWithPlaylistOptions();
+                }
             })
         }
     },
     showNetworkIssueWithPlaylistOptions: function() {
         var that = this;
         var keys = this.keys;
+
+        // Update network issue text with MAC address
+        $('#network-issue-text').html(
+            'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
+            '🔌 Network issue – Please check your internet connection.<br>' +
+            '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+            '<div class="device-info-section">' +
+            '<strong>Device Information:</strong><br>' +
+            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
+            '</div>' +
+            'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
+        );
+
+        // Hide or show Choose Playlist button based on playlist count
+        var playlistCount = playlist_urls ? playlist_urls.length : 0;
+        console.log("Playlist count:", playlistCount, "playlist_urls:", playlist_urls);
         
-        // Update network issue text to include playlist selection if multiple playlists exist
-        if (playlist_urls && playlist_urls.length > 1) {
-            var playlistOptionsHtml = '<div id="playlist-selection-in-error"><br><strong>Or try a different playlist:</strong><br>';
-            for (var i = 0; i < playlist_urls.length; i++) {
-                if (i !== keys.playlist_selection) { // Don't show current failing playlist
-                    playlistOptionsHtml += '<div class="network-issue-btn playlist-option-btn" ' +
-                        'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
-                        'onmouseenter="login_page.hoverNetworkIssueBtn(' + (3 + (i > keys.playlist_selection ? i - 1 : i)) + ')">' +
-                        'Playlist ' + (i + 1) + '</div>';
-                }
-            }
-            playlistOptionsHtml += '</div>';
-            
-            $('#network-issue-text').html(
-                'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
-                '🔌 Network issue – Please check your internet connection.<br>' +
-                '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
-                'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.' +
-                playlistOptionsHtml
-            );
+        // Find the Choose Playlist button by its onclick attribute
+        var choosePlaylistBtn = $('.network-issue-btn').filter(function() {
+            return $(this).attr('onclick') === 'login_page.showPlaylistSelectionModal()';
+        });
+        
+        if (playlistCount > 1) {
+            // Show Choose Playlist button when multiple playlists exist
+            choosePlaylistBtn.show();
+            console.log("Showing Choose Playlist button - multiple playlists available");
+        } else {
+            // Hide Choose Playlist button when only one or no playlist exists
+            choosePlaylistBtn.hide();
+            console.log("Hiding Choose Playlist button - only one or no playlist available");
         }
-        
-        $('#network-issue-container').show();
-        keys.focused_part = "network_issue_btn";
-        that.hoverNetworkIssueBtn(0);
+
+        // Show modal first, then handle focus after a brief delay to prevent freeze
+        $('#network-issue-container').hide().fadeIn(300);
+
+        // Refresh network button references after modal is fully shown
+        setTimeout(function() {
+            that.network_btn_doms = $('.network-issue-btn:visible');
+            keys.focused_part = "network_issue_btn";
+            keys.network_issue_btn = 0;
+            $(that.network_btn_doms).removeClass('active');
+            if(that.network_btn_doms.length > 0) {
+                $(that.network_btn_doms[0]).addClass('active');
+            }
+        }, 350);
     },
     selectPlaylistFromError: function(playlistIndex) {
         var that = this;
         var keys = this.keys;
-        
+
+        // Only clear network issue button states, don't touch playlist items
+        $('.network-issue-btn').removeClass('active');
+
         // Update selected playlist
         keys.playlist_selection = playlistIndex;
         settings.saveSettings('playlist_url', playlist_urls[playlistIndex], '');
         settings.saveSettings('playlist_url_index', playlistIndex, '');
         parseM3uUrl();
-        
-        // Hide network issue dialog and try new playlist
+
+        // Hide playlist selection modal and network issue dialog
+        $('#playlist-selection-modal').hide();
         $('#network-issue-container').hide();
         that.showLoadImage();
         that.proceed_login();
+    },
+    showPlaylistSelectionModal: function() {
+        var that = this;
+        var keys = this.keys;
+
+        if (playlist_urls && playlist_urls.length > 1) {
+            var playlistOptionsHtml = '';
+            for (var i = 0; i < playlist_urls.length; i++) {
+                var isSelected = i === keys.playlist_selection ? ' playlist-selected' : '';
+                playlistOptionsHtml += '<div class="playlist-modal-item' + isSelected + '" ' +
+                    'data-playlist-index="' + i + '" ' +
+                    'onclick="login_page.selectPlaylistFromError(' + i + ')" ' +
+                    'onmouseenter="login_page.hoverPlaylistModalItem(' + i + ')">' +
+                    'Playlist ' + (i + 1) + 
+                    (i === keys.playlist_selection ? ' (Current)' : '') +
+                    '</div>';
+            }
+
+            $('#playlist-modal-items').html(playlistOptionsHtml);
+            $('#playlist-selection-modal').show();
+
+            // Set focus to playlist selection
+            keys.focused_part = "playlist_modal";
+            keys.playlist_modal_selection = keys.playlist_selection;
+
+            // Highlight current selection
+            $('.playlist-modal-item').removeClass('active');
+            $('.playlist-modal-item[data-playlist-index="' + keys.playlist_selection + '"]').addClass('active');
+        }
+    },
+    hoverPlaylistModalItem: function(index) {
+        var keys = this.keys;
+        keys.focused_part = "playlist_modal";
+        keys.playlist_modal_selection = index;
+
+        $('.playlist-modal-item').removeClass('active');
+        $('.playlist-modal-item[data-playlist-index="' + index + '"]').addClass('active');
     },
     handleMenuClick:function(){
         var keys=this.keys;
@@ -506,24 +742,91 @@ var login_page={
         else if(keys.focused_part==="network_issue_btn"){
             $(this.network_btn_doms[keys.network_issue_btn]).trigger('click');
         }
+        else if(keys.focused_part==="playlist_modal"){
+            var selectedItem = $('.playlist-modal-item')[keys.playlist_modal_selection];
+            if(selectedItem) {
+                $(selectedItem).trigger('click');
+            }
+        }
     },
     handleMenuUpDown:function(increment){
         var keys=this.keys;
         if(keys.focused_part==="playlist_selection"){
-        }
+            // Remove active class from all playlist items first
+            $(this.playlist_doms).removeClass('active');
 
+            keys.playlist_selection+=increment;
+            if(keys.playlist_selection<0)
+                keys.playlist_selection=playlist_urls.length-1;
+            if(keys.playlist_selection>=playlist_urls.length)
+                keys.playlist_selection=0;
+
+            // Add active class only to the selected item
+            $(this.playlist_doms[keys.playlist_selection]).addClass('active');
+            moveScrollPosition($('#login-playlist-items-container'),this.playlist_doms[keys.playlist_selection],'vertical',false);
+        }
+        else if(keys.focused_part==="turn_off_modal"){
+            keys.turn_off_modal+=increment;
+            var buttons=$('#turn-off-modal').find('button');
+            if(keys.turn_off_modal<0)
+                keys.turn_off_modal=1;
+            if(keys.turn_off_modal>1)
+                keys.turn_off_modal=0;
+            $(buttons).removeClass('active');
+            $(buttons[keys.turn_off_modal]).addClass('active');
+        }
+        else if(keys.focused_part==="network_issue_btn"){
+            // Refresh button references before navigation
+            this.network_btn_doms = $('.network-issue-btn');
+
+            keys.network_issue_btn+=increment;
+            if(keys.network_issue_btn<0)
+                keys.network_issue_btn=this.network_btn_doms.length-1;
+            if(keys.network_issue_btn>=this.network_btn_doms.length)
+                keys.network_issue_btn=0;
+
+            // Clear all active states first
+            $('.network-issue-btn').removeClass('active');
+
+            // Set active state only on the selected button
+            if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
+                $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            }
+        }
+        else if(keys.focused_part==="playlist_modal"){
+            var playlistItems = $('.playlist-modal-item');
+            keys.playlist_modal_selection+=increment;
+            if(keys.playlist_modal_selection<0)
+                keys.playlist_modal_selection=playlistItems.length-1;
+            if(keys.playlist_modal_selection>=playlistItems.length)
+                keys.playlist_modal_selection=0;
+
+            // Clear all active states first
+            playlistItems.removeClass('active');
+
+            // Set active state only on the selected item
+            $(playlistItems[keys.playlist_modal_selection]).addClass('active');
+        }
     },
     handleMenuLeftRight:function(increment){
         var keys=this.keys;
         if(keys.focused_part==="network_issue_btn"){
+            // Refresh button references before navigation
+            this.network_btn_doms = $('.network-issue-btn');
+
             keys.network_issue_btn+=increment;
-            this.network_btn_doms=$('.network-issue-btn');
             if(keys.network_issue_btn<0)
                 keys.network_issue_btn=0;
             else if(keys.network_issue_btn>=this.network_btn_doms.length)
                 keys.network_issue_btn=this.network_btn_doms.length-1;
-            $(this.network_btn_doms).removeClass('active');
-            $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+
+            // Clear all active states first
+            $('.network-issue-btn').removeClass('active');
+
+            // Set active state only on the selected button
+            if(this.network_btn_doms.length > 0 && keys.network_issue_btn < this.network_btn_doms.length) {
+                $(this.network_btn_doms[keys.network_issue_btn]).addClass('active');
+            }
         }
         if(keys.focused_part==="turn_off_modal"){
             keys.turn_off_modal+=increment;
@@ -554,7 +857,22 @@ var login_page={
                 this.handleMenuClick();
                 break;
             case tvKey.RETURN:
-                if(this.keys.focused_part==="playlist_selection" || this.keys.focused_part==="network_issue_btn"){
+                if(this.keys.focused_part==="playlist_modal"){
+                    // When playlist modal is open, RETURN key should only close the modal
+                    $('#playlist-selection-modal').hide();
+                    this.keys.focused_part="network_issue_btn";
+                    // Refresh network button focus
+                    this.network_btn_doms = $('.network-issue-btn');
+                    $('.network-issue-btn').removeClass('active');
+                    if(this.network_btn_doms[this.keys.network_issue_btn]) {
+                        $(this.network_btn_doms[this.keys.network_issue_btn]).addClass('active');
+                    }
+                }
+                else if(this.keys.focused_part==="network_issue_btn"){
+                    // When network issue modal is open, RETURN key should trigger "Continue Anyway"
+                    this.fallbackToLocalDemo();
+                }
+                else if(this.keys.focused_part==="playlist_selection"){
                     $('#turn-off-modal').modal('show');
                     this.keys.focused_part="turn_off_modal";
                     this.keys.turn_off_modal=0;
@@ -572,5 +890,42 @@ var login_page={
                 }
                 break;
         }
-    }
+    },
+    hoverPlaylistItem:function(index){
+        var keys=this.keys;
+        keys.focused_part="playlist_selection";
+
+        // Only clear playlist active states, not network issue buttons
+        $('.login-playlist-item-wrapper').removeClass('active');
+
+        // Set the new selection
+        keys.playlist_selection=index;
+        if(this.playlist_doms && this.playlist_doms[index]) {
+            $(this.playlist_doms[index]).addClass('active');
+        }
+    },
+    tryPlaylistUrl: function(index) {
+        var that = this;
+        var keys = this.keys;
+
+        // Clear all active states first
+        $(this.network_btn_doms).removeClass('active');
+        $(this.playlist_doms).removeClass('active');
+
+        // Update selection to the clicked playlist
+        keys.playlist_selection = index;
+        keys.network_issue_btn = index;
+
+        // Update visual selection
+        $(this.network_btn_doms[index]).addClass('active');
+
+        // Update playlist URL
+        settings.playlist_url = playlist_urls[index];
+        parseM3uUrl();
+
+        // Hide network issue dialog and try new playlist
+        $('#network-issue-container').hide();
+        that.showLoadImage();
+        that.proceed_login();
+    },
 }

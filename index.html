@@ -85,11 +85,23 @@
                             Continue Anyway
                         </div>
                         <div class="network-issue-btn"
-                             onclick="closeApp()"
+                             onclick="login_page.showPlaylistSelectionModal()"
                              onmouseenter="login_page.hoverNetworkIssueBtn(2)"
                         >
-                            Exit
+                            Choose Playlist
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playlist Selection Modal -->
+            <div id="playlist-selection-modal">
+                <div id="playlist-modal-content">
+                    <div id="playlist-modal-title">
+                        Choose Playlist
+                    </div>
+                    <div id="playlist-modal-items">
+                        <!-- Playlist items will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -546,10 +558,9 @@
                                         <input class="form-control" id="parent-confirm-password" type="password" value="" maxlength="4">
                                     </div>
                                 </div>
-                                <div class="parent-modal-input-item-container">
-                                    <div class="parent-modal-label-wrapper  text-right">
+                                <div class="parent-modal-input-item-container">                                    <div class="parent-modal-label-wrapper  text-right">
                                     </div>
-                                    <div class="parent-modal-input-wrapper default-code-container">
+                                                                   <div class="parent-modal-input-wrapper default-code-container">
                                         <span data-word_code="default_code">Default Code</span>:
                                         <span class="default-code">0000</span>
                                     </div>
@@ -906,15 +917,17 @@
             <div class="vod-series-background-img-overlay"></div>
             <div class="vod-series-summary-page-contents-container">
                 <div id="vod-summary-content-container">
-                    <div style="width: 33.33%;display: inline-block;height: 100vh">
+                    <div style="display: inline-block;height: 100vh; vertical-align: top;width: 500px;position: relative;">
                         <div id="vod-summary-image-wrapper">
                             <img onerror="this.src='images/404.png'">
                         </div>
                     </div>
-                    <div class="" style="height:100vh; overflow: hidden;width: 66.66%;vertical-align: top;display: inline-block">
+                    <div class="" style="height:100vh; overflow: hidden;width: calc(100% - 500px);vertical-align: top;display: inline-block;position: relative;">
                         <div class="vod-summary-information-container position-relative">
                             <h3 id="vod-summary-name"></h3>
-                            <div id="current-vod-category">Current Category</div>
+                            <div class="category-rating-wrapper">
+                                <div id="current-vod-category">Current Category</div>
+                            </div>
                             <p class="vod-summary-item">
                                 <span class="vod-summary-item-label" data-word_code="genre">
                                     Genre
@@ -1025,12 +1038,12 @@
             <div class="vod-series-background-img-overlay"></div>
             <div class="vod-series-summary-page-contents-container">
                 <div class="" id="series-summary-content-container">
-                    <div style="display: inline-block;height: 100vh; vertical-align: top;width: 33.33%">
+                    <div style="display: inline-block;height: 100vh; vertical-align: top;width: 500px;position: relative;">
                         <div id="series-summary-image-wrapper">
                             <img onerror="this.src='images/series.png'">
                         </div>
                     </div>
-                    <div style="height:100vh; overflow: hidden;vertical-align: top;display: inline-block;width: 66.66%">
+                    <div style="height:100vh; overflow: hidden;vertical-align: top;display: inline-block;width: calc(100% - 500px);position: relative;">
                         <div class="vod-summary-information-container position-relative">
                             <h3 id="series-summary-name"></h3>
                             <!--                    <p class="vod-summary-item">-->
@@ -1039,7 +1052,9 @@
                             <!--                        </span>-->
                             <!--                        <span class="vod-summary-item-text" id="series-summary-release-genre"></span>-->
                             <!--                    </p>-->
-                            <div id="current-series-category"></div>
+                            <div class="category-rating-wrapper">
+                                <div id="current-series-category"></div>
+                            </div>
                             <p class="vod-summary-item max-line-2">
                                 <span class="vod-summary-item-label" data-word_code="genre">
                                     Genre:
@@ -1486,7 +1501,12 @@
                 </div>
                 <div class="modal-body modal-body-bg-img-1 p-20" style="padding:20px 20px;" id="playlist-modal-body">
                     <div id="playlist-error">
-                        Sorry, current playlist is not working. please try other playlist or restart app
+                        Sorry, current playlist is not working.<br><br>
+                        <div class="device-info-section">
+                            <strong>Device Information:</strong><br>
+                            MAC Address: <span class="mac-address-display" id="playlist-error-mac"></span>
+                        </div><br>
+                        Please try other playlist or restart app.
                     </div>
                     <div id="playlist-items-container"></div>
                 </div>
@@ -1554,7 +1574,12 @@
         </div>
     </div>
 
-    <script src="$WEBAPIS/webapis/webapis.js"></script>
+    <script>
+        // Conditionally load WebOS APIs only if available
+        if (window.navigator.userAgent.toLowerCase().includes('web0s') && window.PalmSystem) {
+            document.write('<script src="$WEBAPIS/webapis/webapis.js"><\/script>');
+        }
+    </script>
     <script src="webOSTVjs-1.2.0/webOSTV.js"></script>
     <script src="js/libs/jquery.3.4.1.min.js"></script>
     <script src="js/libs/popper.1.16.0.min.js"></script>
@@ -1568,8 +1593,8 @@
     <script src="js/Models/LiveModel.js"></script>
     <script src="js/Models/SeriesModel.js"></script>
     <script src="js/settings.js"></script>
-    <script src="js/login_operation.js"></script>
     <script src="js/env.js"></script>
+    <script src="js/login_operation.js"></script>
     <script src="js/common.js"></script>
     <script src="js/home_operation.js"></script>
     <script src="js/catchup.js"></script>
