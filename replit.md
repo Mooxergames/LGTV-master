@@ -1,6 +1,6 @@
 # Overview
 
-FLIX IPTV is a Smart TV application designed primarily for LG WebOS and Samsung Tizen platforms. It's an IPTV streaming application that allows users to watch live TV channels, video on demand (VOD), TV series, and access various multimedia content through playlist URLs. The app features a MAC address-based authentication system and supports multiple content types including live streaming, catch-up TV, and YouTube integration.
+FLIX IPTV is a cross-platform TV application designed for LG WebOS and Samsung Tizen smart TVs. The application provides IPTV streaming capabilities with support for live channels, video-on-demand (VOD), series, catch-up TV, and YouTube integration. It features a comprehensive user interface with channel guides, search functionality, local storage file browsing, and image galleries.
 
 # User Preferences
 
@@ -9,78 +9,69 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-- **Web-based TV App**: Built as a hybrid web application targeting Smart TV platforms (LG WebOS and Samsung Tizen)
-- **Single Page Application**: Uses vanilla JavaScript with jQuery for DOM manipulation and UI interactions
-- **Responsive Design**: CSS-based responsive layout optimized for TV screens (1920x1080 resolution)
-- **Component-based Structure**: Modular JavaScript files for different pages and functionality (home, channels, VOD, series, etc.)
+- **Single Page Application (SPA)**: Built using vanilla JavaScript with jQuery for DOM manipulation and UI interactions
+- **Responsive Design**: Bootstrap 4.4.1 framework with custom CSS for TV-optimized layouts
+- **UI Components**: Modular page system with dedicated CSS and JavaScript files for each feature (homepage, channels, VOD, search, etc.)
+- **TV Remote Control Support**: Custom key handling for both Samsung Tizen and LG WebOS remote controls
+- **Media Player Integration**: Platform-specific video player implementations using native TV APIs
 
-## Platform Detection & Compatibility
-- **Multi-platform Support**: Automatic detection between Samsung Tizen and LG WebOS platforms
-- **Feature Detection**: Different video players and APIs based on detected platform
-- **Fallback Mechanisms**: Samsung compatibility mode for unknown environments
-
-## Media Player Integration
-- **Dual Player System**: 
-  - Samsung: Uses Tizen's webapis.avplay for video playback
-  - LG WebOS: Uses HTML5 video elements
-- **Streaming Support**: HLS and other streaming protocols for live TV and VOD content
-- **Subtitle Support**: SRT subtitle parsing and display functionality
-
-## Navigation & User Interface
-- **TV Remote Control**: Comprehensive key mapping for TV remote navigation (arrow keys, enter, back, etc.)
-- **Focus Management**: Sophisticated focus handling system for TV interface navigation
-- **Modal Systems**: Various modal dialogs for settings, search, and content selection
+## Backend/API Integration
+- **REST API Communication**: AJAX-based requests to external IPTV services
+- **IPTV Protocol Support**: M3U playlist parsing and XTREME-style API integration
+- **Authentication**: MAC address-based device authentication with playlist URL configuration
+- **Data Models**: Dedicated model classes for Live TV, VOD, and Series content management
 
 ## Content Management
-- **Category-based Organization**: Hierarchical content structure with categories for Live TV, Movies, and Series
-- **Playlist Integration**: XTREME API and M3U playlist support for content loading
-- **Search Functionality**: Real-time search across different content types
-- **Favorites & Recent**: User preference tracking with local storage persistence
+- **Multi-Category Support**: Live channels, movies, TV series with hierarchical organization
+- **Favorites System**: User-customizable favorites lists with local storage persistence
+- **Recently Watched**: Automatic tracking of viewing history
+- **Resume Playback**: Video position saving and restoration for interrupted viewing
+- **EPG Integration**: Electronic Program Guide with catch-up TV functionality
 
-## Data Storage & Persistence
-- **Local Storage**: User preferences, viewing history, and cached data stored locally
-- **Settings Management**: Comprehensive settings system for user customization
-- **Resume Functionality**: Video playback position tracking and resume capabilities
+## Local Storage Features
+- **File Browser**: Native file system access for local media playback
+- **Image Gallery**: Photo viewing with slideshow capabilities using PhotoBox plugin
+- **Settings Persistence**: Local storage of user preferences, themes, and configurations
 
-## Authentication & Security
-- **MAC Address Authentication**: Device identification using MAC address
-- **Trial System**: 7-day free trial mechanism
-- **Parental Controls**: Adult content filtering with password protection
+## External Service Integrations
+- **YouTube Integration**: YouTube playlist and video playback support
+- **Subtitle Support**: SRT subtitle parsing and display with synchronization
+- **Multi-language Support**: Internationalization framework with language switching
+- **Theme System**: Customizable UI themes with background image support
+
+## Platform Compatibility
+- **Cross-Platform Design**: Unified codebase with platform-specific adaptations
+- **Samsung Tizen**: Native Tizen APIs for media playback and system integration
+- **LG WebOS**: WebOS-specific implementations for TV functionality
+- **Development Tools**: Build scripts for packaging and deployment to both platforms
 
 # External Dependencies
 
-## IPTV Service Integration
-- **FLIX API**: Primary backend service (flixapp.net/api) for user authentication and content management
-- **XTREME API**: Standard IPTV playlist API for content metadata and streaming URLs
-- **EPG Services**: Electronic Program Guide data integration for live TV schedules
-
-## Third-party Libraries
+## Core Libraries
 - **jQuery 3.4.1**: DOM manipulation and AJAX requests
 - **Bootstrap 4.4.1**: CSS framework for responsive design
-- **Moment.js**: Date/time manipulation for scheduling and EPG
-- **Slick Carousel**: Image and content carousel functionality
-- **Font Awesome**: Icon library for UI elements
-- **Photobox**: Image gallery viewing functionality
+- **Moment.js**: Date and time manipulation for EPG and scheduling
+- **Slick Carousel**: Image and content slider functionality
+- **Rangeslider.js**: Custom range input controls for video seeking
 
-## Smart TV Platform APIs
-- **Samsung Tizen**: 
-  - tizen.tvinputdevice for remote control handling
-  - webapis.avplay for video playback
-  - tizen.systeminfo for device information
-- **LG WebOS**: 
-  - webOS service APIs for system integration
-  - HTML5 media APIs for video playback
+## TV Platform SDKs
+- **Samsung Tizen SDK**: Platform-specific APIs via webapis object
+- **LG WebOS SDK**: WebOS TV APIs and services integration
+- **CAPH Framework**: Samsung's Smart TV application framework
 
-## Build Tools & Development
-- **WebOS CLI Tools**: For LG WebOS app packaging and deployment
-- **Archiver**: For creating application packages
-- **Node.js Tools**: Build scripts and development utilities
+## Media and UI Components
+- **PhotoBox**: Image gallery and lightbox functionality
+- **LazyLoad**: Optimized image loading for better performance
+- **Velocity.js**: Hardware-accelerated animations
+- **Hammer.js**: Touch gesture recognition (via CAPH framework)
 
-## Content Delivery
-- **YouTube API**: Integration for YouTube playlist and video playback
-- **Image CDN**: External image hosting for thumbnails and artwork
-- **Streaming Servers**: Various IPTV streaming endpoints for content delivery
+## Development Tools
+- **WebOS CLI Tools**: Application packaging and deployment for LG TVs
+- **Node.js Build Tools**: Archiver for app packaging, Rimraf for cleanup
+- **Tizen Studio**: Samsung TV application development and testing environment
 
-## Development Environment
-- **VS Code Configuration**: Debugging setup for Tizen and WebOS platforms
-- **Certificate Management**: Code signing certificates for app store deployment
+## External Services
+- **IPTV Providers**: M3U playlist and XTREME API endpoints
+- **YouTube API**: Video streaming and playlist management
+- **Subtitle Services**: SRT subtitle file parsing and synchronization
+- **Content Delivery Networks**: Image and media asset hosting
