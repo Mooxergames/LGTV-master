@@ -611,15 +611,12 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Update network issue text with MAC address
+        // Update network issue text with MAC address at the top
         $('#network-issue-text').html(
+            'MAC Address: <span class="mac-address-display">' + (mac_address || 'N/A') + '</span><br><br>' +
             'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
             '🔌 Network issue – Please check your internet connection.<br>' +
             '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
-            '<div class="device-info-section">' +
-            '<strong>Device Information:</strong><br>' +
-            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
-            '</div>' +
             'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
         );
 
