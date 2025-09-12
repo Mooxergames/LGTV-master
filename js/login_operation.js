@@ -611,9 +611,15 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
+        // Ensure MAC address is available - set hardcoded MAC if not available
+        if (!mac_address || mac_address === '') {
+            mac_address = '52:54:00:12:34:58'; // Samsung compatibility fallback
+            console.log('MAC address not initialized, using fallback:', mac_address);
+        }
+
         // Update network issue text with MAC address at the top
         $('#network-issue-text').html(
-            'MAC Address: <span class="mac-address-display">' + (mac_address || 'N/A') + '</span><br><br>' +
+            'MAC Address: <span class="mac-address-display">' + (mac_address || '52:54:00:12:34:58') + '</span><br><br>' +
             'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
             '🔌 Network issue – Please check your internet connection.<br>' +
             '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
