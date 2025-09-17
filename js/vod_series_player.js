@@ -679,7 +679,7 @@ var vod_series_player={
                     }
                     $.ajax({
                         method:'post',
-                        url:'https://flixapp.net/subtitle-test',
+                        url:'https://exoapp.tv/api/get-subtitles',
                         data: subtitle_request_data,
                         dataType:'json',
                         success:function (result) {
