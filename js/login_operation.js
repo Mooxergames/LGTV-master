@@ -162,14 +162,23 @@ var login_page = {
         console.log("Request data:", data);
         var encrypted_data = encryptRequest(data);
         console.log("Encrypted data:", encrypted_data);
+        
+        // Try direct request first, fallback to proxy if CORS fails
+        var requestUrl = panel_url + "/device_info";
+        
         $.ajax({
             method: "post",
-            url: panel_url + "/device_info",
+            url: requestUrl,
             data: {
                 data: encrypted_data,
             },
             crossDomain: true,  // Explicitly allow cross-domain requests
-            success: function (data1) {
+            success: function (data1, textStatus, xhr) {
+                console.log("device_info POST SUCCESS!");
+                console.log("Response data:", data1);
+                console.log("Response headers:", xhr.getAllResponseHeaders());
+                console.log("Status:", textStatus);
+                console.log("XHR status:", xhr.status);
                 var data = decryptResponse(data1);
                 console.log(data);
                 localStorage.setItem(
@@ -178,11 +187,58 @@ var login_page = {
                 );
                 that.startApp(data);
             },
-            error: function (error) {
+            error: function (xhr, textStatus, errorThrown) {
+                console.log("device_info POST failed:", {readyState: xhr.readyState, status: xhr.status, statusText: xhr.statusText});
+                
+                // If direct request failed due to CORS (status 0), try proxy
+                if (xhr.status === 0 && requestUrl.includes("https://flixapp.net")) {
+                    console.log("Making POST request to proxy:", window.location.origin + "/api/proxy/device_info");
+                    console.log("Request data:", {data: encrypted_data});
+                    
+                    $.ajax({
+                        method: "post",
+                        url: window.location.origin + "/api/proxy/device_info",
+                        data: {
+                            data: encrypted_data,
+                        },
+                        success: function (data1, textStatus, xhr) {
+                            console.log("Raw API response:", data1);
+                            console.log("Response type:", typeof data1);
+                            try {
+                                var data = decryptResponse(data1);
+                                console.log(data);
+                                localStorage.setItem(
+                                    storage_id + "api_data",
+                                    JSON.stringify(data),
+                                );
+                                that.startApp(data);
+                            } catch (error) {
+                                console.log("Decryption error:", error);
+                                console.log("Failed to decrypt response:", data1);
+                                // Handle decryption failure - try with local data
+                                var local_data = localStorage.getItem(storage_id + "api_data");
+                                if (local_data) that.startApp(JSON.parse(local_data));
+                                else that.showNetworkError();
+                            }
+                        },
+                        error: function (xhr2, textStatus2, errorThrown2) {
+                            console.log("Proxy request also failed:", {status: xhr2.status, text: xhr2.responseText});
+                            var local_data = localStorage.getItem(storage_id + "api_data");
+                            if (local_data) that.startApp(JSON.parse(local_data));
+                            else that.showNetworkError();
+                        }
+                    });
+                    return;
+                }
+                
                 var local_data = localStorage.getItem(storage_id + "api_data");
                 if (local_data) that.startApp(JSON.parse(local_data));
-                else {
-                    that.hideLoadImage();
+                else that.showNetworkError();
+            }
+        });
+    },
+    showNetworkError: function () {
+        this.hideLoadImage();
                     // Update MAC address in network issue modal
                     if (typeof mac_address !== "undefined" && mac_address) {
                         $("#network-issue-mac-address").text(mac_address);
@@ -208,11 +264,8 @@ var login_page = {
                     }
 
                     $("#network-issue-container").show();
-                    if (keys.focused_part !== "turn_off_modal")
-                        that.hoverNetworkIssueBtn(0);
-                }
-            },
-        });
+                    if (this.keys.focused_part !== "turn_off_modal")
+                        this.hoverNetworkIssueBtn(0);
     },
     // Helper function to convert string to MAC format
     stringToMacAddress: function (inputString) {
