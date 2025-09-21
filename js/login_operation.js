@@ -163,6 +163,7 @@ var login_page = {
             data: {
                 data: encrypted_data,
             },
+            crossDomain: true,  // Explicitly allow cross-domain requests
             success: function (data1) {
                 var data = decryptResponse(data1);
                 console.log(data);
