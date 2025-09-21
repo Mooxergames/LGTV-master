@@ -156,7 +156,12 @@ var login_page = {
             app_type: platform,
             version: version,
         };
+        console.log("fetchPlaylistInformation called with MAC:", mac_address);
+        console.log("panel_url:", panel_url);
+        console.log("Making POST request to:", panel_url + "/device_info");
+        console.log("Request data:", data);
         var encrypted_data = encryptRequest(data);
+        console.log("Encrypted data:", encrypted_data);
         $.ajax({
             method: "post",
             url: panel_url + "/device_info",
