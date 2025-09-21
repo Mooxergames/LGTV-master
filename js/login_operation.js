@@ -147,6 +147,8 @@ var login_page = {
         }
     },
     fetchPlaylistInformation: function () {
+        console.log('fetchPlaylistInformation called with MAC:', mac_address);
+        console.log('panel_url:', panel_url);
         var that = this;
         $(".mac-address").text(mac_address);
         var keys = this.keys;
@@ -157,6 +159,8 @@ var login_page = {
             version: version,
         };
         var encrypted_data = encryptRequest(data);
+        console.log('Making POST request to:', panel_url + "/device_info");
+        console.log('Request data:', { data: encrypted_data });
         $.ajax({
             method: "post",
             url: panel_url + "/device_info",
@@ -173,6 +177,7 @@ var login_page = {
                 that.startApp(data);
             },
             error: function (error) {
+                console.log('device_info POST request failed:', error);
                 var local_data = localStorage.getItem(storage_id + "api_data");
                 if (local_data) that.startApp(JSON.parse(local_data));
                 else {
