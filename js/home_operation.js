@@ -67,11 +67,6 @@ var home_page={
     init:function(){
         this.slider_items=[];
         $('#app').show();
-        
-        // Display MAC address at the top of home page
-        if(typeof mac_address !== 'undefined' && mac_address) {
-            $('#home-page-mac-address').text(mac_address);
-        }
         var  htmlContents="";
         var live_favourite_movie=LiveModel.getRecentOrFavouriteMovies('favourite');
         live_favourite_movie.map(function(movie, index){
