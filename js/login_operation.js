@@ -159,17 +159,27 @@ var login_page = {
             version: version,
         };
         var encrypted_data = encryptRequest(data);
-        console.log('Making POST request to:', panel_url + "/device_info");
+        // Use local proxy server to avoid CORS issues
+        var proxy_url = window.location.origin + "/api/proxy/device_info";
+        console.log('Making POST request to proxy:', proxy_url);
         console.log('Request data:', { data: encrypted_data });
         $.ajax({
             method: "post",
-            url: panel_url + "/device_info",
+            url: proxy_url,
             data: {
                 data: encrypted_data,
             },
             success: function (data1) {
-                var data = decryptResponse(data1);
-                console.log(data);
+                console.log('Raw API response:', data1);
+                console.log('Response type:', typeof data1);
+                try {
+                    var data = decryptResponse(data1);
+                    console.log('Decrypted data:', data);
+                } catch (e) {
+                    console.log('Decryption error:', e);
+                    console.log('Failed to decrypt response:', data1);
+                    return;
+                }
                 localStorage.setItem(
                     storage_id + "api_data",
                     JSON.stringify(data),
