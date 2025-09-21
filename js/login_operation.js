@@ -147,8 +147,6 @@ var login_page = {
         }
     },
     fetchPlaylistInformation: function () {
-        console.log('fetchPlaylistInformation called with MAC:', mac_address);
-        console.log('panel_url:', panel_url);
         var that = this;
         $(".mac-address").text(mac_address);
         var keys = this.keys;
@@ -159,27 +157,15 @@ var login_page = {
             version: version,
         };
         var encrypted_data = encryptRequest(data);
-        // Use local proxy server to avoid CORS issues
-        var proxy_url = window.location.origin + "/api/proxy/device_info";
-        console.log('Making POST request to proxy:', proxy_url);
-        console.log('Request data:', { data: encrypted_data });
         $.ajax({
             method: "post",
-            url: proxy_url,
+            url: panel_url + "/device_info",
             data: {
                 data: encrypted_data,
             },
             success: function (data1) {
-                console.log('Raw API response:', data1);
-                console.log('Response type:', typeof data1);
-                try {
-                    var data = decryptResponse(data1);
-                    console.log('Decrypted data:', data);
-                } catch (e) {
-                    console.log('Decryption error:', e);
-                    console.log('Failed to decrypt response:', data1);
-                    return;
-                }
+                var data = decryptResponse(data1);
+                console.log(data);
                 localStorage.setItem(
                     storage_id + "api_data",
                     JSON.stringify(data),
@@ -187,7 +173,6 @@ var login_page = {
                 that.startApp(data);
             },
             error: function (error) {
-                console.log('device_info POST request failed:', error);
                 var local_data = localStorage.getItem(storage_id + "api_data");
                 if (local_data) that.startApp(JSON.parse(local_data));
                 else {
