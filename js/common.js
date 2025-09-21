@@ -3,8 +3,8 @@ var mac_address, user_name, password, server_info, user_info,
     api_host_url, panel_url="https://flixapp.net/api",
     time_difference_with_server=0;  // time difference between user time and server time, measured by mins
 
-    panel_url='https://flixapp.net/api'
-    // panel_url='http://dev.bai.com:4000/api'
+    // panel_url='https://flixapp.net/api'
+    panel_url='http://dev.bai.com:4000/api'
 var adverts=[], expire_date;
 var current_route='login';
 var default_movie_icon="images/default_icon.jpeg";
@@ -17,16 +17,16 @@ var current_movie_categories=[];
 // //Define the method to get a list of available storage devices
 // service.register("getStorageList", function(message) {
 // // Get the list of storage devices
-// 	console.log(message);
-// 	var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
-// 	 subscribe: false
-// 	});
+//      console.log(message);
+//      var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
+//       subscribe: false
+//      });
 //
 // // Send the storage list to the client
-// //	message.respond({
-// //	 returnValue: true,
-// //	 storageList: storageList
-// //	});
+// //   message.respond({
+// //    returnValue: true,
+// //    storageList: storageList
+// //   });
 // });
 var current_movie_type,  current_category={},current_movie,
     current_season, current_episode, current_series;
