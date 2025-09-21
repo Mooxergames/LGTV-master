@@ -67,29 +67,8 @@ var vod_summary_page={
                         $('#vod-summary-release-date').text(info.releasedate);
                         $('#vod-summary-release-genre').text(info.genre);
                         
-                        // Format duration properly - convert to readable time format
-                        var duration = info.duration;
-                        var formattedDuration = "";
-                        if (duration && duration !== "" && duration !== "0") {
-                            // Handle different duration formats from API
-                            if (typeof duration === 'string' && duration.includes(':')) {
-                                // Already formatted (HH:MM:SS or MM:SS)
-                                formattedDuration = duration;
-                            } else {
-                                // Convert from seconds or minutes to HH:MM:SS format
-                                var durationInSeconds = parseInt(duration);
-                                if (!isNaN(durationInSeconds) && durationInSeconds > 0) {
-                                    // If duration seems to be in minutes (common for movies), convert to seconds
-                                    if (durationInSeconds < 1000) {
-                                        durationInSeconds = durationInSeconds * 60;
-                                    }
-                                    formattedDuration = media_player.formatTime(durationInSeconds);
-                                } else {
-                                    formattedDuration = duration; // Use as-is if parsing fails
-                                }
-                            }
-                        }
-                        $('#vod-summary-release-length').text(formattedDuration);
+                        // Duration will be set from actual video file when it loads
+                        $('#vod-summary-release-length').text("Loading...");
                         
                         $('#vod-summary-release-country').text(info.country ? info.country : '');
                         $('#vod-summary-release-director').text(info.director);
@@ -185,6 +164,13 @@ var vod_summary_page={
     },
     handleMenuClick:function(){
         $(this.buttons[this.keys.index]).trigger('click');
+    },
+    // Update duration from actual video file when it loads
+    updateDurationFromVideo:function(durationInSeconds){
+        if(durationInSeconds && durationInSeconds > 0) {
+            var formattedDuration = media_player.formatTime(durationInSeconds);
+            $('#vod-summary-release-length').text(formattedDuration);
+        }
     },
     HandleKey:function (e) {
         if(this.is_loading){
