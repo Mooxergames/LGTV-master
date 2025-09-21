@@ -160,6 +160,19 @@ var login_page={
                     if(typeof mac_address !== 'undefined' && mac_address) {
                         $('#network-issue-mac-address').text(mac_address);
                     }
+                    
+                    // Hide or show Choose Playlist button based on playlist count
+                    var playlistCount = playlist_urls ? playlist_urls.length : 0;
+                    var choosePlaylistBtn = $('.network-issue-btn').filter(function() {
+                        return $(this).attr('onclick') === 'login_page.showPlaylistSelectionModal()';
+                    });
+                    
+                    if (playlistCount > 1) {
+                        choosePlaylistBtn.show();
+                    } else {
+                        choosePlaylistBtn.hide();
+                    }
+                    
                     $('#network-issue-container').show();
                     if(keys.focused_part!=='turn_off_modal')
                         that.hoverNetworkIssueBtn(0);
