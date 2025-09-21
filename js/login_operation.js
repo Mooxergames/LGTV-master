@@ -204,18 +204,39 @@ var login_page = {
                         success: function (data1, textStatus, xhr) {
                             console.log("Raw API response:", data1);
                             console.log("Response type:", typeof data1);
+                            
+                            var data;
                             try {
-                                var data = decryptResponse(data1);
-                                console.log(data);
-                                localStorage.setItem(
-                                    storage_id + "api_data",
-                                    JSON.stringify(data),
-                                );
-                                that.startApp(data);
+                                // Check if response is already JSON
+                                if (typeof data1 === 'string' && (data1.startsWith('{') || data1.startsWith('['))) {
+                                    console.log("Response is JSON, parsing directly");
+                                    data = JSON.parse(data1);
+                                } else {
+                                    console.log("Response is encrypted, decrypting");
+                                    data = decryptResponse(data1);
+                                }
+                                
+                                console.log("Parsed API response:", data);
+                                
+                                // Check if response indicates an error
+                                if (data.status === "error" || data.msg === "Access Disabled") {
+                                    console.log("API returned error:", data.msg || data.status);
+                                    // Handle API error - try with local data or show network error
+                                    var local_data = localStorage.getItem(storage_id + "api_data");
+                                    if (local_data) that.startApp(JSON.parse(local_data));
+                                    else that.showNetworkError();
+                                } else {
+                                    // Success response - store and start app
+                                    localStorage.setItem(
+                                        storage_id + "api_data",
+                                        JSON.stringify(data),
+                                    );
+                                    that.startApp(data);
+                                }
                             } catch (error) {
-                                console.log("Decryption error:", error);
-                                console.log("Failed to decrypt response:", data1);
-                                // Handle decryption failure - try with local data
+                                console.log("Response parsing error:", error);
+                                console.log("Failed to parse response:", data1);
+                                // Handle parsing failure - try with local data
                                 var local_data = localStorage.getItem(storage_id + "api_data");
                                 if (local_data) that.startApp(JSON.parse(local_data));
                                 else that.showNetworkError();
