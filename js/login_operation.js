@@ -141,9 +141,10 @@ var login_page={
         $.ajax({
             method: 'post',
             url: panel_url+"/device_info",
-            data:{
-                data:encrypted_data,
-            },
+            contentType: 'application/json',
+            data: JSON.stringify({
+                data: encrypted_data
+            }),
             success: function (data1) {
                 var data=decryptResponse(data1);
                 console.log(data);
