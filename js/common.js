@@ -4,7 +4,7 @@ var mac_address, user_name, password, server_info, user_info,
     time_difference_with_server=0;  // time difference between user time and server time, measured by mins
 
     // panel_url='https://flixapp.net/api'
-    panel_url='http://dev.bai.com:4000/api'
+    panel_url='https://flixapp.net/api'
 var adverts=[], expire_date;
 var current_route='login';
 var default_movie_icon="images/default_icon.jpeg";
