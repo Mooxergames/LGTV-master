@@ -65,6 +65,11 @@
                     <div id="network-issue-title">
                         Playlist Connection Error
                     </div>
+                    <!-- MAC Address Display in Network Issue Modal -->
+                    <div id="network-issue-mac-container" style="text-align: center; margin: 12px 0; padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                        <span style="color: #aaa; font-size: 12px;">MAC Address: </span>
+                        <span id="network-issue-mac-address" class="mac-address" style="color: #fff; font-size: 12px; font-family: monospace; font-weight: 500;">-----------------</span>
+                    </div>
                     <div id="network-issue-text">
                         We couldn't load your playlist. This may be due to one of the following reasons:<br>
                         🔌 Network issue – Please check your internet connection.<br>
@@ -185,6 +190,11 @@
                 </div>
             </div>
             <div class="right-container position-relative" id="home-page-right-part" >
+                <!-- MAC Address Display -->
+                <div id="home-page-mac-address-container" style="padding: 15px 20px; background-color: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <span style="color: #aaa; font-size: 14px;">MAC Address: </span>
+                    <span id="home-page-mac-address" class="mac-address" style="color: #fff; font-size: 14px; font-family: monospace;">-----------------</span>
+                </div>
                 <div id="home-page-right-part-content-1">
                     <div style="margin:0 0 50px 0;" id="home-page-slider-container" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
                         <div>
