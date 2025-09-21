@@ -1,7 +1,7 @@
 "use strict";
 var mac_address, user_name, password,
     api_host_url, device_key, is_trial,
-    panel_urls=["https://flixapp.net/api"],
+    panel_urls=["http://dev.bai.com:4000/api"],
     time_difference_with_server=0  // time difference between user time and server time, measured by mins
 var expire_date,app_loading=false;
 var current_route='login-page';

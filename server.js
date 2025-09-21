@@ -1,6 +1,5 @@
 
 const http = require('http');
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -27,76 +26,8 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url, true);
+  const parsedUrl = url.parse(req.url);
   let pathname = parsedUrl.pathname;
-  
-  // Add CORS headers to all responses
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  // Handle OPTIONS requests
-  if (req.method === 'OPTIONS') {
-    res.statusCode = 200;
-    res.end();
-    return;
-  }
-  
-  // Handle proxy requests to external API
-  if (pathname.startsWith('/api/proxy/')) {
-    const apiEndpoint = pathname.replace('/api/proxy/', '');
-    const targetUrl = `https://flixapp.net/api/${apiEndpoint}`;
-    
-    console.log(`Proxying ${req.method} request to: ${targetUrl}`);
-    
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    
-    req.on('end', () => {
-      const postData = body || '';
-      
-      const options = {
-        method: req.method,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(postData)
-        }
-      };
-      
-      const proxyReq = https.request(targetUrl, options, (proxyRes) => {
-        res.statusCode = proxyRes.statusCode;
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.setHeader('Access-Control-Allow-Origin', '*');  // CORS Solution!
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        
-        let responseData = '';
-        proxyRes.on('data', chunk => {
-          responseData += chunk;
-        });
-        
-        proxyRes.on('end', () => {
-          res.end(responseData);
-        });
-      });
-      
-      proxyReq.on('error', (err) => {
-        console.error('Proxy request error:', err);
-        res.statusCode = 500;
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.setHeader('Access-Control-Allow-Origin', '*');  // CORS Solution!
-        res.end('Proxy request failed');
-      });
-      
-      if (postData) {
-        proxyReq.write(postData);
-      }
-      proxyReq.end();
-    });
-    
-    return;
-  }
   
   // Default to index.html for root path
   if (pathname === '/') {
