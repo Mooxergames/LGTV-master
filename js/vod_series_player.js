@@ -698,12 +698,17 @@ var vod_series_player={
                         movieType = 'movie';
                     } else {
                         var episode = current_season.episodes[episode_variable.keys.index];
-                        // Pass the complete episode object with all TMDB data
+                        // Pass the complete episode object with all TMDB data and series info
                         movieData = {
-                            name: episode.title || episode.name || current_series.name,  // Use episode name first
+                            name: episode.title || episode.name,  // Episode name
                             title: episode.title,
+                            episode_name: episode.title, 
                             info: episode.info,  // Contains episode TMDB ID
-                            series_tmdb_id: episode.series_tmdb_id  // Series TMDB ID fallback
+                            series_tmdb_id: episode.series_tmdb_id,  // Series TMDB ID fallback
+                            // Add series info for fallback subtitle matching
+                            series_name: current_series.name,  // Full series name
+                            season: episode.season || current_season.season_number || 1,  // Season number
+                            episode_num: episode.episode_num || (episode_variable.keys.index + 1)  // Episode number
                         };
                         movieType = 'episode';
                     }

@@ -86,10 +86,10 @@ var SubtitleFetcher = {
                 // SMART FALLBACK: Use series name + season/episode from data structure
                 console.log('⚠️ Episode parsing failed - using series data structure');
                 
-                // Try to get series name from current_series or movieData
-                var seriesName = null;
-                if (typeof current_series !== 'undefined' && current_series.name) {
-                    seriesName = current_series.name.replace(/\[.*?\]/g, '').trim(); // Remove [MultiAudio] etc
+                // Get series name from movieData (now passed from vod_series_player.js)
+                var seriesName = movieData.series_name;
+                if (seriesName) {
+                    seriesName = seriesName.replace(/\[.*?\]/g, '').trim(); // Remove [MultiAudio] etc
                 }
                 
                 // Get season/episode from movieData structure  
