@@ -248,17 +248,9 @@ function initPlayer() {
                         that.current_time=currentTime;
                         if(current_route==='vod-series-player-video') {
                             vod_series_player.current_time=currentTime/1000;
-                            // 🔧 SAMSUNG TIMING DEBUG: Samsung gives time in milliseconds
-                            var currentTimeSeconds = currentTime/1000;
-                            console.log("📱 SAMSUNG TIMING:", {
-                                platform: "Samsung/Tizen",
-                                currentTime_ms: currentTime,
-                                currentTime_seconds: currentTimeSeconds,
-                                route: current_route
-                            });
-                            
+                            // Samsung subtitle timing - convert ms to seconds
                             if(typeof SrtOperation !== 'undefined') {
-                                SrtOperation.timeChange(currentTimeSeconds);
+                                SrtOperation.timeChange(currentTime/1000);
                             }
                         }
                         $('#'+that.parent_id).find('.video-error').hide();
@@ -477,15 +469,6 @@ function initPlayer() {
                     var currentTime=videoObj.currentTime;
                     if(current_route==='vod-series-player-video') {
                         vod_series_player.current_time=currentTime;
-                        
-                        // 🔧 BROWSER TIMING DEBUG: Browser gives time in seconds directly
-                        console.log("🌐 BROWSER TIMING:", {
-                            platform: "Browser/HTML5",
-                            currentTime_seconds: currentTime,
-                            duration: duration,
-                            route: current_route
-                        });
-                        
                         SrtOperation.timeChange(currentTime);
                     }
                     if (duration > 0) {
