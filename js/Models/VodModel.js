@@ -3,7 +3,7 @@ var VodModel ={
     movies:[],
     category_name:'vod',
     favourite_category_index:'top-1',
-    recent_category_index:'bottom-1',
+    recent_category_index:'top-2',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
     favourite_movie_count:200,
