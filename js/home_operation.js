@@ -79,19 +79,11 @@ var home_page={
         })
         $('#favourite_tv_wrapper').html(htmlContents);
 
-        // Initialize VOD favorites
+        // Initialize VOD favorites (auto-seed random content)
         VodModel.pruneInvalidFavorites();
         if(settings.random_vod_seed_on_start) {
             VodModel.seedRandomFavorites(settings.random_vod_favourites_target);
         }
-        
-        // Render VOD favorites slider
-        var vod_favourite_movies = VodModel.getFavouriteMovies();
-        var vodFavoritesHtml = "";
-        vod_favourite_movies.map(function(movie, index){
-            vodFavoritesHtml += home_page.makeSliderMovieItemElement(movie,'vod',0, index);
-        });
-        $('#vod_favourite_wrapper').html(vodFavoritesHtml);
 
         var vod_featured_movies=[];
         if(settings.show_featured_movies==='on')
