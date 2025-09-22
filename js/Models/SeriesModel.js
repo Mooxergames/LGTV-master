@@ -2,8 +2,8 @@
 var SeriesModel={
     movies:[],
     category_name:'series',
-    favourite_category_index:'top-2',
-    recent_category_index:'top-1',
+    favourite_category_index:'top-1',
+    recent_category_index:'top-0',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
     favourite_movie_count:200,
