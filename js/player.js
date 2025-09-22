@@ -343,24 +343,37 @@ function initPlayer() {
                 try{
                     if(kind === "TEXT") {
                         if(index === -1) {
-                            // Disable native subtitles
-                            webapis.avplay.setSubtitle(-1);
+                            // Disable native subtitles - check if webapis is available
+                            if(typeof webapis !== 'undefined' && webapis.avplay && webapis.avplay.setSubtitle) {
+                                webapis.avplay.setSubtitle(-1);
+                            }
                         } else {
-                            // Enable native subtitle track
-                            webapis.avplay.setSilentSubtitle(true);
-                            webapis.avplay.setSelectTrack(kind, index);
-                            webapis.avplay.setSilentSubtitle(false);
+                            // Enable native subtitle track - check if webapis is available
+                            if(typeof webapis !== 'undefined' && webapis.avplay) {
+                                if(webapis.avplay.setSilentSubtitle) {
+                                    webapis.avplay.setSilentSubtitle(true);
+                                }
+                                if(webapis.avplay.setSelectTrack) {
+                                    webapis.avplay.setSelectTrack(kind, index);
+                                }
+                                if(webapis.avplay.setSilentSubtitle) {
+                                    webapis.avplay.setSilentSubtitle(false);
+                                }
+                            }
                         }
                         
                         if(index > -1) {
                             $('#'+this.parent_id).find('.subtitle-container').show();
                         }
                     } else {
-                        // Audio track handling
-                        webapis.avplay.setSelectTrack(kind, index);
+                        // Audio track handling - check if webapis is available
+                        if(typeof webapis !== 'undefined' && webapis.avplay && webapis.avplay.setSelectTrack) {
+                            webapis.avplay.setSelectTrack(kind, index);
+                        }
                     }
                 }catch (e) {
-                    console.error('Samsung subtitle/audio track error:', e);
+                    console.error('Samsung subtitle/audio track error:', e.message || e);
+                    console.error('Error details:', e);
                 }
             },
             seekTo:function(step){

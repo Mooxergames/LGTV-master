@@ -161,29 +161,45 @@ var EnhancedSubtitleWorkflow = {
      * @param {Function} errorCallback - Error callback
      */
     selectApiSubtitle: function(subtitle, loadingCallback, successCallback, errorCallback) {
-        // Disable native subtitles first
+        // Disable native subtitles first - only if webapis is available
         try {
-            if(platform === 'samsung') {
+            if(platform === 'samsung' && typeof webapis !== 'undefined') {
+                console.log('Disabling Samsung native subtitles');
                 media_player.setSubtitleOrAudioTrack("TEXT", -1);
             } else if(platform === 'lg' && media_player.videoObj && media_player.videoObj.textTracks) {
+                console.log('Disabling LG native subtitles');
                 for(var i = 0; i < media_player.videoObj.textTracks.length; i++) {
                     media_player.videoObj.textTracks[i].mode = 'hidden';
                 }
+            } else if(platform === 'samsung' && typeof webapis === 'undefined') {
+                console.log('Samsung platform detected but webapis not available (browser mode)');
             }
         } catch(e) {
             console.error('Error disabling native subtitles:', e);
         }
         
-        // Get subtitle file URL
-        var subtitleFile = subtitle.apiData ? subtitle.apiData.file : subtitle.file;
-        if(!subtitleFile) {
-            if(errorCallback) errorCallback('No subtitle file available');
-            return;
+        // Get subtitle file URL - handle different API response formats
+        var subtitleUrl = '';
+        
+        // Since apiData = subtitle (from subtitle_fetcher.js), check subtitle properties directly
+        if(subtitle.file) {
+            subtitleUrl = subtitle.file;
+            if(subtitleUrl.startsWith('/')) {
+                subtitleUrl = 'https://exoapp.tv' + subtitleUrl;
+            }
+        } else if(subtitle.url) {
+            subtitleUrl = subtitle.url;
+        } else if(subtitle.id && subtitle.language) {
+            // Construct API URL for subtitle file
+            subtitleUrl = 'https://exoapp.tv/api/subtitle-file?lang=' + subtitle.language + '&id=' + subtitle.id;
+        } else {
+            // Log the full subtitle object to understand the structure
+            console.log('Unable to determine subtitle URL. Subtitle object:', subtitle);
         }
         
-        var subtitleUrl = subtitleFile;
-        if(subtitleUrl.startsWith('/')) {
-            subtitleUrl = 'https://exoapp.tv' + subtitleUrl;
+        if(!subtitleUrl) {
+            if(errorCallback) errorCallback('No subtitle file URL available');
+            return;
         }
         
         console.log('Loading API subtitle:', subtitleUrl);
@@ -196,20 +212,34 @@ var EnhancedSubtitleWorkflow = {
             method: 'GET',
             dataType: 'text',
             timeout: 15000,
+            crossDomain: true,
+            beforeSend: function(xhr) {
+                // Add headers if needed for CORS
+                xhr.setRequestHeader('Accept', 'text/plain, application/x-subrip, */*');
+            },
             success: function(subtitleContent) {
-                console.log('Subtitle content loaded successfully');
+                console.log('Subtitle content loaded successfully, length:', subtitleContent ? subtitleContent.length : 0);
+                
+                if(!subtitleContent || subtitleContent.trim().length === 0) {
+                    console.error('Subtitle content is empty');
+                    if(errorCallback) errorCallback('Subtitle content is empty');
+                    return;
+                }
                 
                 // Get current video time
                 var currentTime = 0;
                 try {
-                    if(platform === 'samsung' && typeof webapis !== 'undefined' && webapis.avplay) {
+                    if(platform === 'samsung' && typeof webapis !== 'undefined' && webapis.avplay && webapis.avplay.getCurrentTime) {
                         currentTime = webapis.avplay.getCurrentTime() / 1000; // Convert ms to seconds
                     } else if(media_player.videoObj && media_player.videoObj.currentTime) {
                         currentTime = media_player.videoObj.currentTime;
                     }
                 } catch(e) {
+                    console.error('Error getting current time:', e);
                     currentTime = 0;
                 }
+                
+                console.log('Initializing SRT with current time:', currentTime);
                 
                 // Initialize SRT operation
                 SrtOperation.init({content: subtitleContent}, currentTime);
@@ -220,8 +250,21 @@ var EnhancedSubtitleWorkflow = {
                 if(successCallback) successCallback();
             },
             error: function(xhr, status, error) {
-                console.error('Error loading subtitle:', error);
-                if(errorCallback) errorCallback(error);
+                console.error('Error loading subtitle. Status:', status, 'Error:', error, 'Response:', xhr.responseText);
+                console.error('URL that failed:', subtitleUrl);
+                console.error('XHR object:', xhr);
+                console.error('Response status:', xhr.status);
+                
+                // Try alternative approach if CORS is the issue
+                if(status === 'error' && xhr.status === 0) {
+                    console.log('CORS or network error detected, falling back to native subtitles');
+                    if(errorCallback) errorCallback('CORS or network error when loading subtitle');
+                } else if(xhr.status === 404) {
+                    console.log('Subtitle file not found (404)');
+                    if(errorCallback) errorCallback('Subtitle file not found');
+                } else {
+                    if(errorCallback) errorCallback('Failed to load subtitle: ' + (error || status || 'HTTP ' + xhr.status));
+                }
             }
         });
     },
@@ -233,14 +276,16 @@ var EnhancedSubtitleWorkflow = {
         // Stop API subtitles
         SrtOperation.stopOperation();
         
-        // Disable native subtitles
+        // Disable native subtitles - only if webapis is available
         try {
-            if(platform === 'samsung') {
+            if(platform === 'samsung' && typeof webapis !== 'undefined') {
                 media_player.setSubtitleOrAudioTrack("TEXT", -1);
             } else if(platform === 'lg' && media_player.videoObj && media_player.videoObj.textTracks) {
                 for(var i = 0; i < media_player.videoObj.textTracks.length; i++) {
                     media_player.videoObj.textTracks[i].mode = 'hidden';
                 }
+            } else if(platform === 'samsung' && typeof webapis === 'undefined') {
+                console.log('Samsung platform in browser mode - cannot disable native subtitles');
             }
         } catch(e) {
             console.error('Error disabling subtitles:', e);
