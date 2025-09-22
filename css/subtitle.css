@@ -193,6 +193,7 @@
     max-height: 400px;
     overflow-y: auto;
     padding-right: 10px;
+    margin-bottom: 25px;
 }
 
 #subtitle-selection-container::-webkit-scrollbar {
