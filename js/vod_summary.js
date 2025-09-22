@@ -136,8 +136,6 @@ var vod_summary_page={
     },
     showMovie:function(){
         $('#vod-summary-page').hide();
-        if(!checkForAdult(current_movie,'movie',VodModel.categories))
-            VodModel.addRecentOrFavouriteMovie(current_movie,'recent');  // Add To Recent Movies
         vod_series_player.makeEpisodeDoms('home-page');
         vod_series_player.init(current_movie,"movies",this.prev_route);
     },
