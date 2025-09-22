@@ -246,8 +246,13 @@ function initPlayer() {
                     },
                     oncurrentplaytime: function(currentTime) {
                         that.current_time=currentTime;
-                        if(current_route==='vod-series-player-video')
+                        if(current_route==='vod-series-player-video') {
                             vod_series_player.current_time=currentTime/1000;
+                            // Samsung subtitle timing - convert ms to seconds
+                            if(typeof SrtOperation !== 'undefined') {
+                                SrtOperation.timeChange(currentTime/1000);
+                            }
+                        }
                         $('#'+that.parent_id).find('.video-error').hide();
                         var duration =  webapis.avplay.getDuration();
                         if (duration > 0) {
