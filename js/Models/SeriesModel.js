@@ -289,11 +289,18 @@ var SeriesModel={
         localStorage.setItem(storage_id+settings.playlist_url+"_"+this.category_name+"_"+kind, JSON.stringify(movie_ids));
         if(is_deleted && kind==="favourite"){
             this.favourite_ids=movie_ids;
-            // var domElement1=getDomElementFromData($('#movie-grids-container').find('.movie-item-container'),'channel_id',movie_id);
-            // $(domElement1).find('.favourite-badge').remove();
-
-            var domElement=home_page.movie_grid_doms[home_page.keys.grid_selection];
-            $(domElement).find('.favourite-badge').remove();
+            
+            // Check if we're currently viewing the favorites category
+            if(typeof current_category !== 'undefined' && current_category.category_id === 'favourite' && 
+               typeof current_route !== 'undefined' && current_route === 'home-page') {
+                // Refresh the entire category to fill the empty space
+                home_page.showCategoryContent();
+            } else {
+                // If not in favorites view, just remove the DOM element (legacy behavior)
+                var domElement=home_page.movie_grid_doms[home_page.keys.grid_selection];
+                $(domElement).find('.favourite-badge').remove();
+                $(domElement).remove();
+            }
         }
     },
     checkForAdult:function(movie){

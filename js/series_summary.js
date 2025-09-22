@@ -74,8 +74,16 @@ var series_summary_page={
         $('#series-summary-page').hide();
         switch (this.prev_route) {
             case "home-page":
-                // $('#home-page').css({height:'100vh'});
-                home_page.reEnter();
+                // Check if we need to refresh favorites category after removal
+                if(typeof current_category !== 'undefined' && current_category.category_id === 'favourite') {
+                    // Refresh the favorites category to fill empty spaces
+                    home_page.reEnter();
+                    setTimeout(function() {
+                        home_page.showCategoryContent();
+                    }, 100);
+                } else {
+                    home_page.reEnter();
+                }
                 break;
             case "search-page":
                 $('#search-page').show();
