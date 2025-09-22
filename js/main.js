@@ -53,10 +53,13 @@ $(document).ready(function () {
     parent_account_password=saved_parent_password!=null ? saved_parent_password : parent_account_password;
     if(platform==='samsung'){
         document.addEventListener("visibilitychange", function(){
-            if(document.hidden)
-                webapis.avplay.suspend();
-            else
-                webapis.avplay.restore();
+            // Only call webapis methods if they're available (TV environment)
+            if(typeof webapis !== 'undefined' && webapis.avplay) {
+                if(document.hidden)
+                    webapis.avplay.suspend();
+                else
+                    webapis.avplay.restore();
+            }
         });
     }
     else if(platform==='lg')
