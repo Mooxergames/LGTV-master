@@ -125,17 +125,134 @@ var SubtitleFetcher = {
                     successCallback(subtitles);
                 }
             }, function(error) {
-                // STAGE 2: No TMDB - just season/episode structure
-                console.log('🎯 Stage 2: Season/episode without TMDB');
-                that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
+                // STAGE 2: Name-based fallback "Series S01 E01" (reliable for wrong TMDB)
+                console.log('🎯 Stage 2: Name-based series fallback');
+                var parsedEpisode = that.parseEpisodeName(episodeName);
+                
+                if(parsedEpisode.series_name && parsedEpisode.season_number && parsedEpisode.episode_number) {
+                    var seasonStr = 'S' + String(parsedEpisode.season_number).padStart(2, '0');
+                    var episodeStr = 'E' + String(parsedEpisode.episode_number).padStart(2, '0');
+                    var nameBasedTitle = parsedEpisode.series_name + ' ' + seasonStr + ' ' + episodeStr;
+                    
+                    var nameBasedRequest = {
+                        movie_type: 'movie',
+                        movie_name: nameBasedTitle
+                    };
+                    
+                    console.log('🎯 Using name-based format:', nameBasedTitle);
+                    
+                    that.makeSubtitleRequest(nameBasedRequest, function(subtitles) {
+                        console.log('✅ Name-based series matching successful');
+                        if(successCallback) {
+                            successCallback(subtitles);
+                        }
+                    }, function(error2) {
+                        // STAGE 3: Season/episode structure only (no TMDB, no name)
+                        console.log('🎯 Stage 3: Season/episode structure only');
+                        that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
+                            console.log('✅ Season/episode structure matching successful');
+                            if(successCallback) {
+                                successCallback(subtitles);
+                            }
+                        }, function(error3) {
+                            // STAGE 4: Episode TMDB as last resort
+                            if(episodeTmdbFallback) {
+                                console.log('🎯 Stage 4: Episode TMDB last resort');
+                                var episodeRequestData = Object.assign({}, subtitleRequestData, {
+                                    tmdb_id: String(episodeTmdbFallback)
+                                });
+                                
+                                that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                            } else {
+                                if(errorCallback) {
+                                    errorCallback('No subtitles found in all stages');
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    // Can't parse name - skip to season/episode structure
+                    console.log('🎯 Stage 2B: Season/episode structure (no name parsing)');
+                    that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
+                        console.log('✅ Season/episode structure matching successful');
+                        if(successCallback) {
+                            successCallback(subtitles);
+                        }
+                    }, function(error2) {
+                        if(episodeTmdbFallback) {
+                            console.log('🎯 Stage 3B: Episode TMDB fallback');
+                            var episodeRequestData = Object.assign({}, subtitleRequestData, {
+                                tmdb_id: String(episodeTmdbFallback)
+                            });
+                            
+                            that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                        } else {
+                            if(errorCallback) {
+                                errorCallback('No subtitles found in all stages');
+                            }
+                        }
+                    });
+                }
+            });
+        } 
+        // STAGE 1B: No series TMDB - prioritize name-based matching
+        else if(subtitleRequestData.season_number && subtitleRequestData.episode_number) {
+            console.log('🎯 Stage 1B: Name-based matching (no series TMDB)');
+            
+            var parsedEpisode = this.parseEpisodeName(episodeName);
+            
+            if(parsedEpisode.series_name && parsedEpisode.season_number && parsedEpisode.episode_number) {
+                var seasonStr = 'S' + String(parsedEpisode.season_number).padStart(2, '0');
+                var episodeStr = 'E' + String(parsedEpisode.episode_number).padStart(2, '0');
+                var nameBasedTitle = parsedEpisode.series_name + ' ' + seasonStr + ' ' + episodeStr;
+                
+                var nameBasedRequest = {
+                    movie_type: 'movie',
+                    movie_name: nameBasedTitle
+                };
+                
+                console.log('🎯 Using name-based format:', nameBasedTitle);
+                
+                this.makeSubtitleRequest(nameBasedRequest, function(subtitles) {
+                    console.log('✅ Name-based series matching successful');
+                    if(successCallback) {
+                        successCallback(subtitles);
+                    }
+                }, function(error) {
+                    // STAGE 2B: Season/episode structure fallback
+                    console.log('🎯 Stage 2B: Season/episode structure fallback');
+                    that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
+                        console.log('✅ Season/episode structure matching successful');
+                        if(successCallback) {
+                            successCallback(subtitles);
+                        }
+                    }, function(error2) {
+                        // STAGE 3B: Episode TMDB last resort
+                        if(episodeTmdbFallback) {
+                            console.log('🎯 Stage 3B: Episode TMDB last resort');
+                            var episodeRequestData = Object.assign({}, subtitleRequestData, {
+                                tmdb_id: String(episodeTmdbFallback)
+                            });
+                            
+                            that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                        } else {
+                            if(errorCallback) {
+                                errorCallback('No subtitles found');
+                            }
+                        }
+                    });
+                });
+            } else {
+                // Can't parse name - fall back to season/episode structure
+                console.log('🎯 Stage 1B-Alt: Season/episode structure (no name parsing)');
+                this.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
                     console.log('✅ Season/episode structure matching successful');
                     if(successCallback) {
                         successCallback(subtitles);
                     }
-                }, function(error2) {
-                    // STAGE 3: Episode TMDB fallback (if available)
+                }, function(error) {
                     if(episodeTmdbFallback) {
-                        console.log('🎯 Stage 3: Episode TMDB fallback');
+                        console.log('🎯 Stage 2B-Alt: Episode TMDB fallback');
                         var episodeRequestData = Object.assign({}, subtitleRequestData, {
                             tmdb_id: String(episodeTmdbFallback)
                         });
@@ -143,35 +260,11 @@ var SubtitleFetcher = {
                         that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
                     } else {
                         if(errorCallback) {
-                            errorCallback('No subtitles found in all stages');
+                            errorCallback('No subtitles found');
                         }
                     }
                 });
-            });
-        } 
-        // STAGE 1B: No series TMDB - try season/episode structure only
-        else if(subtitleRequestData.season_number && subtitleRequestData.episode_number) {
-            console.log('🎯 Stage 1B: Season/episode structure without series TMDB');
-            this.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
-                console.log('✅ Season/episode structure matching successful');
-                if(successCallback) {
-                    successCallback(subtitles);
-                }
-            }, function(error) {
-                // STAGE 2B: Episode TMDB fallback
-                if(episodeTmdbFallback) {
-                    console.log('🎯 Stage 2B: Episode TMDB fallback');
-                    var episodeRequestData = Object.assign({}, subtitleRequestData, {
-                        tmdb_id: String(episodeTmdbFallback)
-                    });
-                    
-                    that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
-                } else {
-                    if(errorCallback) {
-                        errorCallback('No subtitles found');
-                    }
-                }
-            });
+            }
         }
         // STAGE 1C: Movie format fallback (when episode parsing failed)
         else {
