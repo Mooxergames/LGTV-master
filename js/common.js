@@ -611,6 +611,31 @@ function getAtob(text) {
     return result;
 }
 
+// Clean movie names for proper alphabetical sorting
+function cleanNameForSorting(name) {
+    if (!name || typeof name !== 'string') return '';
+    
+    // Convert to lowercase for consistent sorting
+    var cleanName = name.toLowerCase();
+    
+    // Remove leading articles (The, A, An) for better alphabetical sorting
+    cleanName = cleanName.replace(/^(the|a|an)\s+/i, '');
+    
+    // Remove common prefixes that interfere with sorting
+    cleanName = cleanName.replace(/^(watch\s+|stream\s+)/i, '');
+    
+    // Remove year info in parentheses for cleaner sorting
+    cleanName = cleanName.replace(/\s*\(\d{4}\).*$/i, '');
+    
+    // Remove quality tags and brackets
+    cleanName = cleanName.replace(/\s*[\[\(](4k|hd|1080p|720p|bluray|web-dl|hdts|cam).*?[\]\)]/gi, '');
+    
+    // Remove extra whitespace
+    cleanName = cleanName.trim().replace(/\s+/g, ' ');
+    
+    return cleanName;
+}
+
 function getSortedMovies(movies1, key) {
     // Handle empty arrays
     if (!movies1 || movies1.length === 0) {
@@ -684,22 +709,22 @@ function getSortedMovies(movies1, key) {
             
         case 'a-z':
         case 'name':
-            // A to Z (ascending)
+            // A to Z (ascending) - Smart alphabetical sorting
             direction = 1;
             new_movies = movies.sort(function(a, b) {
-                var a_name = a[new_key] || '';
-                var b_name = b[new_key] || '';
-                return direction * a_name.localeCompare(b_name);
+                var a_name = cleanNameForSorting(a[new_key] || '');
+                var b_name = cleanNameForSorting(b[new_key] || '');
+                return direction * a_name.localeCompare(b_name, 'en', { numeric: true, sensitivity: 'base' });
             });
             break;
             
         case 'z-a':
-            // Z to A (descending)
+            // Z to A (descending) - Smart alphabetical sorting
             direction = -1;
             new_movies = movies.sort(function(a, b) {
-                var a_name = a[new_key] || '';
-                var b_name = b[new_key] || '';
-                return direction * a_name.localeCompare(b_name);
+                var a_name = cleanNameForSorting(a[new_key] || '');
+                var b_name = cleanNameForSorting(b[new_key] || '');
+                return direction * a_name.localeCompare(b_name, 'en', { numeric: true, sensitivity: 'base' });
             });
             break;
             
