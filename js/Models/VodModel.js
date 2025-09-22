@@ -399,5 +399,63 @@ var VodModel ={
             }
         }
         return result;
+    },
+    
+    // New methods for VOD favorites management
+    getFavouriteMovies: function() {
+        var favourites = this.getRecentOrFavouriteMovies('favourite');
+        return favourites.filter(movie => {
+            // Only return movies that exist in current catalog
+            return this.movies.some(catalogMovie => catalogMovie.stream_id === movie.stream_id);
+        });
+    },
+    
+    addFavourite: function(movie) {
+        this.addRecentOrFavouriteMovie(movie, 'favourite');
+    },
+    
+    removeFavourite: function(movie_id) {
+        this.removeRecentOrFavouriteMovie(movie_id, 'favourite');
+    },
+    
+    pruneInvalidFavorites: function() {
+        var favourites = this.getRecentOrFavouriteMovies('favourite');
+        var validFavourites = favourites.filter(movie => {
+            return this.movies.some(catalogMovie => catalogMovie.stream_id === movie.stream_id);
+        });
+        
+        if (validFavourites.length !== favourites.length) {
+            this.setRecentOrFavouriteMovies(validFavourites, 'favourite');
+            var movie_ids = validFavourites.map(movie => movie.stream_id);
+            localStorage.setItem(storage_id + settings.playlist_url + "_" + this.category_name + "_favourite", JSON.stringify(movie_ids));
+            this.favourite_ids = movie_ids;
+        }
+    },
+    
+    seedRandomFavorites: function(targetCount) {
+        targetCount = targetCount || 10;
+        var currentFavourites = this.getFavouriteMovies();
+        var neededCount = targetCount - currentFavourites.length;
+        
+        if (neededCount <= 0) return;
+        
+        // Get available movies that aren't already favorited
+        var availableMovies = this.movies.filter(movie => {
+            return !this.favourite_ids.includes(movie.stream_id) && 
+                   !this.adult_category_ids.includes(movie.category_id);
+        });
+        
+        if (availableMovies.length === 0) return;
+        
+        // Randomly shuffle and take needed count
+        var shuffled = availableMovies.sort(() => 0.5 - Math.random());
+        var toAdd = shuffled.slice(0, neededCount);
+        
+        // Add each movie to favorites
+        toAdd.forEach(movie => {
+            this.addFavourite(movie);
+        });
+        
+        console.log('Auto-seeded', toAdd.length, 'random VOD favorites');
     }
 }
