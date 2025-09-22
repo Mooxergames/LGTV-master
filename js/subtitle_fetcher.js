@@ -139,10 +139,10 @@ var SubtitleFetcher = {
     combineSubtitles: function(apiSubtitles, nativeSubtitles) {
         var combined = [];
         
-        // Add "Off" option first
+        // Add "Turn Off Subtitles" option first
         combined.push({
             source: 'off',
-            label: 'Off',
+            label: 'Turn Off Subtitles',
             language: 'none'
         });
         
