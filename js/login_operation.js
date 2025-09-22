@@ -283,7 +283,7 @@ var login_page={
 
     getSamsungHardcodedMac: function() {
         console.log('Samsung: Using hardcoded MAC address');
-        mac_address = '52:54:00:12:34:58'; // Hardcoded fallback
+        mac_address = '52:54:00:12:34:59'; // Hardcoded fallback
         this.fetchPlaylistInformation();
     },
 

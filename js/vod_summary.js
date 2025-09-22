@@ -66,10 +66,7 @@ var vod_summary_page={
                         var info=response.info;
                         $('#vod-summary-release-date').text(info.releasedate);
                         $('#vod-summary-release-genre').text(info.genre);
-                        
-                        // Duration will be set from actual video file when it loads
-                        $('#vod-summary-release-length').text("Loading...");
-                        
+                        $('#vod-summary-release-length').text(info.duration);
                         $('#vod-summary-release-country').text(info.country ? info.country : '');
                         $('#vod-summary-release-director').text(info.director);
                         $('#vod-summary-release-cast').text(info.cast);
@@ -164,13 +161,6 @@ var vod_summary_page={
     },
     handleMenuClick:function(){
         $(this.buttons[this.keys.index]).trigger('click');
-    },
-    // Update duration from actual video file when it loads
-    updateDurationFromVideo:function(durationInSeconds){
-        if(durationInSeconds && durationInSeconds > 0) {
-            var formattedDuration = media_player.formatTime(durationInSeconds);
-            $('#vod-summary-release-length').text(formattedDuration);
-        }
     },
     HandleKey:function (e) {
         if(this.is_loading){
