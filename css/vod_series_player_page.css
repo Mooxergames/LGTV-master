@@ -22,36 +22,41 @@
     left: 0;
     width: 100%;
     color: #fff;
-    padding: 30px 40px 40px;
+    padding: 20px;
     z-index: 10;
-    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.8) 100%);
-    backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    transition: opacity 0.3s ease;
 }
 #vod-series-progress-controls-container {
-    margin: 0 auto;
-    width: 85%;
-    background: rgba(15, 15, 15, 0.85);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    padding: 25px 30px 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
-                0 2px 16px rgba(255, 255, 255, 0.1) inset;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    width: 100%;
+    background: none;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+    transition: none;
 }
 #vod-series-progress-controls-container:hover {
-    background: rgba(20, 20, 20, 0.9);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 
-                0 2px 20px rgba(255, 255, 255, 0.15) inset;
+    background: none;
+    transform: none;
+    box-shadow: none;
 }
 #vod-series-progress-container{
     margin: 0 auto;
-    padding: 0 25px;
+    padding: 0 60px;
+    margin-bottom: 20px;
 }
 #vod-series-video-progressbar-container{
     padding: 0;
     position: relative;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: height 0.2s ease;
+}
+#vod-series-video-progressbar-container:hover {
+    height: 6px;
 }
 #vod-series-video-time-container{
     display: inline-block;
@@ -59,120 +64,150 @@
     width: 100%;
 }
 #vod-series-player-page .progress-amount {
-    background: linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #ff4757 100%);
+    background: #e50914;
     height: 100%;
     display: block;
     width: 0%;
-    border-radius: inherit;
-    box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
-    transition: box-shadow 0.3s ease;
+    border-radius: 2px;
+    box-shadow: none;
+    transition: none;
 }
 #vod-series-player-page .progress-amount:hover {
-    box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+    box-shadow: none;
 }
 #vod-series-video-controls-wrapper{
-    width: 85%;
-    margin: 25px auto !important;
-    margin-bottom: 0;
+    width: 100%;
+    margin: 0 auto !important;
+    padding: 0 60px;
     font-size: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 #vod-series-video-time-container{
     font-size: 0;
-    margin-top: 20px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 .video-control-icon {
-    color: #e0e0e0;
-    font-size: 28px;
-    display: inline-block;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 20%;
-    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin: 0 8px;
 }
 .video-control-icon i{
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    display: inline-block;
-    line-height: 56px;
+    width: 44px;
+    height: 44px;
+    background: none;
+    backdrop-filter: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
     border-radius: 50%;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
-                0 1px 4px rgba(255, 255, 255, 0.1) inset;
+    transition: all 0.2s ease;
+    box-shadow: none;
+    opacity: 0.8;
 }
 .video-control-icon i.active{
     color: #fff;
-    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    border-color: rgba(255, 107, 53, 0.6);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4),
-                0 2px 8px rgba(255, 255, 255, 0.2) inset;
-    transform: translateY(-2px) scale(1.05);
+    background: none;
+    border: none;
+    box-shadow: none;
+    transform: none;
+    opacity: 1;
 }
 
 .video-control-icon i.active, .video-control-icon i:hover{
     color: #fff;
     cursor: pointer;
-    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    border-color: rgba(255, 107, 53, 0.6);
-    transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3),
-                0 2px 8px rgba(255, 255, 255, 0.2) inset;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    transform: none;
+    box-shadow: none;
+    opacity: 1;
+}
+.video-controls-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.video-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 #vod-series-player-page .video-time{
-    font-size: 24px;
-    font-weight: 500;
-    width: 50%;
+    font-size: 14px;
+    font-weight: 400;
+    width: auto;
     vertical-align: middle;
     display: inline-block;
-    padding: 0 15px;
-    color: #f5f5f5;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
+    padding: 0;
+    color: #fff;
+    text-shadow: none;
+    letter-spacing: normal;
+    opacity: 0.9;
+    font-family: Netflix Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
 }
 #vod-series-video-title {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 30px 40px;
-    text-align: center;
-    font-size: 34px;
-    font-weight: 600;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
-    backdrop-filter: blur(12px);
+    padding: 20px 60px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+    backdrop-filter: none;
     color: #fff;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: normal;
+    border-bottom: none;
+    font-family: Netflix Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
+    transition: opacity 0.3s ease;
 }
 .rangeslider {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    height: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) inset;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    height: 4px;
+    box-shadow: none;
+    cursor: pointer;
+    transition: height 0.2s ease;
+}
+.rangeslider:hover {
+    height: 6px;
 }
 .rangeslider .rangeslider__handle{
-    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    border: 3px solid rgba(255, 255, 255, 0.9);
+    background: #fff;
+    border: none;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4),
-                0 2px 6px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease;
+    opacity: 0;
 }
 .rangeslider .rangeslider__handle:hover, 
-.rangeslider.active .rangeslider__handle{
-    border: 3px solid #fff;
-    transform: scale(1.2);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.5),
-                0 3px 8px rgba(0, 0, 0, 0.4);
+.rangeslider.active .rangeslider__handle,
+.rangeslider:hover .rangeslider__handle{
+    border: none;
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    opacity: 1;
 }
 .rangeslider .rangeslider__fill {
-    background: linear-gradient(90deg, #ff6b35 0%, #f7931e 50%, #ff4757 100%);
-    border-radius: 8px;
-    box-shadow: 0 0 16px rgba(255, 107, 53, 0.3);
+    background: #e50914;
+    border-radius: 2px;
+    box-shadow: none;
 }
 #vod-video-info-container {
     position: fixed;
