@@ -71,7 +71,15 @@ var series_summary_page={
 
         // Fetch detailed series info from XTREME API for TMDB data
         if(settings.playlist_type==="xtreme"){
-            $.getJSON(api_host_url + '/player_api.php?username=' + user_name + '&password=' + password + '&action=get_series_info&series_id=' + current_series.series_id)
+            console.log('=== SERIES API CALL PREPARATION ===');
+            console.log('Current series object:', current_series);
+            console.log('Series ID field:', current_series.series_id);
+            console.log('Stream ID field:', current_series.stream_id);
+            
+            var seriesApiId = current_series.stream_id || current_series.series_id;
+            console.log('Using API ID:', seriesApiId);
+            
+            $.getJSON(api_host_url + '/player_api.php?username=' + user_name + '&password=' + password + '&action=get_series_info&series_id=' + seriesApiId)
                 .then(
                     function(response){
                         console.log('=== XTREME API get_series_info RESPONSE ANALYSIS ===');
