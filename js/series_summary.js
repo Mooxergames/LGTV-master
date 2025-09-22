@@ -69,6 +69,61 @@ var series_summary_page={
             }
         }
 
+        // Fetch detailed series info from XTREME API for TMDB data
+        if(settings.playlist_type==="xtreme"){
+            $.getJSON(api_host_url + '/player_api.php?username=' + user_name + '&password=' + password + '&action=get_series_info&series_id=' + current_series.series_id)
+                .then(
+                    function(response){
+                        console.log('=== XTREME API get_series_info RESPONSE ANALYSIS ===');
+                        console.log('Full API response:', response);
+                        console.log('Info object:', response.info);
+                        console.log('TMDB ID check:', response.info.tmdb_id);
+                        
+                        var info = response.info;
+                        
+                        // Store complete info object
+                        current_series.info = info;
+                        
+                        // CRITICAL: Extract TMDB ID from API response for series
+                        if(response.info && response.info.tmdb_id) {
+                            current_series.tmdb_id = response.info.tmdb_id;
+                            console.log('✅ SERIES TMDB ID extracted and stored:', current_series.tmdb_id);
+                        } else {
+                            console.log('⚠️ NO SERIES TMDB ID in API response - subtitle matching will be less accurate');
+                        }
+                        
+                        // Process seasons and episodes with TMDB data
+                        if(response.seasons) {
+                            current_series.seasons = response.seasons;
+                        }
+                        if(response.episodes) {
+                            current_series.episodes = response.episodes;
+                            console.log('✅ Episodes with TMDB data stored:', Object.keys(response.episodes).length, 'seasons');
+                        }
+                        
+                        // Update enhanced info if available
+                        if(info.plot && info.plot !== current_series.plot) {
+                            current_series.plot = info.plot;
+                            $('#series-summary-description').text(info.plot);
+                        }
+                        if(info.backdrop_path && info.backdrop_path.length > 0) {
+                            var enhancedBackdrop = info.backdrop_path[0];
+                            if(enhancedBackdrop) {
+                                $('.vod-series-background-img').attr('src', enhancedBackdrop);
+                            }
+                        }
+                        
+                        console.log('=== SERIES DATA STORAGE COMPLETE ===');
+                        console.log('Current series enhanced data - Name:', current_series.name, 'TMDB:', current_series.tmdb_id);
+                    }
+                )
+                .fail(
+                    function(error) {
+                        console.log('⚠️ Failed to fetch series info:', error);
+                    }
+                )
+        }
+        
         showLoader(false);
         this.is_loading=false;
         current_route="series-summary-page";
