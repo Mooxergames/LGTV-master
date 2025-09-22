@@ -257,24 +257,25 @@
     font-size: inherit;
     font-weight: inherit;
     cursor: pointer;
-    padding-left: 0;
+    padding-left: 40px;
     margin: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
 }
 
 .subtitle-option label:before {
+    content: '';
     width: 24px;
     height: 24px;
     border: 2px solid #888;
     border-radius: 4px;
     background: transparent;
-    position: relative;
-    margin-left: auto;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     flex-shrink: 0;
-    order: 1;
 }
 
 .subtitle-option.active label:before,
@@ -287,7 +288,7 @@
 .subtitle-option .magic-radio:checked + label:after {
     content: "✓";
     position: absolute;
-    right: 8px;
+    left: 28px;
     top: 50%;
     transform: translateY(-50%);
     color: #ffffff;
@@ -297,7 +298,33 @@
 }
 
 #subtitle-modal-body .modal-button-wrapper {
-    display: none;
+    background: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 0;
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#subtitle-modal-body .modal-btn-1 {
+    background: rgba(100, 100, 100, 0.4);
+    border: 1px solid #666;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 12px 25px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    text-align: center;
+}
+
+#subtitle-modal-body .modal-btn-1:hover {
+    background: rgba(150, 150, 150, 0.4);
+    border-color: #888;
 }
 
 /* Loading indicator for subtitle fetch */
