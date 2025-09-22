@@ -85,7 +85,6 @@ var series_summary_page={
                         console.log('=== XTREME API get_series_info RESPONSE ANALYSIS ===');
                         console.log('Full API response:', response);
                         console.log('Info object:', response.info);
-                        console.log('TMDB ID check:', response.info.tmdb_id);
                         
                         var info = response.info;
                         
@@ -93,11 +92,32 @@ var series_summary_page={
                         current_series.info = info;
                         
                         // CRITICAL: Extract TMDB ID from API response for series
-                        if(response.info && response.info.tmdb_id) {
-                            current_series.tmdb_id = response.info.tmdb_id;
+                        // Try multiple possible field names for TMDB ID
+                        var seriesTmdbId = response.info.tmdb_id || response.info.tmdb || response.info.movie_db_id || response.info.moviedb_id;
+                        
+                        if(seriesTmdbId) {
+                            current_series.tmdb_id = seriesTmdbId;
                             console.log('✅ SERIES TMDB ID extracted and stored:', current_series.tmdb_id);
                         } else {
-                            console.log('⚠️ NO SERIES TMDB ID in API response - subtitle matching will be less accurate');
+                            // EXOAPP COMPATIBILITY: Try to derive series TMDB from first episode with TMDB ID
+                            console.log('⚠️ NO SERIES TMDB ID in API response - checking episodes for fallback');
+                            var derivedSeriesTmdb = null;
+                            
+                            // Check first episode in first season for TMDB ID
+                            if(response.episodes) {
+                                var firstSeasonKey = Object.keys(response.episodes)[0];
+                                if(firstSeasonKey && response.episodes[firstSeasonKey].length > 0) {
+                                    var firstEpisode = response.episodes[firstSeasonKey][0];
+                                    if(firstEpisode.info && firstEpisode.info.tmdb_id) {
+                                        // In TMDB, episode IDs are different from series IDs, 
+                                        // but we can use episode presence to indicate series has TMDB support
+                                        console.log('✅ Episodes have TMDB IDs - series supports enhanced subtitle matching');
+                                        // Don't set series TMDB since we don't have it, but episodes will work
+                                    }
+                                }
+                            }
+                            
+                            console.log('ℹ️ Series TMDB not available - will use episode-level TMDB IDs for precise matching');
                         }
                         
                         // Process seasons and episodes with TMDB data - EXOAPP METHODOLOGY
@@ -122,8 +142,8 @@ var series_summary_page={
                                 // CRITICAL: Propagate series TMDB ID to episodes for fallback
                                 if(season.episodes.length > 0) {
                                     season.episodes.forEach(function(episode, index) {
-                                        // Add series TMDB ID to each episode for SubtitleFetcher fallback
-                                        episode.series_tmdb_id = current_series.tmdb_id;
+                                        // Add series TMDB ID to each episode for SubtitleFetcher fallback (if available)
+                                        episode.series_tmdb_id = current_series.tmdb_id || null;
                                         
                                         if(episode.info && episode.info.tmdb_id) {
                                             console.log('  Episode ' + (index + 1) + ' - Episode TMDB ID:', episode.info.tmdb_id, '| Series TMDB ID:', episode.series_tmdb_id);
@@ -146,9 +166,9 @@ var series_summary_page={
                                 
                                 console.log('Creating Season ' + (index + 1) + ' with ' + seasonEpisodes.length + ' episodes');
                                 
-                                // CRITICAL: Propagate series TMDB ID to episodes before adding to season
+                                // CRITICAL: Propagate series TMDB ID to episodes before adding to season (if available)
                                 seasonEpisodes.forEach(function(episode, episodeIndex) {
-                                    episode.series_tmdb_id = current_series.tmdb_id;
+                                    episode.series_tmdb_id = current_series.tmdb_id || null;
                                     
                                     if(episode.info && episode.info.tmdb_id) {
                                         console.log('  S' + key + ' E' + (episodeIndex + 1) + ' - Episode TMDB ID:', episode.info.tmdb_id, '| Series TMDB ID:', episode.series_tmdb_id);
