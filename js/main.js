@@ -2,16 +2,22 @@
 "use strict";
 $(document).ready(function () {
     try{
-        // Better platform detection - only set to LG if truly on WebOS
-        if(window.navigator.userAgent.toLowerCase().includes('web0s') && 
+        // Enhanced platform detection from exo app
+        if (navigator.userAgent.indexOf('Tizen') > -1) {
+            platform = 'samsung';
+            console.log('Samsung Tizen platform detected');
+        } else if (navigator.userAgent.indexOf('webOS') > -1) {
+            platform = 'lg';
+            console.log('LG webOS platform detected');
+        } else if(window.navigator.userAgent.toLowerCase().includes('web0s') && 
            (window.PalmSystem || typeof window.PalmServiceBridge !== 'undefined')) {
             platform='lg';
-            console.log('LG WebOS platform detected');
+            console.log('LG WebOS platform detected (fallback)');
         } else if (typeof tizen !== 'undefined' && tizen.systeminfo) {
             platform='samsung';
-            console.log('Samsung Tizen platform detected');
+            console.log('Samsung Tizen platform detected (fallback)');
         } else {
-            // Everything else should be treated as samsung for compatibility
+            // Default to Samsung for compatibility
             platform='samsung';
             console.log('Browser/Other environment detected - using samsung compatibility mode');
         }
