@@ -25,12 +25,12 @@ var SrtOperation={
         this.srt = srt;
         if(srt.length > 0) {
             this.stopped = false;
-            // Find starting subtitle index using binary search with timing compensation
-            var timing_offset = 0.15; // 150ms compensation for processing delay
-            var compensated_time = current_time + timing_offset;
+            // Find starting subtitle index using binary search with start lead compensation
+            var start_lead = 0.12; // 120ms lead for better timing synchronization
+            var compensated_time = current_time + start_lead;
             this.current_srt_index = this.findIndex(compensated_time, 0, srt.length - 1);
             if(this.current_srt_index < 0) this.current_srt_index = 0;
-            console.log("SRT initialized - found index:", this.current_srt_index, "for compensated time:", compensated_time);
+            console.log("SRT initialized - found index:", this.current_srt_index, "for time:", current_time, "with lead:", start_lead);
         } else {
             this.stopped = true;
             console.log("No subtitles available or parsing failed");
@@ -68,34 +68,39 @@ var SrtOperation={
             return;
         }
         
-        // Add timing compensation to account for processing and rendering delays
-        var timing_offset = 0.15; // 150ms earlier to compensate for delay
-        var compensated_time = current_time + timing_offset;
+        // Add asymmetric timing compensation for better synchronization
+        var start_lead = 0.12; // 120ms lead for subtitle start to compensate for delay
+        var end_lag = 0.05; // 50ms lag for subtitle end to prevent abrupt cutoff
         
         var srtIndex = this.current_srt_index;
         if(srtIndex >= this.srt.length || srtIndex < 0) {
-            srtIndex = this.findIndex(compensated_time, 0, this.srt.length - 1);
+            srtIndex = this.findIndex(current_time + start_lead, 0, this.srt.length - 1);
             this.current_srt_index = Math.max(0, srtIndex);
-            return;
+            // Continue processing instead of returning to avoid one-tick delay
+            if(this.current_srt_index < this.srt.length) {
+                srtIndex = this.current_srt_index;
+            } else {
+                return;
+            }
         }
         
         var srtItem = this.srt[srtIndex];
         
-        // Check if current subtitle should be displayed (using compensated time)
-        if(compensated_time >= srtItem.startSeconds && compensated_time < srtItem.endSeconds) {
+        // Check if current subtitle should be displayed (asymmetric timing)
+        if((current_time + start_lead) >= srtItem.startSeconds && current_time <= (srtItem.endSeconds + end_lag)) {
             if(!this.subtitle_shown) {
                 this.showSubtitle(srtItem.text);
                 this.subtitle_shown = true;
             }
         } else {
-            // Hide subtitle when out of time range (using compensated time)
+            // Hide subtitle when out of time range
             if(this.subtitle_shown) {
                 this.hideSubtitle();
                 this.subtitle_shown = false;
             }
             
             // Find next subtitle using binary search for efficiency
-            var newIndex = this.findIndex(compensated_time, 0, this.srt.length - 1);
+            var newIndex = this.findIndex(current_time + start_lead, 0, this.srt.length - 1);
             if(newIndex >= 0 && newIndex !== this.current_srt_index) {
                 this.current_srt_index = newIndex;
             }
