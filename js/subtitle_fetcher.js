@@ -15,38 +15,91 @@ var SubtitleFetcher = {
      * @param {Function} errorCallback - Called on error
      */
     fetchSubtitles: function(movieData, movieType, successCallback, errorCallback) {
-        var movieName = movieData.name;
+        var subtitleRequestData = {};
         
-        // Clean movie name for better API matching
-        if (movieType === 'movie' && movieName) {
-            // Remove year from title (e.g., "Thor: Love and Thunder (2022)" -> "Thor: Love and Thunder")
-            movieName = movieName.replace(/\s*\(\d{4}\)\s*$/g, '').trim();
-        }
-        
-        var subtitleRequestData = {
-            movie_name: movieName,
-            movie_type: movieType || 'movie'
-        };
-        
-        // Enhanced episode name parsing for better subtitle matching
-        if (movieType === 'episode' && movieData.name) {
-            var episodeName = movieData.name.toLowerCase();
+        // MOVIES: Enhanced processing following exoapp methodology
+        if (movieType === 'movie') {
+            var originalName = movieData.name || '';
+            var cleanedName = originalName;
             
-            // Parse episode patterns like "The Witcher S01 E01"
-            var seasonEpisodeMatch = episodeName.match(/s(\d+)\s*e(\d+)/i);
-            if (seasonEpisodeMatch) {
-                subtitleRequestData.season_number = parseInt(seasonEpisodeMatch[1]);
-                subtitleRequestData.episode_number = parseInt(seasonEpisodeMatch[2]);
-                
-                // Extract clean series name
-                var seriesName = episodeName.replace(/s\d+\s*e\d+.*$/i, '').trim();
-                subtitleRequestData.movie_name = seriesName;
+            // Step 1: Extract year from name
+            var yearMatch = cleanedName.match(/\((\d{4})\)/);
+            var extractedYear = null;
+            if (yearMatch) {
+                extractedYear = parseInt(yearMatch[1]);
+                // Remove year from name: "Movie Name (2023)" → "Movie Name"
+                cleanedName = cleanedName.replace(/\s*\(\d{4}\)\s*/, '').trim();
             }
-        }
-        
-        // Prioritize TMDB ID if available
-        if (movieData.tmdb_id) {
-            subtitleRequestData.tmdb_id = movieData.tmdb_id;
+            
+            // Step 2: Remove quality indicators that interfere with matching
+            var qualityPatterns = /\s*\b(HD|4K|1080p|720p|480p|BluRay|BRRip|WEB-DL|WEBRip|DVDRip|CAMRip|TS|TC|HDTV|PDTV|XviD|x264|x265|HEVC|DivX|AC3|AAC|MP3|Dubbed|Subbed|MultiAudio)\b\s*/gi;
+            cleanedName = cleanedName.replace(qualityPatterns, ' ').trim();
+            cleanedName = cleanedName.replace(/\s+/g, ' ').trim();
+            
+            // Step 3: Remove bracketed content (except years)
+            cleanedName = cleanedName.replace(/\[.*?\]/g, '').trim();
+            cleanedName = cleanedName.replace(/\{.*?\}/g, '').trim();
+            cleanedName = cleanedName.replace(/\s+/g, ' ').trim();
+            
+            // Step 4: Build request data
+            subtitleRequestData = {
+                movie_name: cleanedName,
+                movie_type: 'movie'
+            };
+            
+            // Step 5: Add TMDB ID (highest priority for matching)
+            if (movieData.tmdb_id) {
+                subtitleRequestData.tmdb_id = movieData.tmdb_id;
+            }
+            
+            // Step 6: Add year for better matching
+            if (extractedYear) {
+                subtitleRequestData.year = extractedYear;
+            } else if (movieData.year) {
+                subtitleRequestData.year = movieData.year;
+            }
+            
+            console.log('Movie subtitle request - Original:', originalName, 'Cleaned:', cleanedName, 'Year:', subtitleRequestData.year, 'TMDB:', subtitleRequestData.tmdb_id);
+        } 
+        // EPISODES: Enhanced logic with episode name parsing fallback
+        else {
+            var episodeName = movieData.title || movieData.name || movieData.episode_name || '';
+            
+            subtitleRequestData = {
+                movie_type: 'episode'
+            };
+            
+            // PRIMARY STRATEGY: Use episode TMDB ID
+            if (movieData && movieData.info && movieData.info.tmdb_id) {
+                subtitleRequestData.tmdb_id = String(movieData.info.tmdb_id);
+            } 
+            // FALLBACK STRATEGY: Parse episode name for series info
+            else {
+                var parsedEpisode = this.parseEpisodeName(episodeName);
+                
+                if (parsedEpisode.series_name) {
+                    // Format as single string: "the witcher s01 e01"
+                    var formattedName = parsedEpisode.series_name.toLowerCase();
+                    
+                    if (parsedEpisode.season_number && parsedEpisode.episode_number) {
+                        var seasonStr = 's' + String(parsedEpisode.season_number).padStart(2, '0');
+                        var episodeStr = 'e' + String(parsedEpisode.episode_number).padStart(2, '0');
+                        formattedName = formattedName + ' ' + seasonStr + ' ' + episodeStr;
+                    }
+                    
+                    subtitleRequestData.movie_name = formattedName;
+                    
+                    // Use series TMDB ID if available
+                    if (movieData.info && movieData.info.tmdb_id) {
+                        subtitleRequestData.id = String(movieData.info.tmdb_id);
+                    }
+                } else {
+                    // No pattern recognized - let API auto-detect
+                    subtitleRequestData.movie_type = 'auto';
+                }
+            }
+            
+            console.log('Episode subtitle request - Original:', episodeName, 'Formatted:', subtitleRequestData.movie_name, 'TMDB:', subtitleRequestData.tmdb_id);
         }
         
         // Make API request
@@ -157,5 +210,83 @@ var SubtitleFetcher = {
         }
         
         return combined;
+    },
+    
+    /**
+     * Enhanced Episode Name Parser following exoapp methodology
+     * @param {string} episodeName - Episode name to parse
+     * @returns {Object} Parsed episode data
+     */
+    parseEpisodeName: function(episodeName) {
+        var result = {
+            series_name: null,
+            season_number: null,
+            episode_number: null,
+            episode_title: null
+        };
+        
+        if (!episodeName || typeof episodeName !== 'string') {
+            return result;
+        }
+        
+        var cleanedName = episodeName.trim();
+        
+        // Step 1: Remove country/language codes (TR:, ES:, EN:, etc.)
+        cleanedName = cleanedName.replace(/^[A-Z]{2}:\s*/i, '');
+        
+        // Step 2: Try multiple season/episode patterns
+        var seasonEpisodePatterns = [
+            // "Series Name S01 E01" or "Series Name S01E01"
+            /^(.+?)\s+S(\d{1,2})\s*E(\d{1,2})(?:\s*-\s*(.+))?$/i,
+            // "Series Name Season 1 Episode 1"
+            /^(.+?)\s+Season\s+(\d{1,2})\s+Episode\s+(\d{1,2})(?:\s*-\s*(.+))?$/i,
+            // "Series Name 1x01" or "Series Name 1x1"
+            /^(.+?)\s+(\d{1,2})x(\d{1,2})(?:\s*-\s*(.+))?$/i,
+            // "Series Name (2023) S01E01"
+            /^(.+?)\s*\(\d{4}\)\s*S(\d{1,2})E(\d{1,2})(?:\s*-\s*(.+))?$/i
+        ];
+        
+        // Try each pattern
+        for (var i = 0; i < seasonEpisodePatterns.length; i++) {
+            var match = cleanedName.match(seasonEpisodePatterns[i]);
+            if (match) {
+                result.series_name = match[1].trim();
+                result.season_number = parseInt(match[2]);
+                result.episode_number = parseInt(match[3]);
+                if (match[4]) {
+                    result.episode_title = match[4].trim();
+                }
+                break;
+            }
+        }
+        
+        // Step 3: If no pattern found, extract just series name
+        if (!result.series_name) {
+            var seriesOnly = cleanedName
+                .replace(/\s*\(.*?\)/g, '') // Remove parentheses content
+                .replace(/\s*\[.*?\]/g, '') // Remove brackets content  
+                .replace(/\s*\{.*?\}/g, '') // Remove curly braces content
+                .replace(/\s*-\s*Episode.*$/i, '') // Remove "- Episode X" suffix
+                .replace(/\s*Ep\s*\d+.*$/i, '') // Remove "Ep 1" suffix
+                .replace(/\s+/g, ' ') // Normalize spaces
+                .trim();
+                
+            if (seriesOnly && seriesOnly.length > 2) {
+                result.series_name = seriesOnly;
+            }
+        }
+        
+        // Step 4: Clean and normalize the series name
+        if (result.series_name) {
+            result.series_name = result.series_name
+                .replace(/\s*\(.*?\)/g, '') // Remove remaining parentheses
+                .replace(/\s*\[.*?\]/g, '') // Remove remaining brackets
+                .replace(/\s*\{.*?\}/g, '') // Remove remaining braces
+                .replace(/[^\w\s&'-]/g, ' ') // Keep only safe characters
+                .replace(/\s+/g, ' ') // Normalize multiple spaces
+                .trim();
+        }
+        
+        return result;
     }
 };
