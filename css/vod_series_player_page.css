@@ -30,14 +30,15 @@
 #vod-series-progress-controls-container {
     margin: 0;
     width: 100%;
-    background: none;
-    padding: 0;
+    background: rgba(128, 128, 128, 0.4);
+    padding: 16px 0;
     box-shadow: none;
     border: none;
     transition: none;
+    border-radius: 4px;
 }
 #vod-series-progress-controls-container:hover {
-    background: none;
+    background: rgba(128, 128, 128, 0.4);
     transform: none;
     box-shadow: none;
 }
