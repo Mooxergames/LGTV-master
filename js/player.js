@@ -73,17 +73,12 @@ function initPlayer() {
                             webapis.avplay.play();
                             try{
                                 that.full_screen_state=1;
-                                webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                                // Keep AUTO_ASPECT_RATIO for consistent aspect ratio handling
+                                // webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
                             }catch (e) {
                             }
-                            var actualDuration = webapis.avplay.getDuration()/1000;
-                            $('#'+that.parent_id).find('.video-total-time').text(that.formatTime(actualDuration));
+                            $('#'+that.parent_id).find('.video-total-time').text(that.formatTime(webapis.avplay.getDuration()/1000));
                             $('#'+that.parent_id).find('.video-error').hide();
-                            
-                            // Update VOD summary with real duration if we're on summary page
-                            if(current_route === 'vod-summary-page' && typeof vod_summary_page !== 'undefined') {
-                                vod_summary_page.updateDurationFromVideo(actualDuration);
-                            }
                             $('#'+that.parent_id).find('.progress-amount').css({width:0})
                             var attributes={
                                 min: 0,
@@ -205,7 +200,8 @@ function initPlayer() {
                     }
                 }else{
                     try{
-                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                        // Keep AUTO_ASPECT_RATIO for consistent aspect ratio handling
+                        // webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
                         this.full_screen_state=1;
                     }catch (e) {
                     }
@@ -231,6 +227,10 @@ function initPlayer() {
                     },
                     onbufferingcomplete: function() {
                         $('#'+that.parent_id).find('.video-loader').hide();
+                        // Reapply display area after buffering for proper sizing
+                        setTimeout(function() {
+                            that.setDisplayArea();
+                        }, 100);
                         // console.log('Buffering Complete, Can play now!');
                         // console.log("Buffereing complete time "+(new Date()).getTime()/1000)
                     },
@@ -458,11 +458,6 @@ function initPlayer() {
                     $('#'+that.parent_id).find('.video-total-time').text(that.formatTime(duration));
                     $('#'+that.parent_id).find('.video-progress-bar-slider').attr(attributes)
                     $('#'+that.parent_id).find('.video-progress-bar-slider').rangeslider('update', true);
-                    
-                    // Update VOD summary with real duration if we're on summary page
-                    if(current_route === 'vod-summary-page' && typeof vod_summary_page !== 'undefined') {
-                        vod_summary_page.updateDurationFromVideo(duration);
-                    }
                 });
                 this.videoObj.addEventListener('waiting', function(event){
                     // console.log('Video is waiting for more data.',event);
