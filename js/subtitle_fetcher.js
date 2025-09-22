@@ -69,12 +69,14 @@ var SubtitleFetcher = {
                 movie_type: 'episode'
             };
             
-            // PRIMARY STRATEGY: Use episode TMDB ID
+            // PRIMARY STRATEGY: Use episode TMDB ID (EXOAPP METHODOLOGY)
             if (movieData && movieData.info && movieData.info.tmdb_id) {
                 subtitleRequestData.tmdb_id = String(movieData.info.tmdb_id);
+                console.log('✅ Using episode TMDB ID:', movieData.info.tmdb_id);
             } 
             // FALLBACK STRATEGY: Parse episode name for series info
             else {
+                console.log('⚠️ No episode TMDB ID - using fallback parsing');
                 var parsedEpisode = this.parseEpisodeName(episodeName);
                 
                 if (parsedEpisode.series_name) {
@@ -89,17 +91,24 @@ var SubtitleFetcher = {
                     
                     subtitleRequestData.movie_name = formattedName;
                     
-                    // Use series TMDB ID if available
-                    if (movieData.info && movieData.info.tmdb_id) {
-                        subtitleRequestData.id = String(movieData.info.tmdb_id);
+                    // Use series TMDB ID as fallback if available
+                    if (movieData.series_tmdb_id) {
+                        subtitleRequestData.tmdb_id = String(movieData.series_tmdb_id);
+                        console.log('Using series TMDB ID as fallback:', movieData.series_tmdb_id);
                     }
                 } else {
                     // No pattern recognized - let API auto-detect
                     subtitleRequestData.movie_type = 'auto';
+                    console.log('No episode pattern recognized - using auto-detection');
                 }
             }
             
-            console.log('Episode subtitle request - Original:', episodeName, 'Formatted:', subtitleRequestData.movie_name, 'TMDB:', subtitleRequestData.tmdb_id);
+            console.log('Episode subtitle request data:', {
+                movie_type: subtitleRequestData.movie_type,
+                tmdb_id: subtitleRequestData.tmdb_id,
+                movie_name: subtitleRequestData.movie_name,
+                original_episode: episodeName
+            });
         }
         
         // Make API request
