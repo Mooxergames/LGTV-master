@@ -83,12 +83,39 @@ var SubtitleFetcher = {
                 subtitleRequestData._episode_tmdb_fallback = movieData.info ? movieData.info.tmdb_id : null;
                 
             } else {
-                // FALLBACK: If parsing fails, use movie format with name
-                console.log('⚠️ Episode parsing failed - using movie format fallback');
-                subtitleRequestData = {
-                    movie_type: 'movie',
-                    movie_name: episodeName
-                };
+                // SMART FALLBACK: Use series name + season/episode from data structure
+                console.log('⚠️ Episode parsing failed - using series data structure');
+                
+                // Try to get series name from current_series or movieData
+                var seriesName = null;
+                if (typeof current_series !== 'undefined' && current_series.name) {
+                    seriesName = current_series.name.replace(/\[.*?\]/g, '').trim(); // Remove [MultiAudio] etc
+                }
+                
+                // Get season/episode from movieData structure  
+                var seasonNum = movieData.season || null;
+                var episodeNum = movieData.episode_num || null;
+                
+                if (seriesName && seasonNum && episodeNum) {
+                    // Create proper "Series S01 E03" format
+                    var seasonStr = 'S' + String(seasonNum).padStart(2, '0');
+                    var episodeStr = 'E' + String(episodeNum).padStart(2, '0');
+                    var properSeriesTitle = seriesName + ' ' + seasonStr + ' ' + episodeStr;
+                    
+                    subtitleRequestData = {
+                        movie_type: 'movie',
+                        movie_name: properSeriesTitle
+                    };
+                    
+                    console.log('✅ Using series structure format:', properSeriesTitle);
+                } else {
+                    // Last resort: use episode name only
+                    console.log('⚠️ No series structure available - using episode title');
+                    subtitleRequestData = {
+                        movie_type: 'movie', 
+                        movie_name: episodeName
+                    };
+                }
                 
                 // Store TMDB IDs for fallback
                 subtitleRequestData._episode_tmdb_fallback = movieData.info ? movieData.info.tmdb_id : null;
