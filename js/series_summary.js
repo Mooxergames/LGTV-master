@@ -119,13 +119,16 @@ var series_summary_page={
                                 
                                 console.log('Season ' + season.season_number + ' episodes:', season.episodes.length);
                                 
-                                // Log episode TMDB IDs for debugging
+                                // CRITICAL: Propagate series TMDB ID to episodes for fallback
                                 if(season.episodes.length > 0) {
                                     season.episodes.forEach(function(episode, index) {
+                                        // Add series TMDB ID to each episode for SubtitleFetcher fallback
+                                        episode.series_tmdb_id = current_series.tmdb_id;
+                                        
                                         if(episode.info && episode.info.tmdb_id) {
-                                            console.log('  Episode ' + (index + 1) + ' TMDB ID:', episode.info.tmdb_id);
+                                            console.log('  Episode ' + (index + 1) + ' - Episode TMDB ID:', episode.info.tmdb_id, '| Series TMDB ID:', episode.series_tmdb_id);
                                         } else {
-                                            console.log('  Episode ' + (index + 1) + ' - NO TMDB ID');
+                                            console.log('  Episode ' + (index + 1) + ' - NO Episode TMDB ID | Series TMDB ID:', episode.series_tmdb_id);
                                         }
                                     });
                                 }
@@ -143,20 +146,22 @@ var series_summary_page={
                                 
                                 console.log('Creating Season ' + (index + 1) + ' with ' + seasonEpisodes.length + ' episodes');
                                 
+                                // CRITICAL: Propagate series TMDB ID to episodes before adding to season
+                                seasonEpisodes.forEach(function(episode, episodeIndex) {
+                                    episode.series_tmdb_id = current_series.tmdb_id;
+                                    
+                                    if(episode.info && episode.info.tmdb_id) {
+                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' - Episode TMDB ID:', episode.info.tmdb_id, '| Series TMDB ID:', episode.series_tmdb_id);
+                                    } else {
+                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' - NO Episode TMDB ID | Series TMDB ID:', episode.series_tmdb_id);
+                                    }
+                                });
+                                
                                 seasons.push({
                                     season_number: parseInt(key),
                                     name: "Season " + key,
                                     cover: "images/404.png",
-                                    episodes: seasonEpisodes  // Each episode has info.tmdb_id
-                                });
-                                
-                                // Log episode TMDB IDs for debugging  
-                                seasonEpisodes.forEach(function(episode, episodeIndex) {
-                                    if(episode.info && episode.info.tmdb_id) {
-                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' TMDB ID:', episode.info.tmdb_id);
-                                    } else {
-                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' - NO TMDB ID');
-                                    }
+                                    episodes: seasonEpisodes  // Each episode now has both info.tmdb_id and series_tmdb_id
                                 });
                             });
                             
