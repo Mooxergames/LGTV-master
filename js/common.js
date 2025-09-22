@@ -611,126 +611,58 @@ function getAtob(text) {
     return result;
 }
 
-// Clean movie names for proper alphabetical sorting
-function cleanNameForSorting(name) {
-    if (!name || typeof name !== 'string') return '';
-    
-    // Convert to lowercase for consistent sorting
-    var cleanName = name.toLowerCase();
-    
-    // Remove leading articles (The, A, An) for better alphabetical sorting
-    cleanName = cleanName.replace(/^(the|a|an)\s+/i, '');
-    
-    // Remove common prefixes that interfere with sorting
-    cleanName = cleanName.replace(/^(watch\s+|stream\s+)/i, '');
-    
-    // Remove year info in parentheses for cleaner sorting
-    cleanName = cleanName.replace(/\s*\(\d{4}\).*$/i, '');
-    
-    // Remove quality tags and brackets
-    cleanName = cleanName.replace(/\s*[\[\(](4k|hd|1080p|720p|bluray|web-dl|hdts|cam).*?[\]\)]/gi, '');
-    
-    // Remove extra whitespace
-    cleanName = cleanName.trim().replace(/\s+/g, ' ');
-    
-    return cleanName;
-}
-
 function getSortedMovies(movies1, key) {
-    // Handle empty arrays
-    if (!movies1 || movies1.length === 0) {
-        return movies1;
-    }
+    // Handle empty arrays - ExoApp style
+    if (movies1.length == 0) return movies1;
     
-    // Create deep copy to avoid modifying original array
-    var movies = JSON.parse(JSON.stringify(movies1));
+    var movies = movies1.slice(); // Shallow copy like ExoApp
     var new_movies = [];
     var new_key = key;
     
-    // Map sort keys to data properties
-    if (key === 'a-z' || key === 'z-a' || key === 'name') {
-        new_key = 'name';
-    }
-    if (key === 'number') {
-        new_key = 'num';
-    }
+    // Map sort keys to data properties - ExoApp style
+    if (key === "a-z" || key === "z-a") new_key = "name";
+    if (key === "number") new_key = "num";
     
-    // Check if ANY movie has the required property (not just first one)
-    var hasProperty = movies.some(function(movie) {
-        return typeof movie[new_key] !== 'undefined';
-    });
-    
-    if (!hasProperty) {
-        console.log('getSortedMovies: No movies have property "' + new_key + '" for sort key "' + key + '"');
+    // Return unchanged if property doesn't exist - ExoApp style
+    if (typeof movies[0][new_key] == "undefined") {
         return movies;
     }
     
     var direction = 1;
     
     switch (key) {
-        case 'rating':
-            // Highest rating first (descending)
-            direction = -1;
-            new_movies = movies.sort(function(a, b) {
-                var a_val = parseFloat(a[new_key]);
-                if (isNaN(a_val)) a_val = 0;
-                var b_val = parseFloat(b[new_key]);
-                if (isNaN(b_val)) b_val = 0;
-                
-                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
-            });
-            break;
-            
-        case 'number':
-            // Highest number first (descending)
-            direction = -1;
-            new_movies = movies.sort(function(a, b) {
-                var a_val = parseFloat(a[new_key]);
-                if (isNaN(a_val)) a_val = 0;
-                var b_val = parseFloat(b[new_key]);
-                if (isNaN(b_val)) b_val = 0;
-                
-                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
-            });
-            break;
-            
-        case 'added':
-            // Most recently added first (descending)
-            direction = -1;
-            new_movies = movies.sort(function(a, b) {
-                var a_val = parseFloat(a[new_key]);
-                if (isNaN(a_val)) a_val = 0;
-                var b_val = parseFloat(b[new_key]);
-                if (isNaN(b_val)) b_val = 0;
-                
-                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
-            });
-            break;
-            
-        case 'a-z':
-        case 'name':
-            // A to Z (ascending) - Smart alphabetical sorting
+        case "rating":
+        case "number": 
+        case "added":
+            // ExoApp numeric sorting logic
             direction = 1;
+            if (key === "number") direction = -1;  // Numbers: high to low (ExoApp comment)
+            
             new_movies = movies.sort(function(a, b) {
-                var a_name = cleanNameForSorting(a[new_key] || '');
-                var b_name = cleanNameForSorting(b[new_key] || '');
-                return direction * a_name.localeCompare(b_name, 'en', { numeric: true, sensitivity: 'base' });
+                var a_new_key = parseFloat(a[new_key]);
+                if (isNaN(a_new_key)) a_new_key = 0;
+                var b_new_key = parseFloat(b[new_key]);
+                if (isNaN(b_new_key)) b_new_key = 0;
+                
+                return direction * (a_new_key < b_new_key ? 1 : 
+                                   a_new_key > b_new_key ? -1 : 0);
             });
             break;
             
-        case 'z-a':
-            // Z to A (descending) - Smart alphabetical sorting
-            direction = -1;
+        case "a-z":
+        case "z-a":
+        case "name":
+            // ExoApp alphabetical sorting - NO preprocessing
+            direction = key === "a-z" || key === "name" ? 1 : -1;
+            
             new_movies = movies.sort(function(a, b) {
-                var a_name = cleanNameForSorting(a[new_key] || '');
-                var b_name = cleanNameForSorting(b[new_key] || '');
-                return direction * a_name.localeCompare(b_name, 'en', { numeric: true, sensitivity: 'base' });
+                return direction * a[new_key].localeCompare(b[new_key]);
             });
             break;
             
-        case 'default':
+        case "default":
         default:
-            // Return original order
+            // No sorting - return original order
             return movies;
     }
     
