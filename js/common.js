@@ -17,16 +17,16 @@ var current_movie_categories=[];
 // //Define the method to get a list of available storage devices
 // service.register("getStorageList", function(message) {
 // // Get the list of storage devices
-// 	console.log(message);
-// 	var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
-// 	 subscribe: false
-// 	});
+//      console.log(message);
+//      var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
+//       subscribe: false
+//      });
 //
 // // Send the storage list to the client
-// //	message.respond({
-// //	 returnValue: true,
-// //	 storageList: storageList
-// //	});
+// //   message.respond({
+// //    returnValue: true,
+// //    storageList: storageList
+// //   });
 // });
 var current_movie_type,  current_category={},current_movie,
     current_season, current_episode, current_series;
@@ -611,46 +611,105 @@ function getAtob(text) {
     return result;
 }
 
-function getSortedMovies(movies1,key) {
-    var movies=JSON.parse(JSON.stringify(movies1));
-    var new_movies=[];
-    var new_key=key;
-    if(key==='a-z' || key==='z-a')
-        new_key='name';
-    if(key==='number')
-        new_key='num';
-    if(typeof movies[0][new_key]=='undefined'){
+function getSortedMovies(movies1, key) {
+    // Handle empty arrays
+    if (!movies1 || movies1.length === 0) {
+        return movies1;
+    }
+    
+    // Create deep copy to avoid modifying original array
+    var movies = JSON.parse(JSON.stringify(movies1));
+    var new_movies = [];
+    var new_key = key;
+    
+    // Map sort keys to data properties
+    if (key === 'a-z' || key === 'z-a' || key === 'name') {
+        new_key = 'name';
+    }
+    if (key === 'number') {
+        new_key = 'num';
+    }
+    
+    // Check if ANY movie has the required property (not just first one)
+    var hasProperty = movies.some(function(movie) {
+        return typeof movie[new_key] !== 'undefined';
+    });
+    
+    if (!hasProperty) {
+        console.log('getSortedMovies: No movies have property "' + new_key + '" for sort key "' + key + '"');
         return movies;
     }
-    var direction=1;
+    
+    var direction = 1;
+    
     switch (key) {
         case 'rating':
+            // Highest rating first (descending)
+            direction = -1;
+            new_movies = movies.sort(function(a, b) {
+                var a_val = parseFloat(a[new_key]);
+                if (isNaN(a_val)) a_val = 0;
+                var b_val = parseFloat(b[new_key]);
+                if (isNaN(b_val)) b_val = 0;
+                
+                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
+            });
+            break;
+            
         case 'number':
+            // Highest number first (descending)
+            direction = -1;
+            new_movies = movies.sort(function(a, b) {
+                var a_val = parseFloat(a[new_key]);
+                if (isNaN(a_val)) a_val = 0;
+                var b_val = parseFloat(b[new_key]);
+                if (isNaN(b_val)) b_val = 0;
+                
+                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
+            });
+            break;
+            
         case 'added':
-            direction=1;
-            if(key==='number')
-                direction=-1;
-            new_movies=movies.sort(function(a,b){
-                var a_new_key=parseFloat(a[new_key]);
-                if(isNaN(a_new_key))
-                    a_new_key=0;
-                var b_new_key=parseFloat(b[new_key])
-                if(isNaN(b_new_key))
-                    b_new_key=0;
-                return direction*(a_new_key<b_new_key ? 1
-                    :a_new_key>b_new_key ? -1 : 0);
-            })
+            // Most recently added first (descending)
+            direction = -1;
+            new_movies = movies.sort(function(a, b) {
+                var a_val = parseFloat(a[new_key]);
+                if (isNaN(a_val)) a_val = 0;
+                var b_val = parseFloat(b[new_key]);
+                if (isNaN(b_val)) b_val = 0;
+                
+                return direction * (a_val < b_val ? 1 : a_val > b_val ? -1 : 0);
+            });
             break;
+            
         case 'a-z':
-        case 'z-a':
-            direction=key==='a-z' ? 1 : -1;
-            new_movies=movies.sort(function(a,b){
-                return direction*(a[new_key].localeCompare(b[new_key]));
-            })
+        case 'name':
+            // A to Z (ascending)
+            direction = 1;
+            new_movies = movies.sort(function(a, b) {
+                var a_name = a[new_key] || '';
+                var b_name = b[new_key] || '';
+                return direction * a_name.localeCompare(b_name);
+            });
             break;
+            
+        case 'z-a':
+            // Z to A (descending)
+            direction = -1;
+            new_movies = movies.sort(function(a, b) {
+                var a_name = a[new_key] || '';
+                var b_name = b[new_key] || '';
+                return direction * a_name.localeCompare(b_name);
+            });
+            break;
+            
         case 'default':
+        default:
+            // Return original order
             return movies;
     }
+    
+    console.log('getSortedMovies: Sorted ' + movies.length + ' items by "' + key + '" (direction: ' + (direction === 1 ? 'asc' : 'desc') + ')');
     return new_movies;
 }
 
