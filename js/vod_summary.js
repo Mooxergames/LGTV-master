@@ -77,8 +77,13 @@ var vod_summary_page={
                             backdrop_image=info.backdrop_path[0];
                         }catch (e) {
                         }
-                        if(backdrop_image)
+                        
+                        // Use backdrop if available, otherwise use poster as fallback
+                        if(backdrop_image) {
                             $('.vod-series-background-img').attr('src',backdrop_image);
+                        } else if(current_movie.stream_icon) {
+                            $('.vod-series-background-img').attr('src',current_movie.stream_icon);
+                        }
 
                         if(typeof info.youtube_trailer!='undefined' && info.youtube_trailer!=null && info.youtube_trailer.trim()!==''){
                             that.min_btn_index=0;
