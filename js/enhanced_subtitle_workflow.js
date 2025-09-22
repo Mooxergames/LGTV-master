@@ -73,7 +73,7 @@ var EnhancedSubtitleWorkflow = {
             // Add "Off" option
             var fallbackSubtitles = [{
                 source: 'off',
-                label: 'Off',
+                label: 'Turn Off Subtitles',
                 language: 'none'
             }].concat(nativeSubtitles);
             

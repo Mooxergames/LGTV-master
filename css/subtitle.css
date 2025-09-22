@@ -318,6 +318,43 @@
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
+/* Fix radio button and label alignment */
+.subtitle-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subtitle-option .magic-radio {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.subtitle-option .magic-radio + label {
+    display: inline-block;
+    padding-left: 25px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: inherit;
+    flex-grow: 1;
+    vertical-align: middle;
+}
+
+.subtitle-option .magic-radio + label:before {
+    position: absolute;
+    top: 2px;
+    left: 0;
+}
+
+.subtitle-option .magic-radio + label:after {
+    position: absolute;
+    top: 8px;
+    left: 6px;
+}
+
 /* Loading indicator for subtitle fetch */
 .subtitle-loading-indicator {
     display: inline-block;

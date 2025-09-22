@@ -142,7 +142,7 @@ var SubtitleFetcher = {
         // Add "Off" option first
         combined.push({
             source: 'off',
-            label: 'Off',
+            label: 'Turn Off Subtitles',
             language: 'none'
         });
         
