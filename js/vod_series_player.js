@@ -648,12 +648,7 @@ var vod_series_player={
             var language = item.language || 'unknown';
             var source = item.source || 'api';
             
-            // Add source indicator for better UX
-            if(source === 'api') {
-                label += ' (API)';
-            } else if(source === 'native') {
-                label += ' (Native)';
-            }
+            // Source indicator removed as requested - clean labels only
             
             htmlContent += 
                 '<div class="modal-operation-menu-type-2 subtitle-option"\
