@@ -17,16 +17,16 @@ var current_movie_categories=[];
 // //Define the method to get a list of available storage devices
 // service.register("getStorageList", function(message) {
 // // Get the list of storage devices
-//      console.log(message);
-//      var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
-//       subscribe: false
-//      });
+// 	console.log(message);
+// 	var storageList = webOS.service.request("luna://com.webos.service.storagemanager/getStorageDevices", {
+// 	 subscribe: false
+// 	});
 //
 // // Send the storage list to the client
-// //   message.respond({
-// //    returnValue: true,
-// //    storageList: storageList
-// //   });
+// //	message.respond({
+// //	 returnValue: true,
+// //	 storageList: storageList
+// //	});
 // });
 var current_movie_type,  current_category={},current_movie,
     current_season, current_episode, current_series;
@@ -619,14 +619,7 @@ function getSortedMovies(movies1,key) {
         new_key='name';
     if(key==='number')
         new_key='num';
-    
-    // FIXED BUG: Check if ANY movie has the property, not just the first one
-    if(movies.length === 0) {
-        return movies;
-    }
-    
-    // For name-based sorting (a-z, z-a), all movies should have names
-    if((key === 'a-z' || key === 'z-a') && !movies.some(movie => movie[new_key])) {
+    if(typeof movies[0][new_key]=='undefined'){
         return movies;
     }
     var direction=1;
@@ -638,10 +631,10 @@ function getSortedMovies(movies1,key) {
             if(key==='number')
                 direction=-1;
             new_movies=movies.sort(function(a,b){
-                var a_new_key=parseFloat(a[new_key] || 0);
+                var a_new_key=parseFloat(a[new_key]);
                 if(isNaN(a_new_key))
                     a_new_key=0;
-                var b_new_key=parseFloat(b[new_key] || 0);
+                var b_new_key=parseFloat(b[new_key])
                 if(isNaN(b_new_key))
                     b_new_key=0;
                 return direction*(a_new_key<b_new_key ? 1
@@ -652,9 +645,7 @@ function getSortedMovies(movies1,key) {
         case 'z-a':
             direction=key==='a-z' ? 1 : -1;
             new_movies=movies.sort(function(a,b){
-                var a_val = a[new_key] || '';
-                var b_val = b[new_key] || '';
-                return direction*(a_val.localeCompare(b_val));
+                return direction*(a[new_key].localeCompare(b[new_key]));
             })
             break;
         case 'default':
