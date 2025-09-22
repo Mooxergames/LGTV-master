@@ -65,6 +65,7 @@ var SubtitleFetcher = {
         else {
             var episodeName = movieData.title || movieData.name || movieData.episode_name || '';
             
+            
             subtitleRequestData = {
                 movie_type: 'episode'
             };
