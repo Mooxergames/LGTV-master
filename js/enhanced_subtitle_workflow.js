@@ -214,6 +214,9 @@ var EnhancedSubtitleWorkflow = {
                 // Initialize SRT operation
                 SrtOperation.init({content: subtitleContent}, currentTime);
                 
+                // Ensure subtitle container is visible
+                $('#' + media_player.parent_id).find('.subtitle-container').show();
+                
                 if(successCallback) successCallback();
             },
             error: function(xhr, status, error) {

@@ -64,3 +64,89 @@
     right: 20px;
     bottom:0px;
 }
+
+/* Enhanced subtitle display styling from exo app */
+.subtitle-container {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    max-width: 80%;
+    pointer-events: none;
+}
+
+.subtitle-text {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 24px;
+    line-height: 1.4;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    word-wrap: break-word;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Platform-specific subtitle styling */
+#app.samsung .subtitle-container {
+    bottom: 80px;
+    font-size: 26px;
+}
+
+#app.lg .subtitle-container {
+    bottom: 60px;
+    font-size: 24px;
+}
+
+/* Responsive subtitle sizing */
+@media (max-width: 1280px) {
+    .subtitle-text {
+        font-size: 20px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .subtitle-text {
+        font-size: 18px;
+        padding: 4px 8px;
+    }
+    
+    .subtitle-container {
+        max-width: 90%;
+        bottom: 40px;
+    }
+}
+
+/* Enhanced subtitle modal styling */
+.subtitle-option {
+    transition: background-color 0.2s ease;
+}
+
+.subtitle-option:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.subtitle-option.active {
+    background-color: rgba(0, 123, 255, 0.3);
+    border-left: 3px solid #007bff;
+}
+
+/* Loading indicator for subtitle fetch */
+.subtitle-loading-indicator {
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.subtitle-loading-indicator::after {
+    content: "⏳";
+    animation: rotate 1s infinite linear;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
