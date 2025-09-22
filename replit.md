@@ -8,11 +8,11 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **Completely removed Recently Viewed functionality** - Removed recently viewed tracking for both movies and series, including category creation, data storage, and all related functionality to simplify the user interface
 - Completely removed random VOD favorites auto-seeding functionality with full cleanup and cache-busting implementation
 - Fixed favorites removal empty space issue with automatic grid refresh for both direct removal and detail page removal scenarios
 - Added poster as backdrop fallback functionality for movies and series when backdrop images are missing
 - Fixed debug back button navigation to properly return to VOD page using vod_summary_page.goBack() function
-- Implemented category reordering to position "Recently Viewed" after "Resume Watching" with corrected top positioning logic
 - **Added Resume Watching functionality for series episodes** - Series now include a "Resume Watching" category that shows series with episodes that have saved viewing progress, bringing feature parity with movie functionality
 
 # System Architecture
@@ -33,7 +33,6 @@ Preferred communication style: Simple, everyday language.
 ## Content Management
 - **Multi-Category Support**: Live channels, movies, TV series with hierarchical organization
 - **Favorites System**: User-customizable favorites lists with local storage persistence
-- **Recently Watched**: Automatic tracking of viewing history
 - **Resume Playback**: Video position saving and restoration for interrupted viewing
 - **EPG Integration**: Electronic Program Guide with catch-up TV functionality
 
