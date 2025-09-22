@@ -70,7 +70,7 @@ var home_page={
         
         // Display MAC address at the top of home page
         if(typeof mac_address !== 'undefined' && mac_address) {
-            $('#home-page-mac-address').text(mac_address);
+            $('#bottom-right-mac-address').text(mac_address);
         }
         var  htmlContents="";
         var live_favourite_movie=LiveModel.getRecentOrFavouriteMovies('favourite');
