@@ -3,7 +3,6 @@ var SeriesModel={
     movies:[],
     category_name:'series',
     favourite_category_index:'top-2',
-    recent_category_index:'top-1',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
     favourite_movie_count:200,
@@ -68,9 +67,9 @@ var SeriesModel={
             }
             else{
                 if(!include_hide_category)
-                    return !category.is_hide && (category.category_id!=="favourite" && category.category_id!=="recent");
+                    return !category.is_hide && category.category_id!=="favourite";
                 else
-                    return category.category_id!=="favourite" && category.category_id!=="recent";
+                    return category.category_id!=="favourite";
             }
 
         })
@@ -86,13 +85,6 @@ var SeriesModel={
     insertMoviesToCategories:function(){
         var movies=this.movies;
         var categories=this.categories;
-        var recent_category={
-            category_id:'recent',
-            category_name:'Recently Viewed',
-            parent_id:0,
-            movies:[],
-            is_hide:false
-        }
         var favourite_category={
             category_id:'favourite',
             category_name:'Favourites',
@@ -108,19 +100,15 @@ var SeriesModel={
             is_hide:false
         }
         categories.push(undefined_category);
-         var temps1=this.getRecentOrFavouriteCategoryPosition('recent');
-        var recent_category_position=temps1[0],recent_category_index=temps1[1];
         var temps2=this.getRecentOrFavouriteCategoryPosition('favourite');
         var favourite_category_position=temps2[0], favourite_category_index=temps2[1];
 
         var movie_id_key=this.movie_key;
-        var recent_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_recent"));
         var favourite_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_favourite"));
-        recent_movie_ids=recent_movie_ids==null ? [] : recent_movie_ids;
         favourite_movie_ids=favourite_movie_ids==null ? [] : favourite_movie_ids;
         this.favourite_ids=favourite_movie_ids;
 
-        var recent_movies=[], favourite_movies=[], resume_movies=[];
+        var favourite_movies=[], resume_movies=[];
         var that=this;
         var movies_map={};
         
@@ -133,7 +121,6 @@ var SeriesModel={
         }
         
         movies.map(function(movie){
-            movie.is_recent=false;
             movie.is_favourite=false;
 
             if(typeof movie.category_id=='undefined' || movie.category_id=='null' || movie.category_id==null){
@@ -142,14 +129,6 @@ var SeriesModel={
             if(typeof movies_map[movie.category_id]=="undefined")
                 movies_map[movie.category_id]=[];
             movies_map[movie.category_id].push(movie);
-            if(recent_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
-            {
-                if(that.recent_insert_position==="before")
-                    recent_movies.unshift(movie);
-                else
-                    recent_movies.push(movie);
-                movie.is_recent=true;
-            }
             if(favourite_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
             {
                 if(that.favourite_insert_position==="before")
@@ -201,11 +180,8 @@ var SeriesModel={
             movies:resume_movies
         }
 
-        recent_category.movies=recent_movies;
         favourite_category.movies=favourite_movies;
 
-        // Note: Standard category positioning is now handled above
-        // to ensure they always appear before playlist categories
         var all_category= {
             category_id: 'all',
             category_name: 'All',
@@ -215,9 +191,7 @@ var SeriesModel={
         };
         
         // Insert standard categories at the beginning in correct order
-        // This ensures they always appear before playlist categories
         categories.unshift(favourite_category);
-        categories.unshift(recent_category);
         categories.unshift(resume_category);
         categories.unshift(all_category);
 

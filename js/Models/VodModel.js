@@ -3,7 +3,6 @@ var VodModel ={
     movies:[],
     category_name:'vod',
     favourite_category_index:'top-2',
-    recent_category_index:'top-1',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
     favourite_movie_count:200,
@@ -87,9 +86,9 @@ var VodModel ={
             }
             else{
                 if(!include_hide_category)
-                    return !category.is_hide && (category.category_id!=="favourite" && category.category_id!=="recent");
+                    return !category.is_hide && category.category_id!=="favourite";
                 else
-                    return category.category_id!=="favourite" && category.category_id!=="recent";
+                    return category.category_id!=="favourite";
             }
 
         })
@@ -107,13 +106,6 @@ var VodModel ={
     insertMoviesToCategories:function(){
         var movies=this.movies;
         var categories=this.categories;
-        var recent_category={
-            category_id:'recent',
-            category_name:'Recently Viewed',
-            parent_id:0,
-            movies:[],
-            is_hide:false
-        }
         var favourite_category={
             category_id:'favourite',
             category_name:'Favourites',
@@ -129,8 +121,6 @@ var VodModel ={
             is_hide:false
         }
         categories.push(undefined_category);
-         var temps1=this.getRecentOrFavouriteCategoryPosition('recent');
-        var recent_category_position=temps1[0],recent_category_index=temps1[1];
         var temps2=this.getRecentOrFavouriteCategoryPosition('favourite');
         var favourite_category_position=temps2[0], favourite_category_index=temps2[1];
         var temps=localStorage.getItem(storage_id+settings.playlist_url+"saved_vod_times");
@@ -139,17 +129,14 @@ var VodModel ={
         }
 
         var movie_id_key=this.movie_key;
-        var recent_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_recent"));
         var favourite_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_favourite"));
-        recent_movie_ids=recent_movie_ids==null ? [] : recent_movie_ids;
         favourite_movie_ids=favourite_movie_ids==null ? [] : favourite_movie_ids;
         this.favourite_ids=favourite_movie_ids;
 
-        var recent_movies=[], favourite_movies=[];
+        var favourite_movies=[];
         var that=this;
         var movies_map={}, resume_movies=[];;
         movies.map(function(movie){
-            movie.is_recent=false;
             movie.is_favourite=false;
 
             if(typeof movie.category_id=='undefined' || movie.category_id=='null' || movie.category_id==null){
@@ -159,14 +146,6 @@ var VodModel ={
                 movies_map[movie.category_id]=[];
             movies_map[movie.category_id].push(movie);
 
-            if(recent_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
-            {
-                if(that.recent_insert_position==="before")
-                    recent_movies.unshift(movie);
-                else
-                    recent_movies.push(movie);
-                movie.is_recent=true;
-            }
             if(favourite_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
             {
                 if(that.favourite_insert_position==="before")
@@ -198,44 +177,8 @@ var VodModel ={
             movies:resume_movies
         }
         categories.unshift(resume_category);
-        recent_category.movies=recent_movies;
         favourite_category.movies=favourite_movies;
-
-        if(recent_category_position==="bottom"){
-            if(favourite_category_position==="bottom"){  // all are bottom added
-                if(favourite_category_index>recent_category_index){  // first favourite, secend recent
-                    categories.push(favourite_category);
-                    categories.push(recent_category);
-                }
-                else{
-                    categories.push(recent_category);
-                    categories.push(favourite_category);
-                }
-            }
-            else{
-                categories.unshift(favourite_category);
-                categories.push(recent_category);
-            }
-        }
-        else{
-            if(favourite_category_position==="top"){  // both are top positioned
-                // Insert at specific positions: smaller index goes first
-                if(favourite_category_index < recent_category_index){
-                    // Favourites (index 1) before Recent (index 2)
-                    categories.splice(favourite_category_index, 0, favourite_category);
-                    categories.splice(recent_category_index, 0, recent_category);
-                }
-                else{
-                    // Recent (index 1) before Favourites (index 2) 
-                    categories.splice(recent_category_index, 0, recent_category);
-                    categories.splice(favourite_category_index, 0, favourite_category);
-                }
-            }
-            else{
-                categories.unshift(recent_category);
-                categories.push(favourite_category);
-            }
-        }
+        categories.unshift(favourite_category);
         var all_category= {
             category_id: 'all',
             category_name: 'All',
