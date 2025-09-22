@@ -698,9 +698,12 @@ var vod_series_player={
                         movieType = 'movie';
                     } else {
                         var episode = current_season.episodes[episode_variable.keys.index];
+                        // Pass the complete episode object with all TMDB data
                         movieData = {
-                            name: current_series.name,
-                            tmdb_id: this.current_movie.info ? this.current_movie.info.tmdb_id : null
+                            name: episode.title || episode.name || current_series.name,  // Use episode name first
+                            title: episode.title,
+                            info: episode.info,  // Contains episode TMDB ID
+                            series_tmdb_id: episode.series_tmdb_id  // Series TMDB ID fallback
                         };
                         movieType = 'episode';
                     }
