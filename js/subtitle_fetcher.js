@@ -95,12 +95,30 @@ var SubtitleFetcher = {
                 var tracks = media_player.getSubtitleOrAudioTrack("TEXT");
                 if(tracks && tracks.length > 0) {
                     tracks.forEach(function(track, index) {
+                        var label, language, trackIndex;
+                        
+                        // Handle Samsung vs LG track structure differences based on data shape
+                        if(track.extra_info) {
+                            // Samsung structure: track.extra_info contains track_lang and index
+                            var extraInfo = typeof track.extra_info === 'string' ? 
+                                JSON.parse(track.extra_info) : track.extra_info;
+                            language = extraInfo.track_lang || 'unknown';
+                            label = 'Track ' + (index + 1) + ' (' + language + ')';
+                            // Use Samsung's canonical index for proper track selection
+                            trackIndex = extraInfo.index !== undefined ? extraInfo.index : index;
+                        } else {
+                            // LG structure: track.label, track.language
+                            label = track.label || 'Native Track ' + (index + 1);
+                            language = track.language || 'unknown';
+                            trackIndex = track.index !== undefined ? track.index : index;
+                        }
+                        
                         nativeSubtitles.push({
                             source: 'native',
-                            index: index,
-                            originalIndex: index,
-                            label: track.label || 'Native Track ' + (index + 1),
-                            language: track.language || 'unknown'
+                            index: trackIndex,
+                            originalIndex: trackIndex,
+                            label: label,
+                            language: language
                         });
                     });
                 }
