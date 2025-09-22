@@ -204,44 +204,8 @@ var SeriesModel={
         recent_category.movies=recent_movies;
         favourite_category.movies=favourite_movies;
 
-        if(recent_category_position==="bottom"){
-            if(favourite_category_position==="bottom"){  // all are bottom added
-                if(favourite_category_index>recent_category_index){  // first favourite, secend recent
-                    categories.push(favourite_category);
-                    categories.push(recent_category);
-                }
-                else{
-                    categories.push(recent_category);
-                    categories.push(favourite_category);
-                }
-            }
-            else{
-                categories.unshift(favourite_category);
-                categories.push(recent_category);
-            }
-        }
-        else{
-            if(favourite_category_position==="top"){  // both are top positioned
-                // Insert at specific positions: smaller index goes first
-                if(favourite_category_index < recent_category_index){
-                    // Favourites (index 1) before Recent (index 2)
-                    categories.splice(favourite_category_index, 0, favourite_category);
-                    categories.splice(recent_category_index, 0, recent_category);
-                }
-                else{
-                    // Recent (index 1) before Favourites (index 2) 
-                    categories.splice(recent_category_index, 0, recent_category);
-                    categories.splice(favourite_category_index, 0, favourite_category);
-                }
-            }
-            else{
-                categories.unshift(recent_category);
-                categories.push(favourite_category);
-            }
-        }
-        // Insert resume category first 
-        categories.unshift(resume_category);
-        
+        // Note: Standard category positioning is now handled above
+        // to ensure they always appear before playlist categories
         var all_category= {
             category_id: 'all',
             category_name: 'All',
@@ -249,6 +213,12 @@ var SeriesModel={
             is_hide: false,
             movies: []
         };
+        
+        // Insert standard categories at the beginning in correct order
+        // This ensures they always appear before playlist categories
+        categories.unshift(favourite_category);
+        categories.unshift(recent_category);
+        categories.unshift(resume_category);
         categories.unshift(all_category);
 
 
