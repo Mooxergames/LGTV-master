@@ -8,6 +8,7 @@ var login_page={
         playlist_modal_selection:0
     },
     network_btn_doms:$('.network-issue-btn'),
+    login_in_progress: false, // Flag to prevent duplicate login attempts
     showLoadImage:function(){
         $('#login-container .left-part-content').hide();
         $('.loader-image-container').show();
@@ -148,9 +149,13 @@ var login_page={
                 var data=decryptResponse(data1);
                 console.log(data);
                 localStorage.setItem(storage_id+'api_data',JSON.stringify(data));
+                console.log('Login successful, maintaining init guard (never reset)');
+                // Note: __LOGIN_INIT_STARTED__ is never reset to prevent duplicate inits
                 that.startApp(data);
             },
             error: function(error){
+                console.log('Login error, maintaining init guard (use network issue UI for retry)');
+                // Note: __LOGIN_INIT_STARTED__ is never reset to prevent duplicate inits
                 var local_data=localStorage.getItem(storage_id+'api_data');
                 if(local_data)
                     that.startApp(JSON.parse(local_data));
@@ -368,6 +373,15 @@ var login_page={
     },
 
     getPlayListDetail:function(){
+        // Global session-wide initialization guard (never resets)
+        if (window.__LOGIN_INIT_STARTED__) {
+            console.log('Login init guard hit - initialization already started, skipping duplicate call');
+            return;
+        }
+        window.__LOGIN_INIT_STARTED__ = true;
+        
+        var initId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        console.log('Starting login initialization with ID:', initId);
         this.network_btn_doms=$('.network-issue-btn');
         this.showLoadImage();
         $('#network-issue-container').hide();
