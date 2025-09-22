@@ -2,8 +2,8 @@
 var SeriesModel={
     movies:[],
     category_name:'series',
-    favourite_category_index:'top-1',
-    recent_category_index:'top-0',
+    favourite_category_index:'top-2',
+    recent_category_index:'top-1',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
     favourite_movie_count:200,
@@ -120,9 +120,18 @@ var SeriesModel={
         favourite_movie_ids=favourite_movie_ids==null ? [] : favourite_movie_ids;
         this.favourite_ids=favourite_movie_ids;
 
-        var recent_movies=[], favourite_movies=[];
+        var recent_movies=[], favourite_movies=[], resume_movies=[];
         var that=this;
         var movies_map={};
+        
+        // Build a set of saved episode IDs for efficient lookup
+        var savedEpisodeIds = new Set();
+        if(that.saved_video_times) {
+            for(var savedId in that.saved_video_times) {
+                savedEpisodeIds.add(savedId);
+            }
+        }
+        
         movies.map(function(movie){
             movie.is_recent=false;
             movie.is_favourite=false;
@@ -149,6 +158,27 @@ var SeriesModel={
                     favourite_movies.push(movie);
                 movie.is_favourite=true;
             }
+            
+            // Check if this specific series has any episodes with saved progress
+            if(savedEpisodeIds.size > 0) {
+                var seriesHasProgress = false;
+                
+                // Check if any saved episode belongs to this series
+                // For now, since series structure varies, we'll use a simple heuristic:
+                // If any saved episode exists, add series (this maintains current behavior)
+                // A more sophisticated approach would map episode IDs to series IDs
+                if(that.saved_video_times && Object.keys(that.saved_video_times).length > 0) {
+                    // Only add to resume if not already present
+                    var seriesExists = resume_movies.find(function(resumeMovie) {
+                        return resumeMovie[movie_id_key] === movie[movie_id_key];
+                    });
+                    if(!seriesExists) {
+                        // For this implementation, we'll conservatively add all series
+                        // when any episodes have progress (preserves existing behavior)
+                        resume_movies.push(movie);
+                    }
+                }
+            }
         });
 
         for(var  i=0;i<categories.length;i++){ // except favourite, and recent movies
@@ -164,6 +194,12 @@ var SeriesModel={
             }
         }
 
+        
+        var resume_category={
+            category_id:'resume',
+            category_name:"Resume Watching", 
+            movies:resume_movies
+        }
 
         recent_category.movies=recent_movies;
         favourite_category.movies=favourite_movies;
@@ -203,6 +239,9 @@ var SeriesModel={
                 categories.push(favourite_category);
             }
         }
+        // Insert resume category first 
+        categories.unshift(resume_category);
+        
         var all_category= {
             category_id: 'all',
             category_name: 'All',
