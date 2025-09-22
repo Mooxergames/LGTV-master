@@ -43,8 +43,7 @@ var SubtitleFetcher = {
             
             // Step 4: Build request data
             subtitleRequestData = {
-                movie_name: cleanedName,
-                movie_type: 'movie'
+                movie_name: cleanedName
             };
             
             // Step 5: Add TMDB ID (highest priority for matching)
@@ -69,9 +68,8 @@ var SubtitleFetcher = {
             var parsedEpisode = this.parseEpisodeName(episodeName);
             
             if (parsedEpisode.season_number && parsedEpisode.episode_number) {
-                // CORRECT EXOAPP FORMAT: Use series type with season/episode numbers
+                // CORRECT EXOAPP FORMAT: Use season/episode numbers (API auto-detects type)
                 subtitleRequestData = {
-                    movie_type: 'series',
                     season_number: parseInt(parsedEpisode.season_number),
                     episode_number: parseInt(parsedEpisode.episode_number)
                 };
@@ -103,7 +101,6 @@ var SubtitleFetcher = {
                     var properSeriesTitle = seriesName + ' ' + seasonStr + ' ' + episodeStr;
                     
                     subtitleRequestData = {
-                        movie_type: 'movie',
                         movie_name: properSeriesTitle
                     };
                     
@@ -112,7 +109,6 @@ var SubtitleFetcher = {
                     // Last resort: use episode name only
                     console.log('⚠️ No series structure available - using episode title');
                     subtitleRequestData = {
-                        movie_type: 'movie', 
                         movie_name: episodeName
                     };
                 }
@@ -162,7 +158,6 @@ var SubtitleFetcher = {
                     var nameBasedTitle = parsedEpisode.series_name + ' ' + seasonStr + ' ' + episodeStr;
                     
                     var nameBasedRequest = {
-                        movie_type: 'movie',
                         movie_name: nameBasedTitle
                     };
                     
@@ -234,7 +229,6 @@ var SubtitleFetcher = {
                 var nameBasedTitle = parsedEpisode.series_name + ' ' + seasonStr + ' ' + episodeStr;
                 
                 var nameBasedRequest = {
-                    movie_type: 'movie',
                     movie_name: nameBasedTitle
                 };
                 
