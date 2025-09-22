@@ -2,7 +2,7 @@
 var VodModel ={
     movies:[],
     category_name:'vod',
-    favourite_category_index:'top-1',
+    favourite_category_index:'top-3',
     recent_category_index:'top-2',
     favourite_insert_position:'before', // or after
     recent_insert_position:'before',
@@ -218,14 +218,17 @@ var VodModel ={
             }
         }
         else{
-            if(favourite_category_position==="top"){  // all are bottom added
-                if(favourite_category_index>recent_category_index){  // first favourite, secend recent
-                    categories.push(favourite_category);
-                    categories.push(recent_category);
+            if(favourite_category_position==="top"){  // both are top positioned
+                // Insert at specific positions: smaller index goes first
+                if(favourite_category_index < recent_category_index){
+                    // Favourites (index 1) before Recent (index 2)
+                    categories.splice(favourite_category_index, 0, favourite_category);
+                    categories.splice(recent_category_index, 0, recent_category);
                 }
                 else{
-                    categories.push(recent_category);
-                    categories.push(favourite_category);
+                    // Recent (index 1) before Favourites (index 2) 
+                    categories.splice(recent_category_index, 0, recent_category);
+                    categories.splice(favourite_category_index, 0, favourite_category);
                 }
             }
             else{
