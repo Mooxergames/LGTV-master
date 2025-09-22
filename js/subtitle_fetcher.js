@@ -15,8 +15,16 @@ var SubtitleFetcher = {
      * @param {Function} errorCallback - Called on error
      */
     fetchSubtitles: function(movieData, movieType, successCallback, errorCallback) {
+        var movieName = movieData.name;
+        
+        // Clean movie name for better API matching
+        if (movieType === 'movie' && movieName) {
+            // Remove year from title (e.g., "Thor: Love and Thunder (2022)" -> "Thor: Love and Thunder")
+            movieName = movieName.replace(/\s*\(\d{4}\)\s*$/g, '').trim();
+        }
+        
         var subtitleRequestData = {
-            movie_name: movieData.name,
+            movie_name: movieName,
             movie_type: movieType || 'movie'
         };
         
