@@ -1322,7 +1322,19 @@
                 <div class="modal-dialog modal-dialog-centered1 modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title modal-title-text-3 text-center" id="subtitle-modal-title" data-word_code="subtitle" style="display: block;width: 100%">Subtitle</h5>
+                            <h5 class="modal-title modal-title-text-3" id="subtitle-modal-title" data-word_code="subtitle">Subtitle</h5>
+                            <div class="header-buttons">
+                                <button type="button" class="modal-btn-1" data-word_code="ok"
+                                        onmouseenter="vod_series_player.hoverSubtitleAudioModal(-1)"
+                                        onclick="vod_series_player.confirmSubtitle()">
+                                    OK
+                                </button>
+                                <button type="button" class="modal-btn-1" data-word_code="cancel"
+                                        onmouseenter="vod_series_player.hoverSubtitleAudioModal(-2)"
+                                        onclick="vod_series_player.cancelSubtitle()">
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                         <div class="modal-body p-20" id="subtitle-modal-body">
                             <div id="subtitle-loader-container">

@@ -151,6 +151,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    min-height: 80px;
 }
 
 #subtitle-selection-modal .modal-title {
@@ -170,28 +171,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-}
-
-#subtitle-selection-modal .header-btn {
-    background: rgba(100, 100, 100, 0.3);
-    border: 1px solid #666;
-    border-radius: 6px;
-    color: #ffffff;
-    font-size: 18px;
-    padding: 12px 25px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 120px;
-    text-align: center;
-}
-
-#subtitle-selection-modal .header-btn:hover {
-    background: rgba(150, 150, 150, 0.4);
-    border-color: #888;
-}
-
-#subtitle-selection-modal .header-btn.ok-btn {
-    background: rgba(100, 100, 100, 0.4);
+    z-index: 10;
 }
 
 #subtitle-modal-body {
@@ -272,7 +252,7 @@
     border-radius: 4px;
     background: transparent;
     position: absolute;
-    left: 20px;
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     flex-shrink: 0;
@@ -288,7 +268,7 @@
 .subtitle-option .magic-radio:checked + label:after {
     content: "✓";
     position: absolute;
-    left: 28px;
+    right: 28px;
     top: 50%;
     transform: translateY(-50%);
     color: #ffffff;
@@ -297,19 +277,13 @@
     display: block;
 }
 
-#subtitle-modal-body .modal-button-wrapper {
-    background: transparent;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 0;
-    position: absolute;
-    left: 30px;
-    right: 30px;
-    bottom: 30px;
-    display: flex;
-    justify-content: space-between;
+.subtitle-option label {
+    padding-left: 20px;
+    padding-right: 60px;
 }
 
-#subtitle-modal-body .modal-btn-1 {
+/* Move buttons to header area */
+#subtitle-selection-modal .modal-btn-1 {
     background: rgba(100, 100, 100, 0.4);
     border: 1px solid #666;
     border-radius: 6px;
@@ -320,11 +294,17 @@
     transition: all 0.2s ease;
     min-width: 120px;
     text-align: center;
+    display: block;
 }
 
-#subtitle-modal-body .modal-btn-1:hover {
+#subtitle-selection-modal .modal-btn-1:hover {
     background: rgba(150, 150, 150, 0.4);
     border-color: #888;
+}
+
+/* Hide the bottom button wrapper */
+#subtitle-modal-body .modal-button-wrapper {
+    display: none;
 }
 
 /* Loading indicator for subtitle fetch */
