@@ -62,6 +62,14 @@ const server = http.createServer((req, res) => {
       
       res.statusCode = 200;
       res.setHeader('Content-Type', mimeType);
+      
+      // Cache busting for JavaScript and CSS files to force reload
+      if (ext === '.js' || ext === '.css') {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      
       res.end(data);
     });
   });

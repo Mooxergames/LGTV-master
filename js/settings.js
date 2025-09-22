@@ -19,8 +19,6 @@ var settings={
     language:'en',
     show_featured_movies:'on',
     epg_time_difference:0,
-    random_vod_seed_on_start:true,
-    random_vod_favourites_target:10,
 
     initFromLocal:function(){
         var that=this;
@@ -43,14 +41,6 @@ var settings={
                 that[key]=temp;
         })
         
-        // VOD favorites settings
-        temp=localStorage.getItem(storage_id+'random_vod_seed_on_start');
-        if(temp!=null && temp!=='null')
-            this.random_vod_seed_on_start=(temp==='true');
-        
-        temp=localStorage.getItem(storage_id+'random_vod_favourites_target');
-        if(temp!=null && temp!=='null')
-            this.random_vod_favourites_target=parseInt(temp);
 
         temp=localStorage.getItem(storage_id+'language');
         if(temp!=null && temp!=='null')
@@ -98,7 +88,5 @@ var settings={
         this.language='en';
         this.show_featured_movies='on';
         this.epg_time_difference=0;
-        this.random_vod_seed_on_start=true;
-        this.random_vod_favourites_target=10;
     }
 }
