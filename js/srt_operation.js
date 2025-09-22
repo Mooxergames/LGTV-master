@@ -61,29 +61,51 @@ var SrtOperation={
             return this.findIndex(time, mid+1, end);
     },
     timeChange: function(current_time) {
+        // 🔧 TIMING DEBUG: Add comprehensive subtitle timing logs
+        console.log("⏰ SUBTITLE TIMING DEBUG:", {
+            current_time: current_time,
+            current_time_formatted: this.formatTimeForDebug(current_time),
+            stopped: this.stopped,
+            srt_length: this.srt ? this.srt.length : 0,
+            current_srt_index: this.current_srt_index,
+            subtitle_shown: this.subtitle_shown
+        });
+
         // Exact timing logic from exoapp - no compensation offsets
         if(this.stopped || !this.srt || this.srt.length === 0) {
+            console.log("🚫 SUBTITLE TIMING: Stopped or no subtitles available");
             return;
         }
         
         var srtIndex = this.current_srt_index;
         if(srtIndex >= this.srt.length || srtIndex < 0) {
+            console.log("🔍 SUBTITLE TIMING: Finding new index for time", current_time);
             srtIndex = this.findIndex(current_time, 0, this.srt.length - 1);
             this.current_srt_index = Math.max(0, srtIndex);
+            console.log("📍 SUBTITLE TIMING: New index found:", this.current_srt_index);
             return;
         }
         
         var srtItem = this.srt[srtIndex];
+        console.log("📝 SUBTITLE TIMING: Current item check:", {
+            index: srtIndex,
+            startSeconds: srtItem.startSeconds,
+            endSeconds: srtItem.endSeconds,
+            text_preview: srtItem.text ? srtItem.text.substring(0, 50) + "..." : "No text",
+            should_show: current_time >= srtItem.startSeconds && current_time < srtItem.endSeconds
+        });
         
         // Check if current subtitle should be displayed - exact timing
         if(current_time >= srtItem.startSeconds && current_time < srtItem.endSeconds) {
             if(!this.subtitle_shown) {
+                console.log("✅ SUBTITLE TIMING: Showing subtitle at", current_time, ":", srtItem.text.substring(0, 100));
                 this.showSubtitle(srtItem.text);
                 this.subtitle_shown = true;
             }
         } else {
             // Hide subtitle when out of time range
             if(this.subtitle_shown) {
+                console.log("❌ SUBTITLE TIMING: Hiding subtitle at", current_time);
                 this.hideSubtitle();
                 this.subtitle_shown = false;
             }
@@ -91,9 +113,17 @@ var SrtOperation={
             // Find next subtitle
             var newIndex = this.findIndex(current_time, 0, this.srt.length - 1);
             if(newIndex >= 0 && newIndex !== this.current_srt_index) {
+                console.log("🔄 SUBTITLE TIMING: Moving to index", newIndex, "from", this.current_srt_index);
                 this.current_srt_index = newIndex;
             }
         }
+    },
+    
+    formatTimeForDebug: function(seconds) {
+        var min = Math.floor(seconds / 60);
+        var sec = Math.floor(seconds % 60);
+        var ms = Math.floor((seconds % 1) * 1000);
+        return min + ":" + (sec < 10 ? "0" : "") + sec + "." + (ms < 100 ? "0" : "") + (ms < 10 ? "0" : "") + ms;
     },
     showSubtitle: function(text) {
         // Enhanced subtitle display with better formatting
