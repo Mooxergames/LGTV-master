@@ -79,11 +79,8 @@ var home_page={
         })
         $('#favourite_tv_wrapper').html(htmlContents);
 
-        // Initialize VOD favorites (auto-seed random content)
+        // Clean up invalid favorites
         VodModel.pruneInvalidFavorites();
-        if(settings.random_vod_seed_on_start) {
-            VodModel.seedRandomFavorites(settings.random_vod_favourites_target);
-        }
 
         var vod_featured_movies=[];
         if(settings.show_featured_movies==='on')

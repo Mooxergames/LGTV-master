@@ -432,30 +432,4 @@ var VodModel ={
         }
     },
     
-    seedRandomFavorites: function(targetCount) {
-        targetCount = targetCount || 10;
-        var currentFavourites = this.getFavouriteMovies();
-        var neededCount = targetCount - currentFavourites.length;
-        
-        if (neededCount <= 0) return;
-        
-        // Get available movies that aren't already favorited
-        var availableMovies = this.movies.filter(movie => {
-            return !this.favourite_ids.includes(movie.stream_id) && 
-                   !this.adult_category_ids.includes(movie.category_id);
-        });
-        
-        if (availableMovies.length === 0) return;
-        
-        // Randomly shuffle and take needed count
-        var shuffled = availableMovies.sort(() => 0.5 - Math.random());
-        var toAdd = shuffled.slice(0, neededCount);
-        
-        // Add each movie to favorites
-        toAdd.forEach(movie => {
-            this.addFavourite(movie);
-        });
-        
-        console.log('Auto-seeded', toAdd.length, 'random VOD favorites');
-    }
 }
