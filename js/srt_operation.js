@@ -47,7 +47,7 @@ var SrtOperation={
         let mid=Math.floor((start + end)/2);
 
         // Compare mid with given key x
-        if (arr[mid].startSeconds<=time && time<arr[mid].endTime)
+        if (arr[mid].startSeconds<=time && time<arr[mid].endSeconds)
             return mid;
 
 
@@ -98,11 +98,15 @@ var SrtOperation={
     showSubtitle: function(text) {
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
-        $('#' + media_player.parent_id).find('.subtitle-container').html(subtitleHtml);
+        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
+        subtitleContainer.html(subtitleHtml);
+        subtitleContainer.show(); // Ensure container is visible when showing subtitles
     },
     
     hideSubtitle: function() {
-        $('#' + media_player.parent_id).find('.subtitle-container').html('');
+        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
+        subtitleContainer.html('');
+        // Keep container visible but empty - don't hide it as it may be needed again
     },
     
     stopOperation: function () {
