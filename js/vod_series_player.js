@@ -646,7 +646,8 @@ var vod_series_player={
         try{
             $('#subtitle-loader-container').hide();
             var subtitles;
-            if(platform!=='samsung' && kind==='TEXT'){  // we will use our own made subtitles
+            // Enhanced subtitle workflow integration
+            if(kind === 'TEXT') {
                 if(!this.subtitle_loaded) {
                     $("#subtitle-selection-container").html('');
                     if(!(this.current_movie_type==='movies' || (this.current_movie_type==='series' && settings.playlist_type==='xtreme')))
@@ -654,61 +655,59 @@ var vod_series_player={
                         this.showEmptySubtitleMessage(kind);
                         return;
                     }
-                    var that=this;
-                    this.subtitle_loading=true;
+                    
+                    var that = this;
+                    this.subtitle_loading = true;
                     $('#subtitle-selection-modal').modal('show');
                     this.hoverSubtitleAudioModal(-2);
                     $('#subtitle-loader-container').show();
-                    var subtitle_request_data;
-                    if(this.current_movie_type==='movies'){
-                        subtitle_request_data={
-                            movie_name:this.current_movie.name
-                        }
-                        if(this.current_movie.tmdb_id)
-                            subtitle_request_data.tmdb_id=this.current_movie.tmdb_id
-                    }else {
-                        var episode=current_season.episodes[episode_variable.keys.index];
-                        subtitle_request_data={
-                            movie_name:current_series.name,
-                            movie_type:'episode',
-                            season_number:current_season.season_number ? current_season.season_number : seasons_variable.keys.index+1,
-                            episode_number:episode.episode_num ? episode.episode_num : episode_variable.keys.index+1
-                        }
-                        if(this.current_movie.info && this.current_movie.info.tmdb_id)
-                            subtitle_request_data.tmdb_id=this.current_movie.info.tmdb_id;
+                    
+                    // Prepare movie data for enhanced workflow
+                    var movieData, movieType;
+                    if(this.current_movie_type === 'movies') {
+                        movieData = {
+                            name: this.current_movie.name,
+                            tmdb_id: this.current_movie.tmdb_id
+                        };
+                        movieType = 'movie';
+                    } else {
+                        var episode = current_season.episodes[episode_variable.keys.index];
+                        movieData = {
+                            name: current_series.name,
+                            tmdb_id: this.current_movie.info ? this.current_movie.info.tmdb_id : null
+                        };
+                        movieType = 'episode';
                     }
-                    $.ajax({
-                        method:'post',
-                        url:'https://exoapp.tv/api/get-subtitles',
-                        data: subtitle_request_data,
-                        dataType:'json',
-                        success:function (result) {
-                            that.subtitle_loading=false;
-                            that.subtitle_loaded=true;
+                    
+                    // Use enhanced subtitle workflow
+                    EnhancedSubtitleWorkflow.initializeSubtitles(movieData, movieType,
+                        function(subtitles) {
+                            // Success callback
+                            that.subtitle_loading = false;
+                            that.subtitle_loaded = true;
                             $('#subtitle-loader-container').hide();
-                            if(result.status==='success'){
-                                if(result.subtitles.length>0){
-                                    media_player.subtitles= result.subtitles;
-                                    that.renderSubtitles(kind, media_player.subtitles);
-                                }
-                                else{
-                                    media_player.subtitles=[];
-                                    that.showEmptySubtitleMessage(kind);
-                                }
+                            
+                            if(subtitles && subtitles.length > 0) {
+                                that.renderSubtitles(kind, subtitles);
+                            } else {
+                                that.showEmptySubtitleMessage(kind);
                             }
                         },
-                        error:function (error){
-                            that.subtitle_loading=false;
-                            that.subtitle_loaded=true;
+                        function(error) {
+                            // Error callback
+                            that.subtitle_loading = false;
+                            that.subtitle_loaded = true;
+                            $('#subtitle-loader-container').hide();
                             that.showEmptySubtitleMessage(kind);
+                            console.error('Enhanced subtitle workflow error:', error);
                         }
-                    })
-                }
-                else {
-                    if(media_player.subtitles.length>0) {
+                    );
+                } else {
+                    if(media_player.subtitles && media_player.subtitles.length > 0) {
                         this.renderSubtitles(kind, media_player.subtitles);
-                    }else
+                    } else {
                         this.showEmptySubtitleMessage(kind);
+                    }
                 }
             }
             else {
