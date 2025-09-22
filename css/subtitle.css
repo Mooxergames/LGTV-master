@@ -257,7 +257,7 @@
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
-.subtitle-option.active::after {
+#subtitle-selection-container .subtitle-option.active::after {
     content: "✓";
     position: absolute;
     right: 15px;
