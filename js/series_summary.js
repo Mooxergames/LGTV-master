@@ -100,14 +100,71 @@ var series_summary_page={
                             console.log('⚠️ NO SERIES TMDB ID in API response - subtitle matching will be less accurate');
                         }
                         
-                        // Process seasons and episodes with TMDB data
-                        if(response.seasons) {
-                            current_series.seasons = response.seasons;
+                        // Process seasons and episodes with TMDB data - EXOAPP METHODOLOGY
+                        console.log('=== EPISODES DATA PROCESSING (EXOAPP METHODOLOGY) ===');
+                        console.log('Seasons from API:', response.seasons);
+                        console.log('Episodes from API:', response.episodes);
+                        
+                        var seasons = response.seasons;
+                        var episodes = response.episodes;  // Episodes grouped by season number
+                        
+                        // Process episodes into season structure following exoapp
+                        if(response.episodes && seasons && seasons.length > 0) {
+                            console.log('✅ Processing episodes with existing seasons data');
+                            
+                            // Map episodes to their respective seasons
+                            seasons.map(function(season) {
+                                var seasonKey = season.season_number.toString();
+                                season.episodes = episodes[seasonKey] || [];
+                                
+                                console.log('Season ' + season.season_number + ' episodes:', season.episodes.length);
+                                
+                                // Log episode TMDB IDs for debugging
+                                if(season.episodes.length > 0) {
+                                    season.episodes.forEach(function(episode, index) {
+                                        if(episode.info && episode.info.tmdb_id) {
+                                            console.log('  Episode ' + (index + 1) + ' TMDB ID:', episode.info.tmdb_id);
+                                        } else {
+                                            console.log('  Episode ' + (index + 1) + ' - NO TMDB ID');
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            current_series.seasons = seasons;
+                            
+                        } else if(episodes) {
+                            console.log('✅ Creating seasons from episodes data (no seasons metadata)');
+                            
+                            // No seasons data - create seasons from episode keys
+                            seasons = [];
+                            Object.keys(episodes).map(function(key, index) {
+                                var seasonEpisodes = episodes[key];
+                                
+                                console.log('Creating Season ' + (index + 1) + ' with ' + seasonEpisodes.length + ' episodes');
+                                
+                                seasons.push({
+                                    season_number: parseInt(key),
+                                    name: "Season " + key,
+                                    cover: "images/404.png",
+                                    episodes: seasonEpisodes  // Each episode has info.tmdb_id
+                                });
+                                
+                                // Log episode TMDB IDs for debugging  
+                                seasonEpisodes.forEach(function(episode, episodeIndex) {
+                                    if(episode.info && episode.info.tmdb_id) {
+                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' TMDB ID:', episode.info.tmdb_id);
+                                    } else {
+                                        console.log('  S' + key + ' E' + (episodeIndex + 1) + ' - NO TMDB ID');
+                                    }
+                                });
+                            });
+                            
+                            current_series.seasons = seasons;
                         }
-                        if(response.episodes) {
-                            current_series.episodes = response.episodes;
-                            console.log('✅ Episodes with TMDB data stored:', Object.keys(response.episodes).length, 'seasons');
-                        }
+                        
+                        console.log('=== EPISODE STRUCTURE COMPLETE ===');
+                        console.log('Total seasons processed:', current_series.seasons ? current_series.seasons.length : 0);
                         
                         // Update enhanced info if available
                         if(info.plot && info.plot !== current_series.plot) {
