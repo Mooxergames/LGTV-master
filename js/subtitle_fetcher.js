@@ -70,38 +70,32 @@ var SubtitleFetcher = {
                 movie_type: 'episode'
             };
             
-            // PRIMARY STRATEGY: Use episode TMDB ID (EXOAPP METHODOLOGY)
-            if (movieData && movieData.info && movieData.info.tmdb_id) {
-                subtitleRequestData.tmdb_id = String(movieData.info.tmdb_id);
-                console.log('✅ Using episode TMDB ID:', movieData.info.tmdb_id);
-            } 
-            // FALLBACK STRATEGY: Parse episode name for series info
-            else {
-                console.log('⚠️ No episode TMDB ID - using fallback parsing');
-                var parsedEpisode = this.parseEpisodeName(episodeName);
+            // ROBUST STAGED STRATEGY: Name-first approach (IPTV providers often have wrong TMDB IDs)
+            console.log('🎯 Processing episode with staged name-first approach');
+            var parsedEpisode = this.parseEpisodeName(episodeName);
+            
+            if (parsedEpisode.series_name) {
+                // Format as single string: "dos tumbas s01 e01" 
+                var formattedName = parsedEpisode.series_name.toLowerCase();
                 
-                if (parsedEpisode.series_name) {
-                    // Format as single string: "the witcher s01 e01"
-                    var formattedName = parsedEpisode.series_name.toLowerCase();
-                    
-                    if (parsedEpisode.season_number && parsedEpisode.episode_number) {
-                        var seasonStr = 's' + String(parsedEpisode.season_number).padStart(2, '0');
-                        var episodeStr = 'e' + String(parsedEpisode.episode_number).padStart(2, '0');
-                        formattedName = formattedName + ' ' + seasonStr + ' ' + episodeStr;
-                    }
-                    
-                    subtitleRequestData.movie_name = formattedName;
-                    
-                    // Use series TMDB ID as fallback if available
-                    if (movieData.series_tmdb_id) {
-                        subtitleRequestData.tmdb_id = String(movieData.series_tmdb_id);
-                        console.log('Using series TMDB ID as fallback:', movieData.series_tmdb_id);
-                    }
-                } else {
-                    // No pattern recognized - let API auto-detect
-                    subtitleRequestData.movie_type = 'auto';
-                    console.log('No episode pattern recognized - using auto-detection');
+                if (parsedEpisode.season_number && parsedEpisode.episode_number) {
+                    var seasonStr = 's' + String(parsedEpisode.season_number).padStart(2, '0');
+                    var episodeStr = 'e' + String(parsedEpisode.episode_number).padStart(2, '0');
+                    formattedName = formattedName + ' ' + seasonStr + ' ' + episodeStr;
                 }
+                
+                subtitleRequestData.movie_name = formattedName;
+                console.log('✅ Using name-based matching (primary):', formattedName);
+                
+                // Store potential TMDB IDs for fallback attempts (DO NOT include in first request)
+                subtitleRequestData._episode_tmdb_fallback = movieData.info ? movieData.info.tmdb_id : null;
+                subtitleRequestData._series_tmdb_fallback = movieData.series_tmdb_id || null;
+                
+            } else {
+                // No pattern recognized - try auto-detection with original name
+                subtitleRequestData.movie_name = episodeName;
+                subtitleRequestData.movie_type = 'auto';
+                console.log('No episode pattern - using auto-detection with original name:', episodeName);
             }
             
             console.log('Episode subtitle request data:', {
@@ -112,11 +106,76 @@ var SubtitleFetcher = {
             });
         }
         
-        // Make API request
+        // STAGED API REQUESTS: Name-first, then TMDB ID fallbacks
+        var that = this;
+        
+        // Clean up internal fallback fields before sending request
+        var episodeTmdbFallback = subtitleRequestData._episode_tmdb_fallback;
+        var seriesTmdbFallback = subtitleRequestData._series_tmdb_fallback;
+        delete subtitleRequestData._episode_tmdb_fallback;
+        delete subtitleRequestData._series_tmdb_fallback;
+        
+        // STAGE 1: Name-based request (most reliable for IPTV providers)
+        console.log('🎯 Stage 1: Name-based subtitle request');
+        this.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
+            // SUCCESS: Name-based matching worked
+            if(successCallback) {
+                successCallback(subtitles);
+            }
+        }, function(error) {
+            // STAGE 2: Try with episode TMDB ID if available
+            if(episodeTmdbFallback) {
+                console.log('🎯 Stage 2: Retry with episode TMDB ID:', episodeTmdbFallback);
+                var episodeRequestData = Object.assign({}, subtitleRequestData, {
+                    tmdb_id: String(episodeTmdbFallback)
+                });
+                
+                that.makeSubtitleRequest(episodeRequestData, function(subtitles) {
+                    if(successCallback) {
+                        successCallback(subtitles);
+                    }
+                }, function(error2) {
+                    // STAGE 3: Try with series TMDB ID if available
+                    if(seriesTmdbFallback) {
+                        console.log('🎯 Stage 3: Retry with series TMDB ID:', seriesTmdbFallback);
+                        var seriesRequestData = Object.assign({}, subtitleRequestData, {
+                            tmdb_id: String(seriesTmdbFallback)
+                        });
+                        
+                        that.makeSubtitleRequest(seriesRequestData, successCallback, errorCallback);
+                    } else {
+                        if(errorCallback) {
+                            errorCallback('No subtitles found in all stages');
+                        }
+                    }
+                });
+            } else if(seriesTmdbFallback) {
+                // Skip to stage 3 if no episode TMDB
+                console.log('🎯 Stage 2 (direct): Retry with series TMDB ID:', seriesTmdbFallback);
+                var seriesRequestData = Object.assign({}, subtitleRequestData, {
+                    tmdb_id: String(seriesTmdbFallback)
+                });
+                
+                that.makeSubtitleRequest(seriesRequestData, successCallback, errorCallback);
+            } else {
+                if(errorCallback) {
+                    errorCallback('No subtitles found');
+                }
+            }
+        });
+    },
+    
+    /**
+     * Make individual subtitle API request
+     * @param {Object} requestData - Subtitle request data
+     * @param {Function} successCallback - Success callback
+     * @param {Function} errorCallback - Error callback
+     */
+    makeSubtitleRequest: function(requestData, successCallback, errorCallback) {
         $.ajax({
             method: 'post',
             url: this.apiUrl,
-            data: subtitleRequestData,
+            data: requestData,
             dataType: 'json',
             timeout: 10000, // 10 second timeout
             success: function(result) {
