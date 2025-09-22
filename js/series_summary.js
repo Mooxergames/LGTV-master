@@ -26,9 +26,14 @@ var series_summary_page={
         var backdrop_image='';
         try{
             backdrop_image=current_series.backdrop_path[0];
-            if(backdrop_image)
-                $('.vod-series-background-img').attr('src',backdrop_image);
         }catch (e) {
+        }
+        
+        // Use backdrop if available, otherwise use poster as fallback
+        if(backdrop_image) {
+            $('.vod-series-background-img').attr('src',backdrop_image);
+        } else if(current_series.cover) {
+            $('.vod-series-background-img').attr('src',current_series.cover);
         }
         this.hoverButtons(1);
         if(current_series.is_favourite){
