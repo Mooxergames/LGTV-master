@@ -112,15 +112,15 @@ var SubtitleFetcher = {
         delete subtitleRequestData._episode_tmdb_fallback;
         delete subtitleRequestData._series_tmdb_fallback;
         
-        // STAGE 1: Series TMDB + Season/Episode (Official ExoApp format)
-        if(seriesTmdbFallback && subtitleRequestData.season_number && subtitleRequestData.episode_number) {
-            console.log('🎯 Stage 1: Series TMDB with season/episode numbers');
-            var seriesRequestData = Object.assign({}, subtitleRequestData, {
-                tmdb_id: String(seriesTmdbFallback)
+        // STAGE 1: Episode TMDB + Season/Episode (Most specific - ExoApp format)
+        if(episodeTmdbFallback && subtitleRequestData.season_number && subtitleRequestData.episode_number) {
+            console.log('🎯 Stage 1: Episode TMDB with season/episode numbers');
+            var episodeRequestData = Object.assign({}, subtitleRequestData, {
+                tmdb_id: String(episodeTmdbFallback)
             });
             
-            this.makeSubtitleRequest(seriesRequestData, function(subtitles) {
-                console.log('✅ Series TMDB + season/episode matching successful');
+            this.makeSubtitleRequest(episodeRequestData, function(subtitles) {
+                console.log('✅ Episode TMDB + season/episode matching successful');
                 if(successCallback) {
                     successCallback(subtitles);
                 }
@@ -155,14 +155,14 @@ var SubtitleFetcher = {
                                 successCallback(subtitles);
                             }
                         }, function(error3) {
-                            // STAGE 4: Episode TMDB as last resort
-                            if(episodeTmdbFallback) {
-                                console.log('🎯 Stage 4: Episode TMDB last resort');
-                                var episodeRequestData = Object.assign({}, subtitleRequestData, {
-                                    tmdb_id: String(episodeTmdbFallback)
+                            // STAGE 4: Series TMDB as last resort
+                            if(seriesTmdbFallback) {
+                                console.log('🎯 Stage 4: Series TMDB last resort');
+                                var seriesRequestData = Object.assign({}, subtitleRequestData, {
+                                    tmdb_id: String(seriesTmdbFallback)
                                 });
                                 
-                                that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                                that.makeSubtitleRequest(seriesRequestData, successCallback, errorCallback);
                             } else {
                                 if(errorCallback) {
                                     errorCallback('No subtitles found in all stages');
@@ -195,9 +195,9 @@ var SubtitleFetcher = {
                 }
             });
         } 
-        // STAGE 1B: No series TMDB - prioritize name-based matching
+        // STAGE 1B: No episode TMDB - prioritize name-based matching  
         else if(subtitleRequestData.season_number && subtitleRequestData.episode_number) {
-            console.log('🎯 Stage 1B: Name-based matching (no series TMDB)');
+            console.log('🎯 Stage 1B: Name-based matching (no episode TMDB)');
             
             var parsedEpisode = this.parseEpisodeName(episodeName);
             
@@ -227,14 +227,14 @@ var SubtitleFetcher = {
                             successCallback(subtitles);
                         }
                     }, function(error2) {
-                        // STAGE 3B: Episode TMDB last resort
-                        if(episodeTmdbFallback) {
-                            console.log('🎯 Stage 3B: Episode TMDB last resort');
-                            var episodeRequestData = Object.assign({}, subtitleRequestData, {
-                                tmdb_id: String(episodeTmdbFallback)
+                        // STAGE 3B: Series TMDB last resort
+                        if(seriesTmdbFallback) {
+                            console.log('🎯 Stage 3B: Series TMDB last resort');
+                            var seriesRequestData = Object.assign({}, subtitleRequestData, {
+                                tmdb_id: String(seriesTmdbFallback)
                             });
                             
-                            that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                            that.makeSubtitleRequest(seriesRequestData, successCallback, errorCallback);
                         } else {
                             if(errorCallback) {
                                 errorCallback('No subtitles found');
@@ -251,13 +251,13 @@ var SubtitleFetcher = {
                         successCallback(subtitles);
                     }
                 }, function(error) {
-                    if(episodeTmdbFallback) {
-                        console.log('🎯 Stage 2B-Alt: Episode TMDB fallback');
-                        var episodeRequestData = Object.assign({}, subtitleRequestData, {
-                            tmdb_id: String(episodeTmdbFallback)
+                    if(seriesTmdbFallback) {
+                        console.log('🎯 Stage 2B-Alt: Series TMDB fallback');
+                        var seriesRequestData = Object.assign({}, subtitleRequestData, {
+                            tmdb_id: String(seriesTmdbFallback)
                         });
                         
-                        that.makeSubtitleRequest(episodeRequestData, successCallback, errorCallback);
+                        that.makeSubtitleRequest(seriesRequestData, successCallback, errorCallback);
                     } else {
                         if(errorCallback) {
                             errorCallback('No subtitles found');
