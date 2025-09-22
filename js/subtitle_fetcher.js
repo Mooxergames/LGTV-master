@@ -113,10 +113,6 @@ var SubtitleFetcher = {
         }
         
         // Make API request
-        console.log('🚀 Making ExoApp API call:');
-        console.log('📡 URL:', this.apiUrl);
-        console.log('📊 Request Data:', subtitleRequestData);
-        
         $.ajax({
             method: 'post',
             url: this.apiUrl,
@@ -124,12 +120,7 @@ var SubtitleFetcher = {
             dataType: 'json',
             timeout: 10000, // 10 second timeout
             success: function(result) {
-                console.log('✅ ExoApp API Response:', result);
-                console.log('📊 Status:', result ? result.status : 'null result');
-                console.log('📊 Subtitles:', result ? result.subtitles : 'no subtitles field');
-                
                 if(result.status === 'success' && result.subtitles && result.subtitles.length > 0) {
-                    console.log('✅ API subtitles found! Count:', result.subtitles.length);
                     // Mark subtitles as API source
                     result.subtitles.forEach(function(subtitle) {
                         subtitle.source = 'api';
@@ -140,19 +131,12 @@ var SubtitleFetcher = {
                         successCallback(result.subtitles);
                     }
                 } else {
-                    console.log('❌ No API subtitles found, using fallback');
                     if(errorCallback) {
                         errorCallback('No subtitles found');
                     }
                 }
             },
             error: function(xhr, status, error) {
-                console.log('❌ ExoApp API Error:');
-                console.log('   Status:', status);
-                console.log('   Error:', error);
-                console.log('   Response Text:', xhr.responseText);
-                console.log('   Status Code:', xhr.status);
-                
                 if(errorCallback) {
                     errorCallback(error);
                 }
