@@ -248,9 +248,17 @@ function initPlayer() {
                         that.current_time=currentTime;
                         if(current_route==='vod-series-player-video') {
                             vod_series_player.current_time=currentTime/1000;
-                            // Samsung subtitle timing - convert ms to seconds
+                            // 🔧 SAMSUNG TIMING DEBUG: Samsung gives time in milliseconds
+                            var currentTimeSeconds = currentTime/1000;
+                            console.log("📱 SAMSUNG TIMING:", {
+                                platform: "Samsung/Tizen",
+                                currentTime_ms: currentTime,
+                                currentTime_seconds: currentTimeSeconds,
+                                route: current_route
+                            });
+                            
                             if(typeof SrtOperation !== 'undefined') {
-                                SrtOperation.timeChange(currentTime/1000);
+                                SrtOperation.timeChange(currentTimeSeconds);
                             }
                         }
                         $('#'+that.parent_id).find('.video-error').hide();
@@ -469,7 +477,16 @@ function initPlayer() {
                     var currentTime=videoObj.currentTime;
                     if(current_route==='vod-series-player-video') {
                         vod_series_player.current_time=currentTime;
-                        SrtOperation.timeChange(videoObj.currentTime);
+                        
+                        // 🔧 BROWSER TIMING DEBUG: Browser gives time in seconds directly
+                        console.log("🌐 BROWSER TIMING:", {
+                            platform: "Browser/HTML5",
+                            currentTime_seconds: currentTime,
+                            duration: duration,
+                            route: current_route
+                        });
+                        
+                        SrtOperation.timeChange(currentTime);
                     }
                     if (duration > 0) {
                         $('#'+that.parent_id).find('.video-progress-bar-slider').val(currentTime).change();
