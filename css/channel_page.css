@@ -156,15 +156,15 @@
     /* Robust background with TV browser compatibility */
     background: rgba(0, 0, 0, 0.75);
     position: fixed;
-    bottom: 2vh;
-    left: 2.5vw;
-    right: 2.5vw;
+    bottom: 1.5vh;
+    left: 8vw;
+    right: 8vw;
     /* Three-section flexbox layout - force flex when visible */
     display: flex !important;
     flex-direction: row;
     align-items: center;
-    gap: 20px;
-    padding: 16px 28px;
+    gap: 16px;
+    padding: 12px 20px;
     /* Modern rounded corners */
     border-radius: 14px;
     /* Subtle border for definition */
@@ -209,14 +209,14 @@
 }
 
 .channel-logo {
-    /* Larger logo as requested */
-    height: 76px;
+    /* Compact but prominent logo */
+    height: 68px;
     width: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.05);
-    padding: 4px;
+    padding: 3px;
 }
 
 .channel-info {
@@ -285,7 +285,7 @@
 .program-info {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .program-title {
@@ -315,18 +315,18 @@
 }
 
 .epg-progress {
-    height: 8px;
+    height: 6px;
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
-    border-radius: 4px;
-    margin: 8px 0;
+    border-radius: 3px;
+    margin: 6px 0;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
 
 .current-next-programs {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 6px;
 }
 
 .current-program, .next-program {
