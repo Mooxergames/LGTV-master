@@ -585,10 +585,33 @@ var channel_page={
         
         // Update new channel identity elements
         $('#full-screen-channel-number').text(current_movie.num);
-        $('#full-screen-resolution').text('HD'); // Will be dynamic later
+        
+        // Extract resolution from channel name
+        var resolution = this.extractResolution(current_movie.name);
+        $('#full-screen-resolution').text(resolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
+        }
+    },
+    extractResolution:function(channelName){
+        // Extract resolution information from channel name
+        var name = channelName.toUpperCase();
+        
+        // Check for various resolution formats
+        if(name.includes('4K') || name.includes('UHD')) {
+            return '4K';
+        } else if(name.includes('8K')) {
+            return '8K';
+        } else if(name.includes('FHD') || name.includes('1080P')) {
+            return 'FHD';
+        } else if(name.includes('HD') || name.includes('720P')) {
+            return 'HD';
+        } else if(name.includes('SD') || name.includes('480P')) {
+            return 'SD';
+        } else {
+            // Default to HD if no resolution indicator found
+            return 'HD';
         }
     },
     showNextChannel:function(increment){
