@@ -592,7 +592,7 @@ var channel_page={
         // Extract resolution from channel name and show detailed format
         var resolution = this.extractResolution(current_movie.name);
         var detailedResolution = this.getDetailedResolution(resolution);
-        $('#full-screen-resolution-detailed').text(detailedResolution);
+        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
