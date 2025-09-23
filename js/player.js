@@ -147,6 +147,8 @@ function initPlayer() {
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
+                SrtOperation.deStruct();
+                this.subtitles=[];
             },
             close:function(){
                 this.state = this.STATES.STOPPED;
@@ -158,6 +160,8 @@ function initPlayer() {
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
+                SrtOperation.deStruct();
+                this.subtitles=[];
             },
             tryReconnect: function () {
                 if (current_route !== 'channel-page' && !(current_route=='home-page' && home_page.current_preview_type==='live'))
