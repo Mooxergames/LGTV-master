@@ -448,22 +448,15 @@
 
 /* Compact program header */
 .program-header {
-    display: flex;
-    align-items: center;
     margin-bottom: 8px;
-    font-size: 28px;
-    gap: 12px;
 }
 
 .channel-name-compact {
     color: #007bff;
     font-weight: 600;
-    font-size: 26px;
-}
-
-.separator {
-    color: rgba(255, 255, 255, 0.6);
     font-size: 24px;
+    display: block;
+    margin-bottom: 4px;
 }
 
 .program-title {
@@ -471,6 +464,7 @@
     font-weight: 500;
     font-size: 28px;
     margin: 0;
+    display: block;
 }
 
 /* EPG time labels */
