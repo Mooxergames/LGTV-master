@@ -466,10 +466,12 @@ var channel_page={
             $('#full-screen-current-program').text(current_program_title).show();
             $('#full-screen-program-name').text(current_program_title).show();
             $('#full-screen-information-progress').show();
+            $('.epg-progress-times').show();
         } else {
             $('#full-screen-current-program').hide();
             $('#full-screen-program-name').hide();
-            $('#full-screen-information-progress').hide();
+            // Keep progress container visible but hide time labels for progress functionality
+            $('.epg-progress-times').hide();
         }
         
         if(next_program_title && next_program_title.trim() !== '') {

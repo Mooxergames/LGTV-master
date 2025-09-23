@@ -530,6 +530,15 @@
     font-weight: 500;
 }
 
+/* Hide time labels when no EPG but keep progress bar functional */
+.epg-progress-times:not([style*="display: none"]) {
+    display: flex;
+}
+
+.epg-progress-times[style*="display: none"] {
+    display: none !important;
+}
+
 .progress-start-time,
 .progress-end-time {
     background: rgba(0, 0, 0, 0.4);
