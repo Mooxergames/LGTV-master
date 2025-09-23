@@ -92,11 +92,11 @@ var channel_page={
             });
             that.full_screen_video=true;
             clearTimeout(that.full_screen_timer);
-            $('#full-screen-information').slideDown(400);
+            $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
             $('#live-channel-button-container').hide();
             that.full_screen_timer=setTimeout(function(){
-                $('#full-screen-information').slideUp(400);
+                $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             that.keys.focused_part="full_screen";
@@ -192,10 +192,10 @@ var channel_page={
                         that.hover_channel_id=current_movie.stream_id;
                         that.hoverMenuItem(i);
                         if(that.full_screen_video){
-                            $('#full-screen-information').slideDown(400);
+                            $('#full-screen-information').addClass('visible');
                             $('#full-screen-channel-name').slideDown(400);
                             that.full_screen_timer=setTimeout(function(){
-                                $('#full-screen-information').slideUp(400);
+                                $('#full-screen-information').removeClass('visible');
                                 $('#full-screen-channel-name').slideUp(400);
                             },5000)
                             that.keys.focused_part="full_screen";
@@ -421,6 +421,11 @@ var channel_page={
         $('#full-screen-program-name').text(current_program_title);
         $('#full-screen-next-program').text(next_program_title);
         $('#full-screen-program-description').text(program_desc);
+        
+        // Update current time display
+        var now = new Date();
+        var timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        $('#full-screen-current-time').text(timeString);
     },
     updateNextProgrammes:function(){
         this.showNextProgrammes();
@@ -469,7 +474,7 @@ var channel_page={
             //     media_player.setDisplayArea();
             // }catch (e) {
             // }
-            $('#full-screen-information').hide();
+            $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
@@ -492,10 +497,10 @@ var channel_page={
             $('#live_channels_home').find('.video-skin').hide();
             this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
-            $('#full-screen-information').slideDown(400);
+            $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
             this.full_screen_timer=setTimeout(function(){
-                $('#full-screen-information').slideUp(400);
+                $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
@@ -533,6 +538,11 @@ var channel_page={
             current_movie.num+' : '+current_movie.name
         );
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
+        
+        // Update new channel identity elements
+        $('#full-screen-channel-number').text(current_movie.num);
+        $('#full-screen-channel-name-text').text(current_movie.name);
+        $('#full-screen-resolution').text('HD'); // Will be dynamic later
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -552,7 +562,7 @@ var channel_page={
             current_channel_index+=increment; // the opposite position
             if(current_channel_index>=0 && current_channel_index<menus.length){
                 var stream_id=$(menus[current_channel_index]).data('channel_id');
-                $('#full-screen-information').slideUp(400);
+                $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
                 this.current_channel_id=stream_id;
                 clearTimeout(this.next_channel_timer);
@@ -564,10 +574,10 @@ var channel_page={
                 this.next_channel_timer=setTimeout(function () {
                     that.showLiveChannelMovie(stream_id);
                     clearTimeout(that.full_screen_timer);
-                    $('#full-screen-information').slideDown(400);
+                    $('#full-screen-information').addClass('visible');
                     $('#full-screen-channel-name').slideDown(400);
                     that.full_screen_timer=setTimeout(function(){
-                        $('#full-screen-information').slideUp(400);
+                        $('#full-screen-information').removeClass('visible');
                         $('#full-screen-channel-name').slideUp(400);
                     },5000)
                     that.changeActiveChannel();
