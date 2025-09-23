@@ -163,8 +163,8 @@
     display: flex !important;
     flex-direction: row;
     align-items: center;
-    gap: 32px;
-    padding: 24px 40px;
+    gap: 20px;
+    padding: 16px 28px;
     /* Modern rounded corners */
     border-radius: 14px;
     /* Subtle border for definition */
@@ -202,18 +202,18 @@
 .channel-identity {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .channel-logo {
-    /* Larger logo for better TV prominence */
-    height: 76px;
+    /* Compact logo for TV */
+    height: 50px;
     width: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.05);
-    padding: 4px;
+    padding: 3px;
 }
 
 .channel-info {
@@ -224,7 +224,7 @@
 }
 
 .channel-number {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
     color: #00d4ff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
@@ -232,12 +232,12 @@
 }
 
 .video-resolution-detailed {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     background: rgba(0, 0, 0, 0.6);
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     display: inline-block;
 }
@@ -245,7 +245,7 @@
 /* Ensure the time in the time-resolution-stack is visible and properly styled */
 .time-resolution-stack #full-screen-current-time {
     display: block !important;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 600;
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
@@ -258,13 +258,13 @@
 }
 
 .channel-name {
-    /* TV-optimized size per guidelines */
-    font-size: 42px;
+    /* Compact TV size */
+    font-size: 28px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
     word-wrap: break-word;
-    max-width: 280px;
+    max-width: 220px;
     line-height: 1.1;
 }
 
@@ -282,7 +282,7 @@
 }
 
 .program-title {
-    font-size: 36px;
+    font-size: 26px;
     font-weight: 600;
     color: #ffffff;
     margin: 0;
@@ -293,7 +293,7 @@
 }
 
 .program-description {
-    font-size: 26px;
+    font-size: 18px;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 400;
     margin: 0;
@@ -357,14 +357,14 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    gap: 6px;
 }
 
 .status-indicators .time-resolution-stack {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 4px;
+    gap: 3px;
 }
 
 /* Hide other current-time elements that might be showing in wrong places */
@@ -769,10 +769,10 @@
 .status-indicator {
     background: rgba(0, 0, 0, 0.7);
     color: rgba(255, 255, 255, 0.9);
-    padding: 8px 16px;
-    border-radius: 16px;
-    /* TV-optimized font size per guidelines */
-    font-size: 24px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    /* Compact TV size */
+    font-size: 16px;
     font-weight: 500;
     border: 1px solid rgba(255, 255, 255, 0.15);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
