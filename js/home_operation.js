@@ -1899,9 +1899,9 @@ var home_page={
                 keys.subtitle_settings_item = maxItems - 1;
             }
             
-            // Set initial focus to Cancel button (index 1) when entering buttons section
+            // Set initial focus to Save button (index 0) when entering buttons section
             if(keys.subtitle_settings_section === 3) {
-                keys.subtitle_settings_item = 1; // Focus on Cancel button
+                keys.subtitle_settings_item = 0; // Focus on Save button (Speichern)
             }
             
             this.hoverSubtitleOptionGrid(keys.subtitle_settings_section, keys.subtitle_settings_item);
