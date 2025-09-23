@@ -813,17 +813,17 @@ var home_page={
     },
     
     updateSubtitleUI:function(){
-        // Update size buttons
-        $('.subtitle-option-button').removeClass('active');
-        $('.subtitle-option-button[data-size="' + this.current_subtitle_size + '"]').addClass('active');
+        // Update size buttons - use 'selected' for chosen options, keep 'active' for backward compatibility  
+        $('.subtitle-option-button').removeClass('active selected');
+        $('.subtitle-option-button[data-size="' + this.current_subtitle_size + '"]').addClass('active selected');
         
         // Update background color buttons
-        $('.subtitle-bg-color-options .subtitle-color-button').removeClass('active');
-        $('.subtitle-bg-color-options .subtitle-color-button[data-bg="' + this.current_subtitle_bg_color + '"]').addClass('active');
+        $('.subtitle-bg-color-options .subtitle-color-button').removeClass('active selected');
+        $('.subtitle-bg-color-options .subtitle-color-button[data-bg="' + this.current_subtitle_bg_color + '"]').addClass('active selected');
         
         // Update text color buttons
-        $('.subtitle-text-color-options .subtitle-color-button').removeClass('active');
-        $('.subtitle-text-color-options .subtitle-color-button[data-text="' + this.current_subtitle_text_color + '"]').addClass('active');
+        $('.subtitle-text-color-options .subtitle-color-button').removeClass('active selected');
+        $('.subtitle-text-color-options .subtitle-color-button[data-text="' + this.current_subtitle_text_color + '"]').addClass('active selected');
     },
     
     hoverSubtitleOptionGrid:function(section, item){
