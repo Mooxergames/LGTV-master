@@ -350,6 +350,19 @@
     min-width: 0;
     word-wrap: break-word;
     text-align: center;
+    /* Trim long program names */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Specific trimming for current/next program elements */
+#full-screen-current-program, #catchup-full-screen-current-program,
+#full-screen-next-program, #catchup-full-screen-next-program {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100%;
 }
 
 .current-program {
