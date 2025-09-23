@@ -291,6 +291,10 @@ var home_page={
             extension=movie.container_extension;
         }
         var channel_class=movie_type=='live' ? ' channel' : '';
+        
+        // Featured movies are latest movies, so show NEW badge for featured movies
+        var is_featured_new = (movie_type === 'movie' && slider_index === 1);
+        
         var htmlContent=
             '<div class="movie-item-container">\
                 <div class="movie-item-wrapper '+channel_class+'"\
@@ -302,7 +306,8 @@ var home_page={
                     onclick="home_page.showPreviewVideo(this)"\
                 >\
                     <div class="movie-item-thumbernail">\
-                        <div class="movie-item-thumbernail-img-wrapper">\
+                        <div class="movie-item-thumbernail-img-wrapper position-relative">\
+                            '+(is_featured_new ? '<div class="new-badge">NEW</div>' : '')+'\
                             <img class="movie-item-thumbernail-img" src="'+movie.stream_icon+'" onerror="this.src=\''+fall_back_image+'\'"> \
                         </div> \
                         <div class="movie-thumbernail-title-wrapper">\
