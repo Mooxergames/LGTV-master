@@ -329,13 +329,21 @@ var home_page={
         
         // Check if we should show NEW badge for last 10 added items
         var current_sort_key=current_movie_type==='movies' ? settings.vod_sort : settings.series_sort;
-        var total_movies_count = this.movies.length;
-        var current_movie_index = current_render_count + index;
         var is_new_item = false;
         
-        if(current_sort_key === 'added') {
-            // Last 10 (or all if less than 10) items are the newest when sorted by added (ascending order)
-            is_new_item = current_movie_index >= Math.max(0, total_movies_count - 10);
+        if(current_sort_key === 'added' && this.movies && this.movies.length > 0) {
+            // Find the 10 highest "added" values from all movies  
+            var allAddedValues = this.movies.map(function(m) { 
+                return parseFloat(m.added) || 0; 
+            }).sort(function(a, b) { 
+                return b - a; 
+            }); // Sort descending to get highest values first
+            
+            var top10Threshold = allAddedValues.length >= 10 ? allAddedValues[9] : allAddedValues[allAddedValues.length - 1];
+            var currentMovieAdded = parseFloat(movie.added) || 0;
+            
+            // Item is "new" if its added value is in the top 10 highest
+            is_new_item = currentMovieAdded >= top10Threshold && currentMovieAdded > 0;
         }
         
         var htmlContent=
