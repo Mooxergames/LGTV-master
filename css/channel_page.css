@@ -297,7 +297,7 @@
 }
 
 .program-title {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 600;
     color: #ffffff;
     margin: 0;
@@ -308,7 +308,7 @@
 }
 
 .program-description {
-    font-size: 18px;
+    font-size: 14px;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 400;
     margin: 0;
@@ -522,7 +522,7 @@
 .channel-name-compact {
     color: #007bff;
     font-weight: 600;
-    font-size: 28px;
+    font-size: 32px;
     display: block;
     margin-bottom: 4px;
 }
