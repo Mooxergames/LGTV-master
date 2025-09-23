@@ -586,6 +586,9 @@ var channel_page={
         // Update new channel identity elements
         $('#full-screen-channel-number').text(current_movie.num);
         
+        // Add channel name to compact header
+        $('#full-screen-channel-name-compact').text(current_movie.name);
+        
         // Extract resolution from channel name
         var resolution = this.extractResolution(current_movie.name);
         $('#full-screen-resolution').text(resolution);
