@@ -457,7 +457,8 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
-.subtitle-option-button.active {
+.subtitle-option-button.active,
+.subtitle-option-button.focused {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
     border-color: #667eea;
     color: #ffffff;
@@ -490,7 +491,8 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
-.subtitle-color-button.active {
+.subtitle-color-button.active,
+.subtitle-color-button.focused {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
     border-color: #667eea;
     color: #ffffff;
@@ -552,6 +554,45 @@
     margin-top: 30px;
     padding: 20px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.subtitle-modal-buttons .btn-wrapper-1 {
+    flex: 0 0 auto;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.subtitle-modal-buttons .subtitle-action-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 120px;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    white-space: nowrap;
+}
+
+.subtitle-modal-buttons .subtitle-action-btn:hover,
+.subtitle-modal-buttons .subtitle-action-btn.focused {
+    background: linear-gradient(135deg, #369eff 0%, #00d4ff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+}
+
+.subtitle-modal-buttons .subtitle-action-btn.active {
+    background: linear-gradient(135deg, #2c7cff 0%, #00b8ff 100%);
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.5);
 }
 
 .subtitle-action-btn {

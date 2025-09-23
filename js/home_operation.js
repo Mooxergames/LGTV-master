@@ -792,6 +792,8 @@ var home_page={
         $('#settings-modal').modal('hide');
         $('#subtitle-settings-modal').modal('show');
         this.initSubtitleSettings();
+        this.keys.focused_part = "subtitle_settings_modal";
+        this.keys.subtitle_settings_selection = 0;
         this.hoverSubtitleOption(0);
     },
     
@@ -842,12 +844,35 @@ var home_page={
             '.subtitle-color-button[data-text="yellow"]',
             '.subtitle-color-button[data-text="red"]',
             '.subtitle-color-button[data-text="green"]',
-            '.subtitle-action-btn:first',
-            '.subtitle-action-btn:last'
+            '.subtitle-action-btn[data-action="save"]',
+            '.subtitle-action-btn[data-action="cancel"]'
         ];
         
         if(elements[index]) {
             $(elements[index]).addClass('focused');
+        }
+    },
+    
+    handleSubtitleSettingsClick:function(){
+        var index = this.keys.subtitle_settings_selection;
+        
+        if(index >= 0 && index <= 3) { // Size options (0-3)
+            var sizes = ['small', 'medium', 'large', 'extra-large'];
+            this.changeSubtitleSize(sizes[index]);
+        }
+        else if(index >= 4 && index <= 8) { // Background colors (4-8)
+            var bgColors = ['transparent', 'black', 'red', 'white', 'blue'];
+            this.changeSubtitleBgColor(bgColors[index - 4]);
+        }
+        else if(index >= 9 && index <= 13) { // Text colors (9-13)
+            var textColors = ['white', 'black', 'yellow', 'red', 'green'];
+            this.changeSubtitleTextColor(textColors[index - 9]);
+        }
+        else if(index === 14) { // Save button
+            this.saveSubtitleSettings();
+        }
+        else if(index === 15) { // Cancel button
+            this.cancelSubtitleSettings();
         }
     },
     
@@ -1835,6 +1860,14 @@ var home_page={
                     $(hide_category_btns[0]).addClass('active');
             }
         }
+        else if(keys.focused_part==="subtitle_settings_modal"){
+            keys.subtitle_settings_selection+=increment;
+            if(keys.subtitle_settings_selection<0)
+                keys.subtitle_settings_selection=15; // 4 sizes + 5 bg colors + 5 text colors + 2 buttons = 16 items (0-15)
+            if(keys.subtitle_settings_selection>15)
+                keys.subtitle_settings_selection=0;
+            this.hoverSubtitleOption(keys.subtitle_settings_selection);
+        }
         else if(keys.focused_part==="parent_confirm_modal"){
             if(keys.parent_confirm_modal<=1 || (keys.parent_confirm_modal>1 && increment<0)){
                 keys.parent_confirm_modal+=increment;
@@ -2127,6 +2160,9 @@ var home_page={
                     $($(hide_category_btns[keys.hide_category_modal-item_length]).find('button')[0]).trigger('click');
                 }
                 break;
+            case "subtitle_settings_modal":
+                this.handleSubtitleSettingsClick();
+                break;
             case "parent_confirm_modal":
                 if(keys.parent_confirm_modal==0){
                     $('#parent-confirm-password').focus();
@@ -2195,7 +2231,11 @@ var home_page={
                     this.moveToOtherCategory();
                     break;
                 case tvKey.RETURN:
-                    this.goBack();
+                    if(this.keys.focused_part === "subtitle_settings_modal") {
+                        this.cancelSubtitleSettings();
+                    } else {
+                        this.goBack();
+                    }
             }
         }
     }
