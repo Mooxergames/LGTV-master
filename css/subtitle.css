@@ -476,7 +476,13 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
+/* Selected state - only checkmark, no green styling */
 .subtitle-option-button.active,
+.subtitle-option-button.selected {
+    /* No special styling, just the checkmark from ::after */
+}
+
+/* Focused state - green styling when navigating */
 .subtitle-option-button.focused {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.3) 100%);
     border-color: #22c55e;
@@ -510,7 +516,13 @@
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
+/* Selected state - only checkmark, no green styling */
 .subtitle-color-button.active,
+.subtitle-color-button.selected {
+    /* No special styling, just the checkmark from ::after */
+}
+
+/* Focused state - green styling when navigating */
 .subtitle-color-button.focused {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.3) 100%);
     border-color: #22c55e;
