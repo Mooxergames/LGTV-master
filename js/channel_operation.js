@@ -585,7 +585,6 @@ var channel_page={
         
         // Update new channel identity elements
         $('#full-screen-channel-number').text(current_movie.num);
-        $('#full-screen-channel-name-text').text(current_movie.name);
         $('#full-screen-resolution').text('HD'); // Will be dynamic later
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
