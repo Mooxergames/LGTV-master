@@ -782,6 +782,175 @@ var home_page={
         }
         current_words=words;
     },
+    
+    // Subtitle Settings Functions
+    showSubtitleSettings:function(){
+        $('#settings-modal').modal('hide');
+        $('#subtitle-settings-modal').modal('show');
+        this.initSubtitleSettings();
+        this.hoverSubtitleOption(0);
+    },
+    
+    initSubtitleSettings:function(){
+        // Initialize subtitle settings with current values
+        this.current_subtitle_size = settings.subtitle_size || 'medium';
+        this.current_subtitle_bg_color = settings.subtitle_bg_color || 'black';
+        this.current_subtitle_text_color = settings.subtitle_text_color || 'white';
+        this.subtitle_option_index = 0;
+        
+        // Update UI to reflect current settings
+        this.updateSubtitleUI();
+        this.updateSubtitlePreview();
+    },
+    
+    updateSubtitleUI:function(){
+        // Update size buttons
+        $('.subtitle-option-button').removeClass('active');
+        $('.subtitle-option-button[data-size="' + this.current_subtitle_size + '"]').addClass('active');
+        
+        // Update background color buttons
+        $('.subtitle-bg-color-options .subtitle-color-button').removeClass('active');
+        $('.subtitle-bg-color-options .subtitle-color-button[data-bg="' + this.current_subtitle_bg_color + '"]').addClass('active');
+        
+        // Update text color buttons
+        $('.subtitle-text-color-options .subtitle-color-button').removeClass('active');
+        $('.subtitle-text-color-options .subtitle-color-button[data-text="' + this.current_subtitle_text_color + '"]').addClass('active');
+    },
+    
+    hoverSubtitleOption:function(index){
+        this.subtitle_option_index = index;
+        // Handle focus styling if needed for TV remote navigation
+        $('.subtitle-option-button, .subtitle-color-button, .subtitle-action-btn').removeClass('focused');
+        
+        // Map index to specific elements for remote control navigation
+        var elements = [
+            '.subtitle-option-button[data-size="small"]',
+            '.subtitle-option-button[data-size="medium"]', 
+            '.subtitle-option-button[data-size="large"]',
+            '.subtitle-option-button[data-size="extra-large"]',
+            '.subtitle-color-button[data-bg="transparent"]',
+            '.subtitle-color-button[data-bg="black"]',
+            '.subtitle-color-button[data-bg="red"]',
+            '.subtitle-color-button[data-bg="white"]',
+            '.subtitle-color-button[data-bg="blue"]',
+            '.subtitle-color-button[data-text="white"]',
+            '.subtitle-color-button[data-text="black"]',
+            '.subtitle-color-button[data-text="yellow"]',
+            '.subtitle-color-button[data-text="red"]',
+            '.subtitle-color-button[data-text="green"]',
+            '.subtitle-action-btn:first',
+            '.subtitle-action-btn:last'
+        ];
+        
+        if(elements[index]) {
+            $(elements[index]).addClass('focused');
+        }
+    },
+    
+    changeSubtitleSize:function(size){
+        this.current_subtitle_size = size;
+        this.updateSubtitleUI();
+        this.updateSubtitlePreview();
+    },
+    
+    changeSubtitleBgColor:function(color){
+        this.current_subtitle_bg_color = color;
+        this.updateSubtitleUI();
+        this.updateSubtitlePreview();
+    },
+    
+    changeSubtitleTextColor:function(color){
+        this.current_subtitle_text_color = color;
+        this.updateSubtitleUI();
+        this.updateSubtitlePreview();
+    },
+    
+    updateSubtitlePreview:function(){
+        var preview = $('.subtitle-preview-text');
+        var size = this.getSizeValue(this.current_subtitle_size);
+        var bgColor = this.getBackgroundValue(this.current_subtitle_bg_color);
+        var textColor = this.getTextColorValue(this.current_subtitle_text_color);
+        
+        // Update preview element directly
+        preview.css({
+            'font-size': size,
+            'background': bgColor,
+            'color': textColor,
+            'text-shadow': this.getOutlineValue(this.current_subtitle_text_color)
+        });
+    },
+    
+    getSizeValue:function(size){
+        var sizes = {
+            'small': '18px',
+            'medium': '24px', 
+            'large': '32px',
+            'extra-large': '40px'
+        };
+        return sizes[size] || '24px';
+    },
+    
+    getBackgroundValue:function(color){
+        var backgrounds = {
+            'transparent': 'transparent',
+            'black': 'rgba(0, 0, 0, 0.8)',
+            'red': 'rgba(255, 0, 0, 0.8)',
+            'white': 'rgba(255, 255, 255, 0.8)',
+            'blue': 'rgba(0, 0, 255, 0.8)'
+        };
+        return backgrounds[color] || 'rgba(0, 0, 0, 0.8)';
+    },
+    
+    getTextColorValue:function(color){
+        var colors = {
+            'white': '#ffffff',
+            'black': '#000000',
+            'yellow': '#ffff00',
+            'red': '#ff0000',
+            'green': '#00ff00'
+        };
+        return colors[color] || '#ffffff';
+    },
+    
+    getOutlineValue:function(textColor){
+        // Provide contrast outline based on text color
+        if(textColor === 'white' || textColor === 'yellow') {
+            return '1px 1px 2px rgba(0, 0, 0, 0.8)';
+        } else {
+            return '1px 1px 2px rgba(255, 255, 255, 0.8)';
+        }
+    },
+    
+    saveSubtitleSettings:function(){
+        // Save all subtitle settings to localStorage
+        settings.saveSettings('subtitle_size', this.current_subtitle_size);
+        settings.saveSettings('subtitle_bg_color', this.current_subtitle_bg_color);
+        settings.saveSettings('subtitle_text_color', this.current_subtitle_text_color);
+        
+        // Apply to global subtitle system
+        this.applySubtitleStyles();
+        
+        $('#subtitle-settings-modal').modal('hide');
+        this.keys.focused_part = "menu_selection";
+    },
+    
+    cancelSubtitleSettings:function(){
+        $('#subtitle-settings-modal').modal('hide');
+        this.keys.focused_part = "menu_selection";
+    },
+    
+    applySubtitleStyles:function(){
+        // Update CSS custom properties for global subtitle styling
+        var size = this.getSizeValue(settings.subtitle_size);
+        var bgColor = this.getBackgroundValue(settings.subtitle_bg_color);
+        var textColor = this.getTextColorValue(settings.subtitle_text_color);
+        var outline = this.getOutlineValue(settings.subtitle_text_color);
+        
+        document.documentElement.style.setProperty('--subtitle-size', size);
+        document.documentElement.style.setProperty('--subtitle-bg', bgColor);
+        document.documentElement.style.setProperty('--subtitle-color', textColor);
+        document.documentElement.style.setProperty('--subtitle-outline', outline);
+    },
     goToMainPage:function(){
         $(this.slider_items[0]).removeClass('active');
         $(this.slider_items[1]).removeClass('active');

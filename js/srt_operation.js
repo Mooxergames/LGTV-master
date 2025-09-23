@@ -96,11 +96,70 @@ var SrtOperation={
         }
     },
     showSubtitle: function(text) {
+        // Apply user settings before showing subtitle
+        this.applyUserStyles();
+        
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.html(subtitleHtml);
         subtitleContainer.show(); // Ensure container is visible when showing subtitles
+    },
+    
+    applyUserStyles: function() {
+        // Apply user subtitle settings via CSS custom properties
+        if(typeof settings !== 'undefined') {
+            var size = this.getSizeValue(settings.subtitle_size || 'medium');
+            var bgColor = this.getBackgroundValue(settings.subtitle_bg_color || 'black');
+            var textColor = this.getTextColorValue(settings.subtitle_text_color || 'white');
+            var outline = this.getOutlineValue(settings.subtitle_text_color || 'white');
+            
+            document.documentElement.style.setProperty('--subtitle-size', size);
+            document.documentElement.style.setProperty('--subtitle-bg', bgColor);
+            document.documentElement.style.setProperty('--subtitle-color', textColor);
+            document.documentElement.style.setProperty('--subtitle-outline', outline);
+        }
+    },
+    
+    getSizeValue: function(size) {
+        var sizes = {
+            'small': '18px',
+            'medium': '24px', 
+            'large': '32px',
+            'extra-large': '40px'
+        };
+        return sizes[size] || '24px';
+    },
+    
+    getBackgroundValue: function(color) {
+        var backgrounds = {
+            'transparent': 'transparent',
+            'black': 'rgba(0, 0, 0, 0.8)',
+            'red': 'rgba(255, 0, 0, 0.8)',
+            'white': 'rgba(255, 255, 255, 0.8)',
+            'blue': 'rgba(0, 0, 255, 0.8)'
+        };
+        return backgrounds[color] || 'rgba(0, 0, 0, 0.8)';
+    },
+    
+    getTextColorValue: function(color) {
+        var colors = {
+            'white': '#ffffff',
+            'black': '#000000',
+            'yellow': '#ffff00',
+            'red': '#ff0000',
+            'green': '#00ff00'
+        };
+        return colors[color] || '#ffffff';
+    },
+    
+    getOutlineValue: function(textColor) {
+        // Provide contrast outline based on text color
+        if(textColor === 'white' || textColor === 'yellow') {
+            return '1px 1px 2px rgba(0, 0, 0, 0.8)';
+        } else {
+            return '1px 1px 2px rgba(255, 255, 255, 0.8)';
+        }
     },
     
     hideSubtitle: function() {
