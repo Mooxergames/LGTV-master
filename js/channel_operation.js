@@ -465,14 +465,9 @@ var channel_page={
         if(current_program_title && current_program_title.trim() !== '') {
             $('#full-screen-current-program').text(current_program_title).show();
             $('#full-screen-program-name').text(current_program_title).show();
-            $('#full-screen-information-progress').show();
-            $('.epg-progress-times').show();
         } else {
             $('#full-screen-current-program').hide();
             $('#full-screen-program-name').hide();
-            // Hide progress bar completely when no EPG data
-            $('#full-screen-information-progress').hide();
-            $('.epg-progress-times').hide();
         }
         
         if(next_program_title && next_program_title.trim() !== '') {
