@@ -229,6 +229,18 @@
     color: #00d4ff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     line-height: 1;
+    margin-bottom: 4px;
+}
+
+.video-resolution-detailed {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
 }
 
 .channel-name {

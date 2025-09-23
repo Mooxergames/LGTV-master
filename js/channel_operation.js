@@ -589,9 +589,10 @@ var channel_page={
         // Add channel name to compact header
         $('#full-screen-channel-name-compact').text(current_movie.name);
         
-        // Extract resolution from channel name
+        // Extract resolution from channel name and show detailed format
         var resolution = this.extractResolution(current_movie.name);
-        $('#full-screen-resolution').text(resolution);
+        var detailedResolution = this.getDetailedResolution(resolution);
+        $('#full-screen-resolution-detailed').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -615,6 +616,23 @@ var channel_page={
         } else {
             // Default to HD if no resolution indicator found
             return 'HD';
+        }
+    },
+    getDetailedResolution:function(resolution){
+        // Convert resolution type to detailed format with dimensions
+        switch(resolution) {
+            case '8K':
+                return '7680x4320 8K';
+            case '4K':
+                return '3840x2160 4K';
+            case 'FHD':
+                return '1920x1080 FHD';
+            case 'HD':
+                return '1280x720 HD';
+            case 'SD':
+                return '720x480 SD';
+            default:
+                return '1280x720 HD';
         }
     },
     showNextChannel:function(increment){
