@@ -358,20 +358,24 @@
 .player-info-right {
     flex: 0 0 auto;
     min-width: 0;
+    display: flex;
+    align-items: center;
 }
 
 .status-indicators {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 10px;
+    min-height: auto;
 }
 
 .status-indicators .time-resolution-stack {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 3px;
+    gap: 4px;
+    margin-top: 2px;
 }
 
 /* Hide other current-time elements that might be showing in wrong places */
