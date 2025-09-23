@@ -242,7 +242,9 @@
     display: inline-block;
 }
 
-.time-resolution-stack .current-time {
+/* Ensure the time in the time-resolution-stack is visible and properly styled */
+.time-resolution-stack #full-screen-current-time {
+    display: block !important;
     font-size: 24px;
     font-weight: 600;
     color: #ffffff;
@@ -365,12 +367,20 @@
     gap: 4px;
 }
 
+/* Hide other current-time elements that might be showing in wrong places */
 .current-time {
-    font-size: 28px;
+    display: none !important;
+}
+
+/* Only show the specific right-side time element */
+#full-screen-current-time {
+    display: block !important;
+    font-size: 24px;
     font-weight: 600;
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     letter-spacing: 1px;
+    text-align: right;
 }
 
 #full-screen-resolution {
