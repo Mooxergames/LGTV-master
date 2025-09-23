@@ -242,6 +242,13 @@
     display: inline-block;
 }
 
+.time-resolution-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
 .channel-name {
     /* TV-optimized size per guidelines */
     font-size: 42px;
