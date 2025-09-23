@@ -470,7 +470,8 @@ var channel_page={
         } else {
             $('#full-screen-current-program').hide();
             $('#full-screen-program-name').hide();
-            // Keep progress container visible but hide time labels for progress functionality
+            // Hide progress bar completely when no EPG data
+            $('#full-screen-information-progress').hide();
             $('.epg-progress-times').hide();
         }
         
