@@ -380,8 +380,8 @@ var channel_page={
         else
             $('#'+id).hide().html('');
 
-        var current_program,next_program, current_program_title="No Information",
-            current_program_time='', next_program_title="No Information", next_program_time='',program_desc='No Information';
+        var current_program,next_program, current_program_title="",
+            current_program_time='', next_program_title="", next_program_time='',program_desc='';
         if(current_program_exist){
             current_program=programmes[0];
             if(programmes.length>1)
@@ -452,7 +452,6 @@ var channel_page={
             }
         }
         else{
-            $('#full-screen-current-program').text("No Information");
             elements.map(function(item,index){
                 $(item).css({width:0});
             })
@@ -461,10 +460,37 @@ var channel_page={
             $('#full-screen-program-end-time').text('--:--');
             $('#full-screen-current-time-indicator').css({left: '0%'});
         }
-        $('#full-screen-current-program').text(current_program_title);
-        $('#full-screen-program-name').text(current_program_title);
-        $('#full-screen-next-program').text(next_program_title);
-        $('#full-screen-program-description').text(program_desc);
+        
+        // Show/hide elements based on whether we have EPG data
+        if(current_program_title && current_program_title.trim() !== '') {
+            $('#full-screen-current-program').text(current_program_title).show();
+            $('#full-screen-program-name').text(current_program_title).show();
+            $('#full-screen-information-progress').show();
+        } else {
+            $('#full-screen-current-program').hide();
+            $('#full-screen-program-name').hide();
+            $('#full-screen-information-progress').hide();
+        }
+        
+        if(next_program_title && next_program_title.trim() !== '') {
+            $('#full-screen-next-program').text(next_program_title).show();
+        } else {
+            $('#full-screen-next-program').hide();
+        }
+        
+        if(program_desc && program_desc.trim() !== '') {
+            $('#full-screen-program-description').text(program_desc).show();
+        } else {
+            $('#full-screen-program-description').hide();
+        }
+        
+        // Hide programs container if no current or next program
+        if((!current_program_title || current_program_title.trim() === '') && 
+           (!next_program_title || next_program_title.trim() === '')) {
+            $('#full-screen-programs-container').hide();
+        } else {
+            $('#full-screen-programs-container').show();
+        }
         
         // Update current time display
         var now = new Date();
