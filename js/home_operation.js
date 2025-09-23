@@ -1899,6 +1899,11 @@ var home_page={
                 keys.subtitle_settings_item = maxItems - 1;
             }
             
+            // Set initial focus to Cancel button (index 1) when entering buttons section
+            if(keys.subtitle_settings_section === 3) {
+                keys.subtitle_settings_item = 1; // Focus on Cancel button
+            }
+            
             this.hoverSubtitleOptionGrid(keys.subtitle_settings_section, keys.subtitle_settings_item);
         }
         else if(keys.focused_part==="parent_confirm_modal"){
