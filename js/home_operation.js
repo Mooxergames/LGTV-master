@@ -24,7 +24,9 @@ var home_page={
         lock_account_selection:0,
         clear_cache_selection:0,
         featured_setting_selection:0,
-        epg_setting_selection:0
+        epg_setting_selection:0,
+        subtitle_settings_section:0,
+        subtitle_settings_item:0
     },
     submenu_opened:false,
 
@@ -793,8 +795,9 @@ var home_page={
         $('#subtitle-settings-modal').modal('show');
         this.initSubtitleSettings();
         this.keys.focused_part = "subtitle_settings_modal";
-        this.keys.subtitle_settings_selection = 0;
-        this.hoverSubtitleOption(0);
+        this.keys.subtitle_settings_section = 0; // 0=size, 1=bg_color, 2=text_color, 3=buttons
+        this.keys.subtitle_settings_item = 1; // Start at "Medium" (index 1 in size section)
+        this.hoverSubtitleOptionGrid(0, 1);
     },
     
     initSubtitleSettings:function(){
@@ -823,57 +826,78 @@ var home_page={
         $('.subtitle-text-color-options .subtitle-color-button[data-text="' + this.current_subtitle_text_color + '"]').addClass('active');
     },
     
-    hoverSubtitleOption:function(index){
-        this.subtitle_option_index = index;
-        // Handle focus styling if needed for TV remote navigation
+    hoverSubtitleOptionGrid:function(section, item){
+        // Handle focus styling for grid-based navigation
         $('.subtitle-option-button, .subtitle-color-button, .subtitle-action-btn').removeClass('focused');
         
-        // Map index to specific elements for remote control navigation
-        var elements = [
-            '.subtitle-option-button[data-size="small"]',
-            '.subtitle-option-button[data-size="medium"]', 
-            '.subtitle-option-button[data-size="large"]',
-            '.subtitle-option-button[data-size="extra-large"]',
-            '.subtitle-color-button[data-bg="transparent"]',
-            '.subtitle-color-button[data-bg="black"]',
-            '.subtitle-color-button[data-bg="red"]',
-            '.subtitle-color-button[data-bg="white"]',
-            '.subtitle-color-button[data-bg="blue"]',
-            '.subtitle-color-button[data-text="white"]',
-            '.subtitle-color-button[data-text="black"]',
-            '.subtitle-color-button[data-text="yellow"]',
-            '.subtitle-color-button[data-text="red"]',
-            '.subtitle-color-button[data-text="green"]',
-            '.subtitle-action-btn[data-action="save"]',
-            '.subtitle-action-btn[data-action="cancel"]'
-        ];
+        var selector = '';
         
-        if(elements[index]) {
-            $(elements[index]).addClass('focused');
+        if(section === 0) { // Size section
+            var sizes = ['small', 'medium', 'large', 'extra-large'];
+            selector = '.subtitle-option-button[data-size="' + sizes[item] + '"]';
+        }
+        else if(section === 1) { // Background color section
+            var bgColors = ['transparent', 'black', 'red', 'white', 'blue'];
+            selector = '.subtitle-color-button[data-bg="' + bgColors[item] + '"]';
+        }
+        else if(section === 2) { // Text color section
+            var textColors = ['white', 'black', 'yellow', 'red', 'green'];
+            selector = '.subtitle-color-button[data-text="' + textColors[item] + '"]';
+        }
+        else if(section === 3) { // Buttons section
+            var actions = ['save', 'cancel'];
+            selector = '.subtitle-action-btn[data-action="' + actions[item] + '"]';
+        }
+        
+        if(selector) {
+            $(selector).addClass('focused');
         }
     },
     
-    handleSubtitleSettingsClick:function(){
-        var index = this.keys.subtitle_settings_selection;
+    // Keep old function for backward compatibility but update to use new grid system
+    hoverSubtitleOption:function(index){
+        // Convert linear index to grid coordinates for compatibility
+        var section = 0, item = 0;
+        if(index <= 3) { // Size section
+            section = 0; item = index;
+        } else if(index <= 8) { // Background section  
+            section = 1; item = index - 4;
+        } else if(index <= 13) { // Text section
+            section = 2; item = index - 9;
+        } else { // Buttons section
+            section = 3; item = index - 14;
+        }
+        this.hoverSubtitleOptionGrid(section, item);
+    },
+    
+    handleSubtitleSettingsGridClick:function(){
+        var section = this.keys.subtitle_settings_section;
+        var item = this.keys.subtitle_settings_item;
         
-        if(index >= 0 && index <= 3) { // Size options (0-3)
+        if(section === 0) { // Size options
             var sizes = ['small', 'medium', 'large', 'extra-large'];
-            this.changeSubtitleSize(sizes[index]);
+            this.changeSubtitleSize(sizes[item]);
         }
-        else if(index >= 4 && index <= 8) { // Background colors (4-8)
+        else if(section === 1) { // Background colors
             var bgColors = ['transparent', 'black', 'red', 'white', 'blue'];
-            this.changeSubtitleBgColor(bgColors[index - 4]);
+            this.changeSubtitleBgColor(bgColors[item]);
         }
-        else if(index >= 9 && index <= 13) { // Text colors (9-13)
+        else if(section === 2) { // Text colors
             var textColors = ['white', 'black', 'yellow', 'red', 'green'];
-            this.changeSubtitleTextColor(textColors[index - 9]);
+            this.changeSubtitleTextColor(textColors[item]);
         }
-        else if(index === 14) { // Save button
-            this.saveSubtitleSettings();
+        else if(section === 3) { // Action buttons
+            if(item === 0) { // Save button
+                this.saveSubtitleSettings();
+            } else if(item === 1) { // Cancel button
+                this.cancelSubtitleSettings();
+            }
         }
-        else if(index === 15) { // Cancel button
-            this.cancelSubtitleSettings();
-        }
+    },
+    
+    // Keep old function for backward compatibility
+    handleSubtitleSettingsClick:function(){
+        this.handleSubtitleSettingsGridClick();
     },
     
     changeSubtitleSize:function(size){
@@ -1861,12 +1885,21 @@ var home_page={
             }
         }
         else if(keys.focused_part==="subtitle_settings_modal"){
-            keys.subtitle_settings_selection+=increment;
-            if(keys.subtitle_settings_selection<0)
-                keys.subtitle_settings_selection=15; // 4 sizes + 5 bg colors + 5 text colors + 2 buttons = 16 items (0-15)
-            if(keys.subtitle_settings_selection>15)
-                keys.subtitle_settings_selection=0;
-            this.hoverSubtitleOption(keys.subtitle_settings_selection);
+            // UP/DOWN moves between sections
+            keys.subtitle_settings_section += increment;
+            if(keys.subtitle_settings_section < 0)
+                keys.subtitle_settings_section = 3; // Wrap to buttons section
+            if(keys.subtitle_settings_section > 3)
+                keys.subtitle_settings_section = 0; // Wrap to size section
+            
+            // Adjust item index if current item doesn't exist in new section
+            var sectionSizes = [4, 5, 5, 2]; // Size, BG, Text, Buttons
+            var maxItems = sectionSizes[keys.subtitle_settings_section];
+            if(keys.subtitle_settings_item >= maxItems) {
+                keys.subtitle_settings_item = maxItems - 1;
+            }
+            
+            this.hoverSubtitleOptionGrid(keys.subtitle_settings_section, keys.subtitle_settings_item);
         }
         else if(keys.focused_part==="parent_confirm_modal"){
             if(keys.parent_confirm_modal<=1 || (keys.parent_confirm_modal>1 && increment<0)){
@@ -2100,6 +2133,19 @@ var home_page={
                 keys.clear_cache_selection=increment>0 ? 1 : 0;
                 this.hoverCacheConfirmModal(keys.clear_cache_selection);
                 break;
+            case "subtitle_settings_modal":
+                // LEFT/RIGHT moves within current section
+                keys.subtitle_settings_item += increment;
+                var sectionSizes = [4, 5, 5, 2]; // Size, BG, Text, Buttons
+                var maxItems = sectionSizes[keys.subtitle_settings_section];
+                
+                if(keys.subtitle_settings_item < 0)
+                    keys.subtitle_settings_item = maxItems - 1; // Wrap to end
+                if(keys.subtitle_settings_item >= maxItems)
+                    keys.subtitle_settings_item = 0; // Wrap to beginning
+                
+                this.hoverSubtitleOptionGrid(keys.subtitle_settings_section, keys.subtitle_settings_item);
+                break;
         }
     },
     handleMenuClick:function(){
@@ -2161,7 +2207,7 @@ var home_page={
                 }
                 break;
             case "subtitle_settings_modal":
-                this.handleSubtitleSettingsClick();
+                this.handleSubtitleSettingsGridClick();
                 break;
             case "parent_confirm_modal":
                 if(keys.parent_confirm_modal==0){
