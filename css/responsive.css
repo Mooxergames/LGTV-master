@@ -195,12 +195,6 @@
         top: 5px;
         font-size: 20px;
     }
-    .new-badge {
-        left: 5px;
-        top: 5px;
-        font-size: 10px;
-        padding: 3px 6px;
-    }
     #vod-summary-description, #series-summary-description {
         margin-top: 20px;
         font-size: 22px;
