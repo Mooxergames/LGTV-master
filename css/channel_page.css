@@ -297,7 +297,7 @@
 }
 
 .program-title {
-    font-size: 24px;
+    font-size: 24px !important;
     font-weight: 600;
     color: #ffffff;
     margin: 0;
@@ -308,7 +308,7 @@
 }
 
 .program-description {
-    font-size: 14px;
+    font-size: 14px !important;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 400;
     margin: 0;
