@@ -401,21 +401,65 @@ var channel_page={
             next_program_time=next_program.start.substring(11)+' ~ '+next_program.stop.substring(11);
         }
 
-        var elements=[$('#full-screen-information-progress').find('span')[0],$('#channel-page-right-part').find('.progress-amount')[0]]
+        var elements=[$('#full-screen-information-progress').find('.progress-fill')[0],$('#channel-page-right-part').find('.progress-amount')[0]]
         clearInterval(this.progressbar_timer);
+        var that = this;
+        
         if(current_program_exist){
-            var time_length=(new Date(current_program.stop)).getTime()-(new Date(current_program.start)).getTime();
-            var current_time=(new Date()).getTime();
-            var percentage=(current_time-(new Date(current_program.start).getTime()))*100/time_length;
-            elements.map(function(item,index){
-                $(item).css({width:percentage+'%'});
-            })
+            // Use robust date parsing with EPG offset
+            var epg_offset_hours = settings.epg_time_difference || 0;
+            var start_time = moment(current_program.start, 'YYYY-MM-DD HH:mm').add(epg_offset_hours, 'hours');
+            var end_time = moment(current_program.stop, 'YYYY-MM-DD HH:mm').add(epg_offset_hours, 'hours');
+            
+            // Validate dates and calculate progress
+            if(start_time.isValid() && end_time.isValid()){
+                var time_length = end_time.valueOf() - start_time.valueOf();
+                var now = moment();
+                var elapsed = now.valueOf() - start_time.valueOf();
+                var percentage = Math.max(0, Math.min(100, (elapsed / time_length) * 100));
+                
+                // Safely update progress elements
+                elements.map(function(item,index){
+                    if(item) $(item).css({width: percentage + '%'});
+                })
+                
+                // Update EPG time labels
+                $('#full-screen-program-start-time').text(start_time.format('HH:mm'));
+                $('#full-screen-program-end-time').text(end_time.format('HH:mm'));
+                
+                // Update current time indicator position
+                $('#full-screen-current-time-indicator').css({left: percentage + '%'});
+                
+                // Start real-time timer for progress updates
+                this.progressbar_timer = setInterval(function(){
+                    var current_moment = moment();
+                    var current_elapsed = current_moment.valueOf() - start_time.valueOf();
+                    var current_percentage = Math.max(0, Math.min(100, (current_elapsed / time_length) * 100));
+                    
+                    elements.map(function(item,index){
+                        if(item) $(item).css({width: current_percentage + '%'});
+                    })
+                    $('#full-screen-current-time-indicator').css({left: current_percentage + '%'});
+                }, 5000); // Update every 5 seconds
+            } else {
+                // Invalid dates - show no progress
+                elements.map(function(item,index){
+                    if(item) $(item).css({width: '0%'});
+                })
+                $('#full-screen-program-start-time').text('--:--');
+                $('#full-screen-program-end-time').text('--:--');
+                $('#full-screen-current-time-indicator').css({left: '0%'});
+            }
         }
         else{
             $('#full-screen-current-program').text("No Information");
             elements.map(function(item,index){
                 $(item).css({width:0});
             })
+            // Clear EPG labels when no program
+            $('#full-screen-program-start-time').text('--:--');
+            $('#full-screen-program-end-time').text('--:--');
+            $('#full-screen-current-time-indicator').css({left: '0%'});
         }
         $('#full-screen-current-program').text(current_program_title);
         $('#full-screen-program-name').text(current_program_title);

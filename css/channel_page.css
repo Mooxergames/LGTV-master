@@ -438,28 +438,64 @@
     max-width: calc(100% - 100px); /* Account for logo space */
 }
 #full-screen-information-progress, #guide-video-information-progress{
-    /* Modern progress bar design */
+    /* Enhanced EPG-aware progress container */
+    width: 60%;
+    margin: 16px 0;
+    position: relative;
+}
+
+/* EPG time labels */
+.epg-progress-times {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Roboto', 'Arial', sans-serif;
+    font-weight: 500;
+}
+
+.progress-start-time,
+.progress-end-time {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
+}
+
+/* Enhanced progress bar container */
+.epg-progress-bar {
     height: 8px;
     overflow: hidden;
     background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
     border-radius: 4px;
-    width: 60%;
-    margin: 16px 0;
-    /* Subtle inner shadow */
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     position: relative;
 }
-#full-screen-information-progress span{
+
+/* Progress fill */
+.progress-fill {
     display: block;
-    /* Modern gradient progress fill */
     background: linear-gradient(90deg, #ff6b35 0%, #f7931e  50%, #ffd700 100%);
     height: 100%;
     width: 0;
     border-radius: 4px;
-    /* Subtle glow effect */
     box-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
     transition: width 0.3s ease-out;
     position: relative;
+}
+
+/* Current time indicator */
+.current-time-indicator {
+    position: absolute;
+    top: -2px;
+    width: 4px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 2px;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    transform: translateX(-2px);
+    transition: left 0.5s ease-out;
 }
 #full-screen-programs-container,#catchup-full-screen-programs-container {
     color: white;
