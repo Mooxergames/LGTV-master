@@ -68,6 +68,10 @@ var home_page={
         this.slider_items=[];
         $('#app').show();
         
+        // Initialize subtitle settings event handlers and apply current styles
+        this.initSubtitleEventHandlers();
+        this.applySubtitleStyles();
+        
         // Display MAC address at the top of home page
         if(typeof mac_address !== 'undefined' && mac_address) {
             $('#bottom-right-mac-address').text(mac_address);
@@ -941,15 +945,48 @@ var home_page={
     
     applySubtitleStyles:function(){
         // Update CSS custom properties for global subtitle styling
-        var size = this.getSizeValue(settings.subtitle_size);
-        var bgColor = this.getBackgroundValue(settings.subtitle_bg_color);
-        var textColor = this.getTextColorValue(settings.subtitle_text_color);
-        var outline = this.getOutlineValue(settings.subtitle_text_color);
+        var size = this.getSizeValue(settings.subtitle_size || 'medium');
+        var bgColor = this.getBackgroundValue(settings.subtitle_bg_color || 'black');
+        var textColor = this.getTextColorValue(settings.subtitle_text_color || 'white');
+        var outline = this.getOutlineValue(settings.subtitle_text_color || 'white');
         
         document.documentElement.style.setProperty('--subtitle-size', size);
         document.documentElement.style.setProperty('--subtitle-bg', bgColor);
         document.documentElement.style.setProperty('--subtitle-color', textColor);
         document.documentElement.style.setProperty('--subtitle-outline', outline);
+    },
+    
+    // Add event handlers for subtitle settings modal after DOM is ready
+    initSubtitleEventHandlers:function(){
+        var that = this;
+        
+        // Size button handlers
+        $('.subtitle-option-button').off('click').on('click', function(e){
+            var size = $(this).data('size');
+            that.changeSubtitleSize(size);
+        });
+        
+        // Background color button handlers  
+        $('.subtitle-bg-color-options .subtitle-color-button').off('click').on('click', function(e){
+            var bgColor = $(this).data('bg');
+            that.changeSubtitleBgColor(bgColor);
+        });
+        
+        // Text color button handlers
+        $('.subtitle-text-color-options .subtitle-color-button').off('click').on('click', function(e){
+            var textColor = $(this).data('text');
+            that.changeSubtitleTextColor(textColor);
+        });
+        
+        // Action button handlers
+        $('.subtitle-action-btn').off('click').on('click', function(e){
+            var action = $(this).data('action');
+            if(action === 'save') {
+                that.saveSubtitleSettings();
+            } else if(action === 'cancel') {
+                that.cancelSubtitleSettings();
+            }
+        });
     },
     goToMainPage:function(){
         $(this.slider_items[0]).removeClass('active');
