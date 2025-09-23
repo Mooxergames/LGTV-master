@@ -329,9 +329,12 @@ var home_page={
         
         // Check if this is one of the last 10 added items (show NEW badge)
         var total_item_index = current_render_count + index;
+        var current_sort_key = current_movie_type === 'movies' ? settings.vod_sort : settings.series_sort;
         
-        // Use the actual active sort key that was used to generate this.movies
-        var current_sort_key = home_page.active_sort_key || (current_movie_type === 'movies' ? settings.vod_sort : settings.series_sort);
+        // For "All" category, sort is always 'added'
+        if(current_category && current_category.category_id === 'all') {
+            current_sort_key = 'added';
+        }
         
         // When sorted by 'added' (ascending), newest items are at the END
         // So we show NEW badge for the last 10 items in the total array
@@ -1112,9 +1115,6 @@ var home_page={
         // Always save the new sort preference
         settings.saveSettings(current_sort_key, key, '');
         
-        // Store the active sort key for NEW badge logic
-        this.active_sort_key = key;
-        
         // Get movies to sort based on category
         var movies = [];
         if(category.category_id === 'all'){
@@ -1194,8 +1194,6 @@ var home_page={
                 current_sort_key='added';
                 $(this.submenu_items[0]).find('.menu-item-movies-count').text(movies.length);
             }
-            // Store the active sort key for NEW badge logic
-            this.active_sort_key = current_sort_key;
             this.movies=getSortedMovies(movies, current_sort_key);
             if(this.movies.length>0){
                 this.renderCategoryContent();
