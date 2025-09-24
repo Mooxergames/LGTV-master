@@ -88,6 +88,11 @@ var SrtOperation={
             return;
         }
         
+        // Track video time for real backward seek detection
+        var previous_time = this.last_video_time || 0;
+        var is_real_backward_seek = current_time < (previous_time - 1.0); // 1 second tolerance for normal playback jitter
+        this.last_video_time = current_time;
+        
         var srt_index = this.current_srt_index;
         if(srt_index >= this.srt.length || srt_index < 0) {
             console.log("🕐 SUBTITLE SYNC: Invalid index, searching...", {index: srt_index, length: this.srt.length});
@@ -178,9 +183,14 @@ var SrtOperation={
                 this.current_srt_index = new_index;
             }
         }
-        // **BACKWARDS SEEK**: Current time before subtitle start  
-        else if(current_time < srt_item.startSeconds) {
-            console.log("🕐 SUBTITLE SYNC: ⏪ BACKWARD SEEK DETECTED");
+        // **BACKWARDS SEEK**: Only detect REAL backward seeks, not gaps between subtitles  
+        else if(current_time < srt_item.startSeconds && is_real_backward_seek) {
+            console.log("🕐 SUBTITLE SYNC: ⏪ REAL BACKWARD SEEK DETECTED", {
+                current_time: current_time,
+                previous_time: previous_time,
+                time_diff: current_time - previous_time,
+                subtitle_start: srt_item.startSeconds
+            });
             if(this.subtitle_shown) {
                 this.hideSubtitle();
                 this.subtitle_shown = false;
@@ -188,6 +198,18 @@ var SrtOperation={
             var new_index = this.findIndex(current_time, 0, this.srt.length - 1);
             console.log("🕐 SUBTITLE SYNC: ⏪ Backward search result: index", new_index);
             this.current_srt_index = new_index;
+        }
+        // **GAP HANDLING**: Video time before subtitle start but no real backward seek
+        else if(current_time < srt_item.startSeconds) {
+            console.log("🕐 SUBTITLE SYNC: 📝 Normal gap - waiting for subtitle start", {
+                current_time: current_time,
+                subtitle_start: srt_item.startSeconds,
+                wait_time: (srt_item.startSeconds - current_time).toFixed(3) + "s"
+            });
+            if(this.subtitle_shown) {
+                this.hideSubtitle();
+                this.subtitle_shown = false;
+            }
         }
     },
     showSubtitle: function(text) {
