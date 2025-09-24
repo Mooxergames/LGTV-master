@@ -103,49 +103,21 @@ var SrtOperation={
         
         var srt_item = this.srt[srt_index];
         
-        // ADVANCED TIMING ANALYSIS
-        var timing_diff_start = current_time - srt_item.startSeconds;
-        var timing_diff_end = srt_item.endSeconds - current_time;
-        var is_early = timing_diff_start < 0;
-        var is_late = timing_diff_end < 0;
-        
-        console.log("🕐 SUBTITLE SYNC ADVANCED:", {
+        // Simplified timing logging
+        console.log("🕐 SUBTITLE SYNC:", {
             video_time: current_time,
             current_index: srt_index,
             subtitle_start: srt_item.startSeconds,
             subtitle_end: srt_item.endSeconds,
-            timing_diff_from_start: timing_diff_start.toFixed(3) + "s",
-            timing_diff_to_end: timing_diff_end.toFixed(3) + "s", 
-            is_early: is_early,
-            is_late: is_late,
             subtitle_text: srt_item.text.substring(0, 30) + "...",
-            currently_shown: this.subtitle_shown,
-            timing_status: is_early ? "🚨 EARLY" : is_late ? "🚨 LATE" : "✅ ON_TIME"
+            currently_shown: this.subtitle_shown
         });
         
         // **SHOW SUBTITLE**: Current time within subtitle range - same timing as Samsung
         if(current_time >= srt_item.startSeconds && current_time < srt_item.endSeconds) {
-            var early_display_offset = srt_item.startSeconds - current_time;
             console.log("🕐 SUBTITLE SYNC: ✅ Time within range - should show subtitle");
-            console.log("🕐 SUBTITLE TIMING VALIDATION:", {
-                should_show: true,
-                video_time: current_time,
-                subtitle_start_time: srt_item.startSeconds,
-                early_offset: early_display_offset.toFixed(3) + "s",
-                is_displaying_early: early_display_offset > 0,
-                timing_precision: "Video time >= Subtitle start time"
-            });
-            
             if(!this.subtitle_shown) {
-                console.log("🕐 SUBTITLE SYNC: 🎯 DISPLAYING SUBTITLE NOW:", srt_item.text);
-                console.log("🕐 TIMING CHECKPOINT:", {
-                    action: "SHOW_SUBTITLE",
-                    video_time: current_time,
-                    subtitle_start: srt_item.startSeconds,
-                    subtitle_end: srt_item.endSeconds,
-                    timing_difference: (current_time - srt_item.startSeconds).toFixed(3) + "s",
-                    timing_valid: current_time >= srt_item.startSeconds
-                });
+                console.log("🕐 SUBTITLE SYNC: 🎯 Showing subtitle:", srt_item.text);
                 this.showSubtitle(srt_item.text);
                 this.subtitle_shown = true;
             }
@@ -213,20 +185,7 @@ var SrtOperation={
         }
     },
     showSubtitle: function(text) {
-        var current_video_time = media_player.current_time || 0;
-        var current_srt_item = this.srt[this.current_srt_index];
-        
-        console.log("🎯 SUBTITLE DISPLAY ACTION: Starting display process");
-        console.log("🎯 ADVANCED DISPLAY VALIDATION:", {
-            subtitle_text: text,
-            video_time_at_display: current_video_time,
-            subtitle_start_time: current_srt_item ? current_srt_item.startSeconds : "N/A",
-            subtitle_end_time: current_srt_item ? current_srt_item.endSeconds : "N/A",
-            timing_offset: current_srt_item ? (current_video_time - current_srt_item.startSeconds).toFixed(3) + "s" : "N/A",
-            is_early_display: current_srt_item ? current_video_time < current_srt_item.startSeconds : false,
-            display_timestamp: new Date().toLocaleTimeString()
-        });
-        
+        console.log("🎯 SUBTITLE SHOW: Displaying subtitle:", text);
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
@@ -235,18 +194,7 @@ var SrtOperation={
         
         // Apply user settings AFTER inserting the HTML so styles apply to new elements
         this.applyUserStyles();
-        console.log("🎯 SUBTITLE DISPLAY: ✅ Subtitle displayed and styled");
-        
-        // TIMING DRIFT DETECTION
-        if(current_srt_item && current_video_time < current_srt_item.startSeconds) {
-            console.error("🚨 EARLY SUBTITLE DETECTED:", {
-                problem: "Subtitle displaying before its start time",
-                video_time: current_video_time,
-                subtitle_start: current_srt_item.startSeconds,
-                early_by: (current_srt_item.startSeconds - current_video_time).toFixed(3) + "s",
-                subtitle_text: text
-            });
-        }
+        console.log("🎯 SUBTITLE SHOW: Subtitle displayed and styled");
     },
     
     applyUserStyles: function() {
