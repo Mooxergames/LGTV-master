@@ -1242,6 +1242,11 @@ var vod_series_player={
         this.currentSubtitleBackground = bgType;
         
         this.applyLiveSubtitleStyles();
+        
+        // Also ensure srt_operation uses these settings for future subtitle display
+        if(typeof srt_operation !== 'undefined') {
+            srt_operation.applyUserStyles();
+        }
     },
     
     removeAllActiveClass:function(hide_episode){
