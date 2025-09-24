@@ -252,13 +252,16 @@ function initPlayer() {
                         that.current_time=currentTime;
                         var currentTimeSeconds = currentTime/1000;
                         
-                        // DEBUG: Log every 1 second to avoid spam
+                        // ADVANCED TIME UPDATE LOGGING  
                         if(Math.floor(currentTimeSeconds) !== Math.floor(that.last_debug_time || 0)) {
-                            console.log("📺 VIDEO TIME UPDATE:", {
+                            console.log("📺 VIDEO TIME UPDATE ADVANCED:", {
                                 currentTime: currentTimeSeconds,
                                 currentTimeMs: currentTime,
                                 route: current_route,
-                                platform: "Samsung Tizen"
+                                platform: "Samsung Tizen",
+                                avplay_state: typeof webapis !== 'undefined' && webapis.avplay ? webapis.avplay.getState() : "N/A",
+                                timing_source: "Samsung_webapis.avplay.oncurrentplaytime",
+                                ms_to_seconds_conversion: "Applied (/1000)"
                             });
                             that.last_debug_time = currentTimeSeconds;
                         }
@@ -267,6 +270,14 @@ function initPlayer() {
                             vod_series_player.current_time=currentTimeSeconds;
                             // Samsung subtitle timing - convert ms to seconds
                             if(typeof SrtOperation !== 'undefined') {
+                                // TIMING VALIDATION BEFORE SYNC
+                                console.log("🔄 SUBTITLE SYNC CALL:", {
+                                    platform: "Samsung Tizen", 
+                                    video_time: currentTimeSeconds,
+                                    video_time_ms: currentTime,
+                                    source: "Samsung_webapis.avplay.oncurrentplaytime",
+                                    call_timestamp: performance.now()
+                                });
                                 SrtOperation.timeChange(currentTimeSeconds);
                             }
                         }
@@ -488,13 +499,21 @@ function initPlayer() {
                     var duration =  videoObj.duration;
                     var currentTime=videoObj.currentTime;
                     
-                    // DEBUG: Log every 1 second to avoid spam
+                    // ADVANCED TIME UPDATE LOGGING
                     if(Math.floor(currentTime) !== Math.floor(that.last_debug_time || 0)) {
-                        console.log("📺 VIDEO TIME UPDATE:", {
+                        console.log("📺 VIDEO TIME UPDATE ADVANCED:", {
                             currentTime: currentTime,
                             duration: duration,
                             route: current_route,
-                            platform: "LG WebOS"
+                            platform: "LG WebOS",
+                            playback_rate: videoObj.playbackRate || 1,
+                            video_ready_state: videoObj.readyState,
+                            video_paused: videoObj.paused,
+                            buffered_ranges: videoObj.buffered.length > 0 ? 
+                                Array.from({length: videoObj.buffered.length}, (_, i) => 
+                                    `${videoObj.buffered.start(i).toFixed(2)}-${videoObj.buffered.end(i).toFixed(2)}`
+                                ).join(", ") : "None",
+                            timing_source: "HTML5_Video_ontimeupdate"
                         });
                         that.last_debug_time = currentTime;
                     }
@@ -506,6 +525,13 @@ function initPlayer() {
                         
                         // LG subtitle timing - same logic as Samsung (already in seconds)
                         if(typeof SrtOperation !== 'undefined') {
+                            // TIMING VALIDATION BEFORE SYNC
+                            console.log("🔄 SUBTITLE SYNC CALL:", {
+                                platform: "LG WebOS", 
+                                video_time: currentTime,
+                                source: "HTML5_ontimeupdate",
+                                call_timestamp: performance.now()
+                            });
                             SrtOperation.timeChange(currentTime);
                         }
                     }
