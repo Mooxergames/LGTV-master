@@ -164,11 +164,12 @@ var SrtOperation={
     getBackgroundStyleFromType: function(bgType) {
         switch(bgType) {
             case 'transparent':
+            case 'none':
                 return {
                     background: 'transparent',
                     color: '#fff',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                    padding: '2px 6px',
+                    textShadow: 'none', // No shadows/outlines for transparent background
+                    padding: '0px',     // No padding to avoid visible borders
                     borderRadius: '0px'
                 };
             case 'black':
