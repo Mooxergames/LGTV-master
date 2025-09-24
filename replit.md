@@ -14,6 +14,7 @@ Preferred communication style: Simple, everyday language.
 - Added poster as backdrop fallback functionality for movies and series when backdrop images are missing
 - Fixed debug back button navigation to properly return to VOD page using vod_summary_page.goBack() function
 - **Added Resume Watching functionality for series episodes** - Series now include a "Resume Watching" category that shows series with episodes that have saved viewing progress, bringing feature parity with movie functionality
+- **Implemented subtitle positioning controls for movie player** - Added comprehensive subtitle position adjustment system with dedicated modal interface, Up/Down position controls, preset positions (bottom, middle, center, upper), live preview, and keyboard navigation integration. Users can now customize subtitle vertical placement and save their preferences to local storage.
 
 # System Architecture
 
