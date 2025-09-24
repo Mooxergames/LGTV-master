@@ -6,7 +6,7 @@ var SrtOperation={
     stopped:false,
     subtitle_shown:false,
     init: function (subtitle, current_time) {
-        // Enhanced initialization from exo app
+        // Same seconds logic as Samsung - simple and direct
         // Clear existing subtitles
         $('#' + media_player.parent_id).find('.subtitle-container').html('');
         this.subtitle_shown = false;
@@ -25,7 +25,7 @@ var SrtOperation={
         this.srt = srt;
         if(srt.length > 0) {
             this.stopped = false;
-            // Find starting subtitle index using binary search - exact timing
+            // Find starting subtitle index using binary search - same as Samsung
             this.current_srt_index = this.findIndex(current_time, 0, srt.length - 1);
             if(this.current_srt_index < 0) this.current_srt_index = 0;
             console.log("SRT initialized - found index:", this.current_srt_index, "for time:", current_time);
@@ -64,7 +64,7 @@ var SrtOperation={
             return this.findIndex(time, mid+1, end);
     },
     timeChange: function(current_time) {
-        // Exact timing logic from exoapp - no compensation offsets
+        // Same logic as Samsung - simple and direct
         if(this.stopped || !this.srt || this.srt.length === 0) {
             return;
         }
@@ -78,7 +78,7 @@ var SrtOperation={
         
         var srtItem = this.srt[srtIndex];
         
-        // Check if current subtitle should be displayed - exact timing
+        // Check if current subtitle should be displayed - same exact timing as Samsung
         if(current_time >= srtItem.startSeconds && current_time < srtItem.endSeconds) {
             if(!this.subtitle_shown) {
                 this.showSubtitle(srtItem.text);

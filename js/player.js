@@ -450,6 +450,9 @@ function initPlayer() {
                     $('#'+that.parent_id).find('.video-error').hide();
                     // console.log('Video can start, but not sure it will play through.');
                 });
+                this.videoObj.addEventListener('playing', function(event){
+                    // Video is playing after buffering
+                });
                 this.videoObj.addEventListener('durationchange', function(event){
                     $('#'+that.parent_id).find('.video-error').hide();
                     // console.log('Not sure why, but the duration of the video has changed.');
@@ -472,8 +475,14 @@ function initPlayer() {
                     var duration =  videoObj.duration;
                     var currentTime=videoObj.currentTime;
                     if(current_route==='vod-series-player-video') {
+                        // Use same seconds logic as Samsung - store original time
+                        that.current_time=currentTime;
                         vod_series_player.current_time=currentTime;
-                        SrtOperation.timeChange(currentTime);
+                        
+                        // LG subtitle timing - same logic as Samsung (already in seconds)
+                        if(typeof SrtOperation !== 'undefined') {
+                            SrtOperation.timeChange(currentTime);
+                        }
                     }
                     if (duration > 0) {
                         $('#'+that.parent_id).find('.video-progress-bar-slider').val(currentTime).change();
