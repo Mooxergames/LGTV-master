@@ -139,11 +139,18 @@ var SrtOperation={
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
-        subtitleContainer.html(subtitleHtml);
-        subtitleContainer.show(); // Ensure container is visible when showing subtitles
         
-        // Apply user settings AFTER inserting the HTML so styles apply to new elements
-        this.applyUserStyles();
+        // Only show container if there's actual text content
+        if(text && text.trim() !== '') {
+            subtitleContainer.html(subtitleHtml);
+            subtitleContainer.show(); // Ensure container is visible when showing subtitles
+            
+            // Apply user settings AFTER inserting the HTML so styles apply to new elements
+            this.applyUserStyles();
+        } else {
+            // If no text, hide the container completely
+            this.hideSubtitle();
+        }
     },
     
     applyUserStyles: function() {
@@ -155,27 +162,26 @@ var SrtOperation={
         // Get background style based on saved setting
         var backgroundStyle = this.getBackgroundStyleFromType(bgType);
         
-        // Apply styles directly to subtitle container
+        // Apply ONLY positioning styles to subtitle container (no background)
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.css({
             'bottom': position + 'vh',
             'top': 'auto',
-            'font-size': size + 'px',
-            'background': backgroundStyle.background,
-            'color': backgroundStyle.color,
-            'text-shadow': backgroundStyle.textShadow,
-            'padding': backgroundStyle.padding,
-            'border-radius': backgroundStyle.borderRadius
+            // Remove all visual styling from container - only positioning
+            'background': 'transparent',
+            'padding': '0',
+            'border-radius': '0'
         });
         
-        // Also apply to subtitle text elements
+        // Apply ALL visual styles ONLY to subtitle text elements
         subtitleContainer.find('.subtitle-text').css({
             'font-size': size + 'px',
             'background': backgroundStyle.background,
             'color': backgroundStyle.color,
             'text-shadow': backgroundStyle.textShadow,
             'padding': backgroundStyle.padding,
-            'border-radius': backgroundStyle.borderRadius
+            'border-radius': backgroundStyle.borderRadius,
+            'display': 'inline-block' // Ensure background only covers text area
         });
     },
     
@@ -262,8 +268,15 @@ var SrtOperation={
     
     hideSubtitle: function() {
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
-        subtitleContainer.html('');
-        subtitleContainer.hide(); // Hide the container completely when no subtitles to prevent empty background line
+        subtitleContainer.html(''); // Clear content
+        subtitleContainer.hide(); // Hide the container completely
+        
+        // Also clear any background styling that might have been applied to container
+        subtitleContainer.css({
+            'background': 'transparent',
+            'padding': '0',
+            'border-radius': '0'
+        });
     },
     
     stopOperation: function () {
