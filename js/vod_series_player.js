@@ -1600,12 +1600,15 @@ var vod_series_player={
             if(increment > 0) {
                 // Down navigation paths: up→bottom→center→smaller→small path AND down→middle→upper→large→normal→extra-large→black→dark→cancel path
                 switch(currentIndex) {
-                    // Main up path: up→bottom→center→smaller→small→save
+                    // Main up path: up→bottom→center→smaller→small→large→none→gray→save
                     case 0: this.positionControlIndex = 2; break; // up → bottom
                     case 2: this.positionControlIndex = 4; break; // bottom → center
                     case 4: this.positionControlIndex = 6; break; // center → smaller
                     case 6: this.positionControlIndex = 8; break; // smaller → small
-                    case 8: this.positionControlIndex = 16; break; // small → save
+                    case 8: this.positionControlIndex = 10; break; // small → large
+                    case 10: this.positionControlIndex = 12; break; // large → none (from up path)
+                    case 12: this.positionControlIndex = 14; break; // none → gray
+                    case 14: this.positionControlIndex = 16; break; // gray → save
                     
                     // Main down path: down→middle→upper→larger→normal→extra-large→black→dark→cancel
                     case 1: this.positionControlIndex = 3; break; // down → middle
@@ -1617,10 +1620,7 @@ var vod_series_player={
                     case 13: this.positionControlIndex = 15; break; // black → dark
                     case 15: this.positionControlIndex = 17; break; // dark → cancel
                     
-                    // Other items continue their paths
-                    case 10: this.positionControlIndex = 9; break; // large → normal
-                    case 12: this.positionControlIndex = 14; break; // none → gray
-                    case 14: this.positionControlIndex = 16; break; // gray → save
+                    // Other navigation points
                     case 16: this.positionControlIndex = 0; break; // save → up (wrap)
                     case 17: this.positionControlIndex = 1; break; // cancel → down (wrap)
                     default: this.positionControlIndex = 0; break; // fallback
@@ -1628,8 +1628,11 @@ var vod_series_player={
             } else {
                 // Up navigation (reverse paths)
                 switch(currentIndex) {
-                    // Reverse up path: save→small→smaller→center→bottom→up
-                    case 16: this.positionControlIndex = 8; break; // save → small
+                    // Reverse up path: save→gray→none→large→small→smaller→center→bottom→up
+                    case 16: this.positionControlIndex = 14; break; // save → gray
+                    case 14: this.positionControlIndex = 12; break; // gray → none
+                    case 12: this.positionControlIndex = 10; break; // none → large
+                    case 10: this.positionControlIndex = 8; break; // large → small
                     case 8: this.positionControlIndex = 6; break; // small → smaller
                     case 6: this.positionControlIndex = 4; break; // smaller → center
                     case 4: this.positionControlIndex = 2; break; // center → bottom
@@ -1647,10 +1650,7 @@ var vod_series_player={
                     case 3: this.positionControlIndex = 1; break; // middle → down
                     case 1: this.positionControlIndex = 17; break; // down → cancel (wrap)
                     
-                    // Other items
-                    case 10: this.positionControlIndex = 7; break; // large → larger
-                    case 12: this.positionControlIndex = 10; break; // none → large
-                    case 14: this.positionControlIndex = 12; break; // gray → none
+                    // Other items (no conflicts with main paths)
                     default: this.positionControlIndex = 0; break; // fallback
                 }
             }
