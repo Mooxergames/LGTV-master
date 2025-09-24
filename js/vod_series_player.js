@@ -1002,6 +1002,25 @@ var vod_series_player={
         }
     },
     
+    // Settings Modal Function
+    showSettingsModal: function() {
+        this.hideControlBar();
+        var keys = this.keys;
+        if(keys.focused_part != "operation_modal") {
+            keys.prev_focus = keys.focused_part;
+        }
+        keys.focused_part = "operation_modal";
+        keys.operation_modal = 0;
+        
+        // Show the settings modal
+        $('#vod-series-player-operation-modal').modal('show');
+        
+        // Set focus to first option
+        var buttons = $('#vod-series-player-operation-modal').find('.modal-operation-menu-type-1');
+        $(buttons).removeClass('active');
+        $(buttons[0]).addClass('active');
+    },
+    
     // Subtitle Position Functions
     showSubtitlePositionModal: function() {
         this.hideControlBar();
