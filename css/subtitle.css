@@ -633,6 +633,36 @@
     min-width: 120px;
 }
 
+/* Position Action Buttons - Save and Cancel in subtitle position overlay */
+.position-action-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: 2px solid #4facfe;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.position-action-btn:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+.position-action-btn.active {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    border: 2px solid #4ade80 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.5);
+}
+
 /* Subtitle Position Modal Styling */
 #subtitle-position-modal .modal-content {
     background: linear-gradient(145deg, #1a1f2e 0%, #16191e 50%, #0f1419 100%);
