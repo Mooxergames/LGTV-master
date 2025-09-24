@@ -55,6 +55,9 @@ var SrtOperation={
         // Apply global subtitle settings immediately after initialization
         this.applyUserStyles();
         console.log("🎬 SUBTITLE DEBUG: === INITIALIZATION COMPLETED ===");
+        
+        // Load any saved subtitle offset
+        this.loadSubtitleOffset();
     },
     findIndex: function (time,start, end) {  // we will use binary search algorithm here
         if(time==0)
@@ -103,31 +106,47 @@ var SrtOperation={
         
         var srt_item = this.srt[srt_index];
         
-        // Simplified timing logging
-        console.log("🕐 SUBTITLE SYNC:", {
+        // Enhanced timing analysis with offset detection
+        var timing_offset = this.subtitle_offset || 0;
+        var adjusted_subtitle_start = srt_item.startSeconds + timing_offset;
+        var adjusted_subtitle_end = srt_item.endSeconds + timing_offset;
+        var timing_difference = current_time - adjusted_subtitle_start;
+        
+        console.log("🕐 SUBTITLE SYNC ANALYSIS:", {
             video_time: current_time,
+            original_subtitle_start: srt_item.startSeconds,
+            adjusted_subtitle_start: adjusted_subtitle_start,
+            timing_offset_applied: timing_offset,
+            timing_difference: timing_difference.toFixed(3) + "s",
             current_index: srt_index,
-            subtitle_start: srt_item.startSeconds,
-            subtitle_end: srt_item.endSeconds,
             subtitle_text: srt_item.text.substring(0, 30) + "...",
-            currently_shown: this.subtitle_shown
+            currently_shown: this.subtitle_shown,
+            sync_status: timing_difference > 10 ? "🚨 LATE" : timing_difference < -10 ? "🚨 EARLY" : "✅ OK"
         });
         
-        // **SHOW SUBTITLE**: Current time within subtitle range - same timing as Samsung
-        if(current_time >= srt_item.startSeconds && current_time < srt_item.endSeconds) {
-            console.log("🕐 SUBTITLE SYNC: ✅ Time within range - should show subtitle");
+        // **SHOW SUBTITLE**: Apply timing offset and check if within range
+        var timing_offset = this.subtitle_offset || 0;
+        var adjusted_start = srt_item.startSeconds + timing_offset;
+        var adjusted_end = srt_item.endSeconds + timing_offset;
+        
+        if(current_time >= adjusted_start && current_time < adjusted_end) {
+            console.log("🕐 SUBTITLE SYNC: ✅ Time within adjusted range - showing subtitle", {
+                original_timing: `${srt_item.startSeconds}-${srt_item.endSeconds}`,
+                adjusted_timing: `${adjusted_start}-${adjusted_end}`,
+                offset_applied: timing_offset
+            });
             if(!this.subtitle_shown) {
-                console.log("🕐 SUBTITLE SYNC: 🎯 Showing subtitle:", srt_item.text);
+                console.log("🕐 SUBTITLE SYNC: 🎯 Showing subtitle with offset:", srt_item.text);
                 this.showSubtitle(srt_item.text);
                 this.subtitle_shown = true;
             }
         }
-        // **HIDE SUBTITLE**: Time passed subtitle end - handle progression
-        else if(current_time >= srt_item.endSeconds) {
+        // **HIDE SUBTITLE**: Time passed adjusted subtitle end - handle progression
+        else if(current_time >= adjusted_end) {
             console.log("🕐 SUBTITLE SYNC: ⏭️ Time past subtitle end, checking next...");
             var next_srt_item = this.srt[srt_index + 1];
             
-            if(next_srt_item && current_time < next_srt_item.startSeconds) {
+            if(next_srt_item && current_time < (next_srt_item.startSeconds + timing_offset)) {
                 // Gap between subtitles - hide current and advance index
                 console.log("🕐 SUBTITLE SYNC: 📝 In gap between subtitles - hiding and advancing index");
                 if(this.subtitle_shown) {
@@ -137,7 +156,7 @@ var SrtOperation={
                 // FIX: Advance to next subtitle index to avoid getting stuck
                 this.current_srt_index = srt_index + 1;
                 console.log("🕐 SUBTITLE SYNC: 🔧 Advanced index to:", this.current_srt_index);
-            } else if(next_srt_item && current_time >= next_srt_item.startSeconds && current_time < next_srt_item.endSeconds) {
+            } else if(next_srt_item && current_time >= (next_srt_item.startSeconds + timing_offset) && current_time < (next_srt_item.endSeconds + timing_offset)) {
                 // Show next subtitle
                 console.log("🕐 SUBTITLE SYNC: ⏭️ Moving to next subtitle:", next_srt_item.text);
                 this.showSubtitle(next_srt_item.text);
@@ -156,7 +175,7 @@ var SrtOperation={
             }
         }
         // **BACKWARDS SEEK**: Only detect REAL backward seeks, not gaps between subtitles  
-        else if(current_time < srt_item.startSeconds && is_real_backward_seek) {
+        else if(current_time < adjusted_start && is_real_backward_seek) {
             console.log("🕐 SUBTITLE SYNC: ⏪ REAL BACKWARD SEEK DETECTED", {
                 current_time: current_time,
                 previous_time: previous_time,
@@ -171,12 +190,14 @@ var SrtOperation={
             console.log("🕐 SUBTITLE SYNC: ⏪ Backward search result: index", new_index);
             this.current_srt_index = new_index;
         }
-        // **GAP HANDLING**: Video time before subtitle start but no real backward seek
-        else if(current_time < srt_item.startSeconds) {
-            console.log("🕐 SUBTITLE SYNC: 📝 Normal gap - waiting for subtitle start", {
+        // **GAP HANDLING**: Video time before adjusted subtitle start but no real backward seek
+        else if(current_time < adjusted_start) {
+            console.log("🕐 SUBTITLE SYNC: 📝 Normal gap - waiting for adjusted subtitle start", {
                 current_time: current_time,
-                subtitle_start: srt_item.startSeconds,
-                wait_time: (srt_item.startSeconds - current_time).toFixed(3) + "s"
+                original_subtitle_start: srt_item.startSeconds,
+                adjusted_subtitle_start: adjusted_start,
+                timing_offset: timing_offset,
+                wait_time: (adjusted_start - current_time).toFixed(3) + "s"
             });
             if(this.subtitle_shown) {
                 this.hideSubtitle();
@@ -195,6 +216,54 @@ var SrtOperation={
         // Apply user settings AFTER inserting the HTML so styles apply to new elements
         this.applyUserStyles();
         console.log("🎯 SUBTITLE SHOW: Subtitle displayed and styled");
+    },
+    
+    // Subtitle timing offset adjustment functions
+    adjustSubtitleOffset: function(offset_seconds) {
+        this.subtitle_offset = (this.subtitle_offset || 0) + offset_seconds;
+        console.log("🕘 SUBTITLE OFFSET ADJUSTED:", {
+            offset_change: offset_seconds + "s",
+            new_total_offset: this.subtitle_offset + "s",
+            direction: offset_seconds > 0 ? "Later" : "Earlier"
+        });
+        
+        // Save offset to localStorage
+        localStorage.setItem('subtitle_offset', this.subtitle_offset);
+        
+        // Show notification to user
+        this.showOffsetNotification(this.subtitle_offset);
+    },
+    
+    showOffsetNotification: function(offset) {
+        var notification = "🕘 Subtitle Timing: ";
+        if(offset === 0) {
+            notification += "Reset to Original";
+        } else if(offset > 0) {
+            notification += "+" + offset.toFixed(1) + "s Later";
+        } else {
+            notification += offset.toFixed(1) + "s Earlier";
+        }
+        
+        // Create or update notification element
+        var notificationEl = $('#subtitle-offset-notification');
+        if(notificationEl.length === 0) {
+            $('body').append('<div id="subtitle-offset-notification" style="position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999; font-size: 16px;"></div>');
+            notificationEl = $('#subtitle-offset-notification');
+        }
+        
+        notificationEl.text(notification).show();
+        
+        // Auto-hide after 2 seconds
+        setTimeout(function() {
+            notificationEl.fadeOut();
+        }, 2000);
+    },
+    
+    // Load saved offset on initialization
+    loadSubtitleOffset: function() {
+        var saved_offset = parseFloat(localStorage.getItem('subtitle_offset') || '0');
+        this.subtitle_offset = saved_offset;
+        console.log("🕘 LOADED SUBTITLE OFFSET:", saved_offset + "s");
     },
     
     applyUserStyles: function() {

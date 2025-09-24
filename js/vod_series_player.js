@@ -1701,10 +1701,26 @@ var vod_series_player={
                 this.handleMenuLeftRight(-1)
                 break;
             case tvKey.DOWN:
-                this.handleMenuUpDown(1);
+                // DOWN key - Menu down or timing fine adjustment
+                if(keys.focused_part === "subtitle_position_controls") {
+                    // Fine adjustment: Make subtitles appear later (+0.5 seconds)
+                    if(typeof SrtOperation !== 'undefined') {
+                        SrtOperation.adjustSubtitleOffset(0.5);
+                    }
+                } else {
+                    this.handleMenuUpDown(1);
+                }
                 break;
             case tvKey.UP:
-                this.handleMenuUpDown(-1);
+                // UP key - Subtitle position up or timing fine adjustment
+                if(keys.focused_part === "subtitle_position_controls") {
+                    // Fine adjustment: Make subtitles appear earlier (-0.5 seconds)
+                    if(typeof SrtOperation !== 'undefined') {
+                        SrtOperation.adjustSubtitleOffset(-0.5);
+                    }
+                } else {
+                    this.handleMenuUpDown(-1);
+                }
                 break;
             case tvKey.MediaPause:
                 this.playPauseVideo("pause");
@@ -1752,6 +1768,18 @@ var vod_series_player={
                     goHomePageWithMovieType("live-tv");
                 else
                     goHomePageWithMovieType("series");
+                break;
+            case tvKey.RED:
+                // RED key - Make subtitles appear earlier (-2 seconds)
+                if(typeof SrtOperation !== 'undefined') {
+                    SrtOperation.adjustSubtitleOffset(-2.0);
+                }
+                break;
+            case tvKey.GREEN:
+                // GREEN key - Make subtitles appear later (+2 seconds)
+                if(typeof SrtOperation !== 'undefined') {
+                    SrtOperation.adjustSubtitleOffset(2.0);
+                }
                 break;
         }
     }
