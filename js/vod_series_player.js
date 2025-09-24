@@ -63,8 +63,8 @@ var vod_series_player={
         $(this.video_control_doms[2]).addClass('active');
 
         var element=$(this.video_control_doms[2]);
-        $(element).removeClass('fas fa-play')
-        $(element).addClass('fas fa-pause');
+        $(element).removeClass('fa-play')
+        $(element).addClass('fa-pause');
         $(element).data('action_type','pause');
 
         keys.control_bar=2;
@@ -359,8 +359,8 @@ var vod_series_player={
         {
             try{
                 media_player.pause();
-                $(element).removeClass('fas fa-pause')
-                $(element).addClass('fas fa-play');
+                $(element).removeClass('fa-pause')
+                $(element).addClass('fa-play');
                 $(element).data('action_type','play');
             }catch (e) {
             }
@@ -368,16 +368,16 @@ var vod_series_player={
         else if(action_type==='play'){
             try{
                 media_player.play();
-                $(element).removeClass('fas fa-play')
-                $(element).addClass('fas fa-pause');
+                $(element).removeClass('fa-play')
+                $(element).addClass('fa-pause');
                 $(element).data('action_type','pause');
             }catch(e){
             }
         }else if(action_type==='stop'){
             try{
                 media_player.stop();
-                $(element).removeClass('fas fa-play')
-                $(element).addClass('fas fa-pause');
+                $(element).removeClass('fa-play')
+                $(element).addClass('fa-pause');
                 $(element).data('action_type','pause');
             }catch(e){
             }
