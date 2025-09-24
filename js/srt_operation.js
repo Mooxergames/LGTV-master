@@ -263,7 +263,7 @@ var SrtOperation={
     hideSubtitle: function() {
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.html('');
-        // Keep container visible but empty - don't hide it as it may be needed again
+        subtitleContainer.hide(); // Hide the container completely when no subtitles to prevent empty background line
     },
     
     stopOperation: function () {
