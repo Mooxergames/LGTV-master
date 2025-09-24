@@ -360,6 +360,129 @@
     height: auto !important;
 }
 
+/* Live Subtitle Position Overlay */
+#subtitle-position-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.position-control-panel {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 300px;
+    background: rgba(22, 25, 30, 0.95);
+    border: 2px solid #988d8d;
+    border-radius: 10px;
+    padding: 20px;
+    pointer-events: auto;
+    z-index: 2001;
+}
+
+.panel-header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.panel-header h6 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.position-value-display {
+    font-size: 18px;
+    color: #f77b05;
+    margin-bottom: 15px;
+}
+
+.position-controls {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.position-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    min-width: 80px;
+}
+
+.position-button.active,
+.position-button:hover {
+    border-color: #f77b05;
+    background: rgba(247, 123, 5, 0.2);
+    color: #fff;
+}
+
+.position-button i {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.preset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.preset-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    font-size: 14px;
+}
+
+.preset-button.active,
+.preset-button:hover {
+    border-color: #f77b05;
+    background: rgba(247, 123, 5, 0.2);
+    color: #fff;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.position-action-btn {
+    background: #f77b05;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+}
+
+.position-action-btn.active,
+.position-action-btn:hover {
+    background: #e56a04;
+    transform: translateY(-1px);
+}
+
 .modal-operation-menu-type-2 {
     color: #ddd;
     font-size: 35px;
