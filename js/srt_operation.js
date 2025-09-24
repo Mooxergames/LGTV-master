@@ -99,14 +99,14 @@ var SrtOperation={
         }
     },
     showSubtitle: function(text) {
-        // Apply user settings before showing subtitle
-        this.applyUserStyles();
-        
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.html(subtitleHtml);
         subtitleContainer.show(); // Ensure container is visible when showing subtitles
+        
+        // Apply user settings AFTER inserting the HTML so styles apply to new elements
+        this.applyUserStyles();
     },
     
     applyUserStyles: function() {
