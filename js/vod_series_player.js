@@ -1285,6 +1285,13 @@ var vod_series_player={
         }
     },
     
+    getColumnInRow: function(index) {
+        // Calculate column position within the current row (0-based)
+        var row = this.getControlRow(index);
+        var range = this.getRowRange(row);
+        return index - range.start;
+    },
+    
     removeAllActiveClass:function(hide_episode){
         $(this.video_info_doms).removeClass('active');
         $(this.episode_doms).removeClass('active');
@@ -1586,28 +1593,65 @@ var vod_series_player={
             $(buttons[keys.operation_modal]).addClass('active');
         }
         else if(keys.focused_part==="subtitle_position_overlay"){
-            // Navigate vertically between control sections
+            // Navigate vertically between control sections with column awareness
             var currentRow = this.getControlRow(this.positionControlIndex);
+            var currentColumn = this.getColumnInRow(this.positionControlIndex);
             
             if(increment > 0) {
-                // Move down to next row
+                // Move down to next row, maintaining column position when possible
                 switch(currentRow) {
-                    case 'position': this.positionControlIndex = 2; break; // Go to position presets
-                    case 'position_presets': this.positionControlIndex = 6; break; // Go to size
-                    case 'size': this.positionControlIndex = 8; break; // Go to size presets
-                    case 'size_presets': this.positionControlIndex = 12; break; // Go to background
-                    case 'background': this.positionControlIndex = 16; break; // Go to save/cancel
-                    case 'action': this.positionControlIndex = 0; break; // Wrap to position
+                    case 'position': 
+                        // From position (2 cols) to position presets (4 cols)
+                        this.positionControlIndex = 2 + Math.min(currentColumn, 3);
+                        break;
+                    case 'position_presets': 
+                        // From position presets (4 cols) to size (2 cols)
+                        this.positionControlIndex = 6 + Math.min(currentColumn, 1);
+                        break;
+                    case 'size': 
+                        // From size (2 cols) to size presets (4 cols)
+                        this.positionControlIndex = 8 + Math.min(currentColumn, 3);
+                        break;
+                    case 'size_presets': 
+                        // From size presets (4 cols) to background (4 cols)
+                        this.positionControlIndex = 12 + Math.min(currentColumn, 3);
+                        break;
+                    case 'background': 
+                        // From background (4 cols) to action (2 cols)
+                        this.positionControlIndex = 16 + Math.min(currentColumn, 1);
+                        break;
+                    case 'action': 
+                        // Wrap to position, maintain column
+                        this.positionControlIndex = 0 + Math.min(currentColumn, 1);
+                        break;
                 }
             } else {
-                // Move up to previous row
+                // Move up to previous row, maintaining column position when possible
                 switch(currentRow) {
-                    case 'position': this.positionControlIndex = 16; break; // Wrap to save/cancel
-                    case 'position_presets': this.positionControlIndex = 0; break; // Go to position
-                    case 'size': this.positionControlIndex = 2; break; // Go to position presets
-                    case 'size_presets': this.positionControlIndex = 6; break; // Go to size
-                    case 'background': this.positionControlIndex = 8; break; // Go to size presets
-                    case 'action': this.positionControlIndex = 12; break; // Go to background
+                    case 'position': 
+                        // Wrap to action, maintain column
+                        this.positionControlIndex = 16 + Math.min(currentColumn, 1);
+                        break;
+                    case 'position_presets': 
+                        // From position presets (4 cols) to position (2 cols)
+                        this.positionControlIndex = 0 + Math.min(currentColumn, 1);
+                        break;
+                    case 'size': 
+                        // From size (2 cols) to position presets (4 cols)
+                        this.positionControlIndex = 2 + Math.min(currentColumn, 3);
+                        break;
+                    case 'size_presets': 
+                        // From size presets (4 cols) to size (2 cols)
+                        this.positionControlIndex = 6 + Math.min(currentColumn, 1);
+                        break;
+                    case 'background': 
+                        // From background (4 cols) to size presets (4 cols)
+                        this.positionControlIndex = 8 + Math.min(currentColumn, 3);
+                        break;
+                    case 'action': 
+                        // From action (2 cols) to background (4 cols)
+                        this.positionControlIndex = 12 + Math.min(currentColumn, 3);
+                        break;
                 }
             }
             this.hoverPositionControl(this.positionControlIndex);
