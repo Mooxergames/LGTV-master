@@ -107,20 +107,77 @@ var SrtOperation={
     },
     
     applyUserStyles: function() {
-        // Apply user subtitle settings via CSS custom properties
-        if(typeof settings !== 'undefined') {
-            var size = this.getSizeValue(settings.subtitle_size || 'medium');
-            var bgColor = this.getBackgroundValue(settings.subtitle_bg_color || 'black');
-            var textColor = this.getTextColorValue(settings.subtitle_text_color || 'white');
-            var outline = this.getOutlineValue(settings.subtitle_text_color || 'white');
-            
-            document.documentElement.style.setProperty('--subtitle-size', size);
-            document.documentElement.style.setProperty('--subtitle-bg', bgColor);
-            document.documentElement.style.setProperty('--subtitle-color', textColor);
-            document.documentElement.style.setProperty('--subtitle-outline', outline);
-        }
+        // Apply user subtitle settings from localStorage (saved by subtitle settings modal)
+        var position = parseInt(localStorage.getItem('subtitle_position') || '10');
+        var size = parseInt(localStorage.getItem('subtitle_size') || '18');
+        var bgType = localStorage.getItem('subtitle_background') || 'black';
+        
+        // Get background style based on saved setting
+        var backgroundStyle = this.getBackgroundStyleFromType(bgType);
+        
+        // Apply styles directly to subtitle container
+        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
+        subtitleContainer.css({
+            'bottom': position + 'vh',
+            'top': 'auto',
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius
+        });
+        
+        // Also apply to subtitle text elements
+        subtitleContainer.find('.subtitle-text').css({
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius
+        });
     },
     
+    getBackgroundStyleFromType: function(bgType) {
+        switch(bgType) {
+            case 'transparent':
+                return {
+                    background: 'transparent',
+                    color: '#fff',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    padding: '2px 6px',
+                    borderRadius: '0px'
+                };
+            case 'black':
+                return {
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px'
+                };
+            case 'gray':
+                return {
+                    background: 'rgba(128,128,128,0.8)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px'
+                };
+            case 'dark':
+                return {
+                    background: 'rgba(22,25,30,0.9)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '6px'
+                };
+            default:
+                return this.getBackgroundStyleFromType('black');
+        }
+    },
+
     getSizeValue: function(size) {
         var sizes = {
             'small': '18px',
