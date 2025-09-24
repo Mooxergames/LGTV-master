@@ -629,3 +629,124 @@
 .subtitle-action-btn {
     min-width: 120px;
 }
+
+/* Subtitle Position Modal Styling */
+#subtitle-position-modal .modal-content {
+    background: linear-gradient(145deg, #1a1f2e 0%, #16191e 50%, #0f1419 100%);
+    border: 2px solid #2d3748;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+#subtitle-position-preview-container {
+    background: linear-gradient(135deg, #2a2d3a 0%, #212328 100%);
+    border: 2px solid #3d4250;
+    border-radius: 12px;
+    height: 150px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.subtitle-position-preview-background {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #000428 0%, #004e92 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subtitle-position-preview-text {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 16px;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.subtitle-position-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0;
+    gap: 20px;
+}
+
+.position-button {
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.position-button:hover,
+.position-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.position-display {
+    text-align: center;
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 150px;
+}
+
+.position-presets {
+    display: flex;
+    gap: 12px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.preset-button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #cbd5e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: center;
+}
+
+.preset-button:hover,
+.preset-button.active {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-color: #00f2fe;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+}
