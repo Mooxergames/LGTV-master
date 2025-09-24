@@ -797,51 +797,164 @@ var vod_series_player={
         $(subtitle_audio_modal_buttons).removeClass('active');
     },
     
-    renderEnhancedSubtitles: function(kind, subtitles) {
-        // Enhanced subtitle rendering for combined API/Native subtitle list
+    // Subtitle cache per content ID to avoid repeated API calls
+    subtitleCache: {},
+    
+    // Clean old cache entries to prevent memory leaks
+    cleanSubtitleCache: function() {
+        var now = Date.now();
+        var maxAge = 10 * 60 * 1000; // 10 minutes
+        
+        for(var key in this.subtitleCache) {
+            if(this.subtitleCache.hasOwnProperty(key)) {
+                var entry = this.subtitleCache[key];
+                if(now - entry.timestamp > maxAge) {
+                    delete this.subtitleCache[key];
+                }
+            }
+        }
+    },
+    
+    // Get cached subtitles if available
+    getCachedSubtitles: function(contentId) {
+        if(contentId && this.subtitleCache[contentId]) {
+            var entry = this.subtitleCache[contentId];
+            var maxAge = 10 * 60 * 1000; // 10 minutes
+            
+            if(Date.now() - entry.timestamp < maxAge) {
+                return entry;
+            } else {
+                // Remove expired entry
+                delete this.subtitleCache[contentId];
+            }
+        }
+        return null;
+    },
+    
+    // Performance-optimized subtitle rendering with caching
+    renderEnhancedSubtitles: function(kind, subtitles, contentId) {
         var keys = this.keys;
         if(keys.focused_part === 'resume_bar') {
             $('#subtitle-selection-modal').modal('hide');
             return;
         }
         
+        // Check cache first for instant rendering
+        var cachedData = null;
+        if(contentId) {
+            cachedData = this.getCachedSubtitles(contentId);
+            if(cachedData && cachedData.kind === kind) {
+                subtitles = cachedData.subtitles;
+            }
+        }
+        
+        // Cache subtitle data for future reopening
+        if(contentId && subtitles && !cachedData) {
+            // Clean old cache entries periodically
+            this.cleanSubtitleCache();
+            
+            this.subtitleCache[contentId] = {
+                subtitles: subtitles,
+                kind: kind,
+                timestamp: Date.now()
+            };
+        }
+        
+        // Set modal title and state
         if(kind == "TEXT")
             $("#subtitle-modal-title").text("Subtitle");
         else
             $("#subtitle-modal-title").text("Audio Track");
             
         keys.focused_part = "subtitle_audio_selection_modal";
-        $('#subtitle-selection-modal .modal-operation-menu-type-2').removeClass('active');
         
-        // Create enhanced HTML for combined subtitle list
+        // Optimized DOM rendering - build in memory first
+        var container = document.getElementById('subtitle-selection-container');
+        container.style.display = 'none'; // Hide during update to prevent reflow
+        
         var htmlContent = this.makeEnhancedMediaTrackElement(subtitles, kind);
-        $("#subtitle-selection-container").html(htmlContent);
-        $('#subtitle-selection-modal').modal('show');
+        container.innerHTML = htmlContent;
         
-        var subtitle_menus = $('#subtitle-selection-modal .subtitle-option');
-        this.subtitle_audio_menus = subtitle_menus;
-        
-        // Initialize selection state - always default to first option (Off)
-        keys.subtitle_audio_selection_modal = 0;
-        $(subtitle_menus[0]).addClass('active');
-        $(subtitle_menus[0]).find('input').prop('checked', true);
-        
-        // Find and activate currently selected subtitle if any
-        var current_selected_index = kind === "TEXT" ? this.current_subtitle_index : this.current_audio_track_index;
-        if(current_selected_index !== undefined && current_selected_index !== null && 
-           current_selected_index >= 0 && current_selected_index < subtitle_menus.length) {
-            // Clear previous selection
-            $(subtitle_menus).removeClass('active');
-            $(subtitle_menus).find('input').prop('checked', false);
+        // Batch DOM updates in requestAnimationFrame
+        var that = this;
+        requestAnimationFrame(function() {
+            container.style.display = ''; // Show after update
             
-            // Set current selection
-            $(subtitle_menus[current_selected_index]).addClass('active');
-            $(subtitle_menus[current_selected_index]).find('input').prop('checked', true);
-            keys.subtitle_audio_selection_modal = current_selected_index;
-        }
+            // Setup event delegation instead of individual handlers
+            that.setupSubtitleEventDelegation();
+            
+            // Initialize modal with animation
+            $('#subtitle-selection-modal').addClass('show').modal('show');
+            
+            var subtitle_menus = $('.subtitle-option');
+            that.subtitle_audio_menus = subtitle_menus;
+            
+            // Set default selection (Off/None) - batch class updates
+            that.setActiveSubtitleOption(0, subtitle_menus);
+            keys.subtitle_audio_selection_modal = 0;
+            
+            // Find and set current selection if applicable
+            var current_selected_index = kind === "TEXT" ? that.current_subtitle_index : that.current_audio_track_index;
+            
+            if(current_selected_index !== undefined && current_selected_index !== null && 
+               current_selected_index >= 0 && current_selected_index < subtitle_menus.length) {
+                that.setActiveSubtitleOption(current_selected_index, subtitle_menus);
+                keys.subtitle_audio_selection_modal = current_selected_index;
+            }
+        });
+    },
+    
+    // Optimized batch selection update
+    setActiveSubtitleOption: function(index, options) {
+        // Batch DOM updates to minimize reflow
+        var that = this;
+        requestAnimationFrame(function() {
+            options.removeClass('active selected focused');
+            options.find('input').prop('checked', false);
+            
+            if(index >= 0 && index < options.length) {
+                $(options[index]).addClass('active focused');
+                $(options[index]).find('input').prop('checked', true);
+            }
+        });
+    },
+    
+    // Setup event delegation for better performance  
+    setupSubtitleEventDelegation: function() {
+        var that = this;
+        var container = $('#subtitle-selection-container');
         
-        var subtitle_audio_modal_buttons = $('#subtitle-selection-modal .modal-btn-1');
-        $(subtitle_audio_modal_buttons).removeClass('active');
+        // Remove any existing delegation to avoid duplicates
+        container.off('focus mouseenter click', '.subtitle-option');
+        
+        // Use event delegation with proper throttling
+        var lastUpdate = 0;
+        var throttleDelay = 16; // ~60fps
+        
+        container.on('focus mouseenter', '.subtitle-option', function(e) {
+            e.preventDefault();
+            
+            var now = Date.now();
+            if(now - lastUpdate < throttleDelay) {
+                return; // Throttle to 60fps
+            }
+            lastUpdate = now;
+            
+            var index = $('.subtitle-option').index(this);
+            
+            // Use rAF for smooth DOM updates
+            requestAnimationFrame(function() {
+                that.hoverSubtitleAudioModal(index);
+            });
+        });
+        
+        // Handle click events
+        container.on('click', '.subtitle-option', function(e) {
+            e.preventDefault();
+            var index = $('.subtitle-option').index(this);
+            that.hoverSubtitleAudioModal(index);
+            that.confirmSubtitle();
+        });
     },
     showEmptySubtitleMessage: function (kind) {
         $('#subtitle-selection-modal').modal('hide');
@@ -1319,16 +1432,48 @@ var vod_series_player={
         $(this.episode_doms[keys.episode_selection]).addClass('active');
         moveScrollPosition($('#player-seasons-container'),this.episode_doms[keys.episode_selection],'horizontal',false)
     },
-    hoverSubtitleAudioModal:function(index){
-        var keys=this.keys;
-        if(index>=0){
-            keys.subtitle_audio_selection_modal=index;
-            moveScrollPosition($('#subtitle-selection-container'),this.subtitle_audio_menus[index],'vertical',false);
+    // Throttled hover handler for better performance
+    hoverTimeout: null,
+    lastHoveredIndex: -1,
+    
+    hoverSubtitleAudioModal: function(index) {
+        var keys = this.keys;
+        
+        // Skip if same index to avoid unnecessary DOM updates
+        if(index === this.lastHoveredIndex) {
+            return;
         }
-        else
-            keys.subtitle_audio_selection_modal=this.subtitle_audio_menus.length+index;
-        $(this.subtitle_audio_menus).removeClass('active');
-        $(this.subtitle_audio_menus[index]).addClass('active');
+        this.lastHoveredIndex = index;
+        
+        if(index >= 0) {
+            keys.subtitle_audio_selection_modal = index;
+            
+            // Batch DOM updates for better performance
+            var that = this;
+            requestAnimationFrame(function() {
+                if(that.subtitle_audio_menus && that.subtitle_audio_menus.length > 0) {
+                    that.subtitle_audio_menus.removeClass('active focused');
+                    if(index < that.subtitle_audio_menus.length) {
+                        $(that.subtitle_audio_menus[index]).addClass('active focused');
+                        // Only scroll if needed - throttled
+                        moveScrollPosition($('#subtitle-selection-container'), that.subtitle_audio_menus[index], 'vertical', false);
+                    }
+                }
+            });
+        } else {
+            // Handle negative indexes (buttons)
+            keys.subtitle_audio_selection_modal = this.subtitle_audio_menus.length + index;
+            var that = this;
+            requestAnimationFrame(function() {
+                if(that.subtitle_audio_menus) {
+                    that.subtitle_audio_menus.removeClass('active focused');
+                    var targetIndex = that.subtitle_audio_menus.length + index;
+                    if(targetIndex >= 0 && targetIndex < that.subtitle_audio_menus.length) {
+                        $(that.subtitle_audio_menus[targetIndex]).addClass('active focused');
+                    }
+                }
+            });
+        }
     },
     hoverResumeBar:function(index){
         var keys=this.keys;
