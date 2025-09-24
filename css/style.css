@@ -348,6 +348,18 @@
     border-bottom:none !important;
 }
 
+/* Ensure the operation modal shows all options */
+#vod-series-player-operation-modal .modal-body {
+    max-height: none !important;
+    overflow: visible !important;
+    min-height: auto !important;
+}
+
+#vod-series-player-operation-modal .modal-content {
+    min-height: auto !important;
+    height: auto !important;
+}
+
 .modal-operation-menu-type-2 {
     color: #ddd;
     font-size: 35px;
@@ -584,7 +596,7 @@
     display:block !important;
     border: 2px solid #988d8d;
     border-radius: 15px;
-    overflow: hidden;
+    overflow: visible;
     background: #16191E;
 }
 .modal-dialog {
