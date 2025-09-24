@@ -1593,67 +1593,60 @@ var vod_series_player={
             $(buttons[keys.operation_modal]).addClass('active');
         }
         else if(keys.focused_part==="subtitle_position_overlay"){
-            // Navigate vertically between control sections with column awareness
-            var currentRow = this.getControlRow(this.positionControlIndex);
-            var currentColumn = this.getColumnInRow(this.positionControlIndex);
+            // Navigate vertically between control sections
+            var currentIndex = this.positionControlIndex;
+            console.log('Down navigation from index:', currentIndex);
             
             if(increment > 0) {
-                // Move down to next row, maintaining column position when possible
-                switch(currentRow) {
-                    case 'position': 
-                        // From position (2 cols) to position presets (4 cols)
-                        this.positionControlIndex = 2 + Math.min(currentColumn, 3);
-                        break;
-                    case 'position_presets': 
-                        // From position presets (4 cols) to size (2 cols)
-                        this.positionControlIndex = 6 + Math.min(currentColumn, 1);
-                        break;
-                    case 'size': 
-                        // From size (2 cols) to size presets (4 cols)
-                        this.positionControlIndex = 8 + Math.min(currentColumn, 3);
-                        break;
-                    case 'size_presets': 
-                        // From size presets (4 cols) to background (4 cols)
-                        this.positionControlIndex = 12 + Math.min(currentColumn, 3);
-                        break;
-                    case 'background': 
-                        // From background (4 cols) to action (2 cols)
-                        this.positionControlIndex = 16 + Math.min(currentColumn, 1);
-                        break;
-                    case 'action': 
-                        // Wrap to position, maintain column
-                        this.positionControlIndex = 0 + Math.min(currentColumn, 1);
-                        break;
+                // Move down to next row
+                if(currentIndex >= 0 && currentIndex <= 1) {
+                    // From position buttons (0-1) to position presets (2-5)
+                    // Map column: 0->2(bottom), 1->4(center)
+                    this.positionControlIndex = currentIndex === 0 ? 2 : 4;
+                } else if(currentIndex >= 2 && currentIndex <= 5) {
+                    // From position presets (2-5) to size buttons (6-7)
+                    // Map to closest size button
+                    this.positionControlIndex = currentIndex <= 3 ? 6 : 7;
+                } else if(currentIndex >= 6 && currentIndex <= 7) {
+                    // From size buttons (6-7) to size presets (8-11)
+                    // Map column: 6->8(small), 7->10(large)
+                    this.positionControlIndex = currentIndex === 6 ? 8 : 10;
+                } else if(currentIndex >= 8 && currentIndex <= 11) {
+                    // From size presets (8-11) to background (12-15)
+                    // Map directly: 8->12, 9->13, 10->14, 11->15
+                    this.positionControlIndex = 12 + (currentIndex - 8);
+                } else if(currentIndex >= 12 && currentIndex <= 15) {
+                    // From background (12-15) to action buttons (16-17)
+                    // Map to closest action button
+                    this.positionControlIndex = currentIndex <= 13 ? 16 : 17;
+                } else if(currentIndex >= 16 && currentIndex <= 17) {
+                    // Wrap to position buttons
+                    this.positionControlIndex = currentIndex - 16;
                 }
             } else {
-                // Move up to previous row, maintaining column position when possible
-                switch(currentRow) {
-                    case 'position': 
-                        // Wrap to action, maintain column
-                        this.positionControlIndex = 16 + Math.min(currentColumn, 1);
-                        break;
-                    case 'position_presets': 
-                        // From position presets (4 cols) to position (2 cols)
-                        this.positionControlIndex = 0 + Math.min(currentColumn, 1);
-                        break;
-                    case 'size': 
-                        // From size (2 cols) to position presets (4 cols)
-                        this.positionControlIndex = 2 + Math.min(currentColumn, 3);
-                        break;
-                    case 'size_presets': 
-                        // From size presets (4 cols) to size (2 cols)
-                        this.positionControlIndex = 6 + Math.min(currentColumn, 1);
-                        break;
-                    case 'background': 
-                        // From background (4 cols) to size presets (4 cols)
-                        this.positionControlIndex = 8 + Math.min(currentColumn, 3);
-                        break;
-                    case 'action': 
-                        // From action (2 cols) to background (4 cols)
-                        this.positionControlIndex = 12 + Math.min(currentColumn, 3);
-                        break;
+                // Move up to previous row
+                if(currentIndex >= 0 && currentIndex <= 1) {
+                    // Wrap to action buttons
+                    this.positionControlIndex = currentIndex + 16;
+                } else if(currentIndex >= 2 && currentIndex <= 5) {
+                    // From position presets to position buttons
+                    this.positionControlIndex = currentIndex <= 3 ? 0 : 1;
+                } else if(currentIndex >= 6 && currentIndex <= 7) {
+                    // From size buttons to position presets
+                    this.positionControlIndex = currentIndex === 6 ? 2 : 4;
+                } else if(currentIndex >= 8 && currentIndex <= 11) {
+                    // From size presets to size buttons
+                    this.positionControlIndex = currentIndex <= 9 ? 6 : 7;
+                } else if(currentIndex >= 12 && currentIndex <= 15) {
+                    // From background to size presets
+                    this.positionControlIndex = 8 + (currentIndex - 12);
+                } else if(currentIndex >= 16 && currentIndex <= 17) {
+                    // From action buttons to background
+                    this.positionControlIndex = currentIndex === 16 ? 12 : 14;
                 }
             }
+            
+            console.log('New index after down navigation:', this.positionControlIndex);
             this.hoverPositionControl(this.positionControlIndex);
         }
         if(keys.focused_part==="subtitle_audio_selection_modal"){
