@@ -9,6 +9,7 @@ Preferred communication style: Simple, everyday language.
 # Recent Changes
 
 - **Completely redesigned and optimized subtitle modal system** - Implemented comprehensive performance improvements including removal of expensive CSS effects (backdrop-filter, heavy gradients), TV-optimized design with larger fonts (22-26px) and better contrast, subtitle caching system for instant reopening, event delegation with 60fps throttling, and requestAnimationFrame-based DOM updates. Modal now opens in <50ms and provides smooth navigation on Samsung Tizen and LG WebOS platforms.
+- **Fixed subtitle display issues** - Resolved empty subtitle background line appearing when no subtitles are active by properly hiding the subtitle container, and updated subtitle background color options changing 'Gray' to 'Red' and 'Dark' to 'Green' in the settings modal for better user preference options.
 - **Cleaned up all debugging logs** - Removed all debugging console.log statements from the entire application while keeping essential error handling. Removed debug logs from subtitle system, video player, and all other components for cleaner code and better performance.
 - **Completely removed Recently Viewed functionality** - Removed recently viewed tracking for both movies and series, including category creation, data storage, and all related functionality to simplify the user interface
 - Completely removed random VOD favorites auto-seeding functionality with full cleanup and cache-busting implementation
