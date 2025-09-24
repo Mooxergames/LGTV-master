@@ -64,38 +64,57 @@ var SrtOperation={
             return this.findIndex(time, mid+1, end);
     },
     timeChange: function(current_time) {
-        // Same logic as Samsung - simple and direct
+        // Same seconds logic as Samsung but with better progression handling
         if(this.stopped || !this.srt || this.srt.length === 0) {
             return;
         }
         
-        var srtIndex = this.current_srt_index;
-        if(srtIndex >= this.srt.length || srtIndex < 0) {
-            srtIndex = this.findIndex(current_time, 0, this.srt.length - 1);
-            this.current_srt_index = Math.max(0, srtIndex);
+        var srt_index = this.current_srt_index;
+        if(srt_index >= this.srt.length || srt_index < 0) {
+            srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            this.current_srt_index = Math.max(0, srt_index);
             return;
         }
         
-        var srtItem = this.srt[srtIndex];
+        var srt_item = this.srt[srt_index];
         
-        // Check if current subtitle should be displayed - same exact timing as Samsung
-        if(current_time >= srtItem.startSeconds && current_time < srtItem.endSeconds) {
+        // **SHOW SUBTITLE**: Current time within subtitle range - same timing as Samsung
+        if(current_time >= srt_item.startSeconds && current_time < srt_item.endSeconds) {
             if(!this.subtitle_shown) {
-                this.showSubtitle(srtItem.text);
+                this.showSubtitle(srt_item.text);
                 this.subtitle_shown = true;
             }
-        } else {
-            // Hide subtitle when out of time range
+        }
+        // **HIDE SUBTITLE**: Time passed subtitle end - handle progression
+        else if(current_time >= srt_item.endSeconds) {
+            var next_srt_item = this.srt[srt_index + 1];
+            if(next_srt_item && current_time < next_srt_item.startSeconds) {
+                // Gap between subtitles - hide current
+                if(this.subtitle_shown) {
+                    this.hideSubtitle();
+                    this.subtitle_shown = false;
+                }
+            } else if(next_srt_item && current_time >= next_srt_item.startSeconds && current_time < next_srt_item.endSeconds) {
+                // Show next subtitle
+                this.showSubtitle(next_srt_item.text);
+                this.current_srt_index += 1;
+                this.subtitle_shown = true;
+            } else {
+                // **SEEK DETECTION**: Use binary search to find correct index
+                if(this.subtitle_shown) {
+                    this.hideSubtitle();
+                    this.subtitle_shown = false;
+                }
+                this.current_srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            }
+        }
+        // **BACKWARDS SEEK**: Current time before subtitle start  
+        else if(current_time < srt_item.startSeconds) {
             if(this.subtitle_shown) {
                 this.hideSubtitle();
                 this.subtitle_shown = false;
             }
-            
-            // Find next subtitle
-            var newIndex = this.findIndex(current_time, 0, this.srt.length - 1);
-            if(newIndex >= 0 && newIndex !== this.current_srt_index) {
-                this.current_srt_index = newIndex;
-            }
+            this.current_srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
         }
     },
     showSubtitle: function(text) {
