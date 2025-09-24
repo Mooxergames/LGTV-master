@@ -6,6 +6,10 @@ var SrtOperation={
     stopped:false,
     subtitle_shown:false,
     init: function (subtitle, current_time) {
+        console.log("🎬 SUBTITLE DEBUG: === INITIALIZATION STARTED ===");
+        console.log("🎬 SUBTITLE DEBUG: Current video time:", current_time);
+        console.log("🎬 SUBTITLE DEBUG: Subtitle data:", subtitle ? "Available" : "Missing");
+        
         // Same seconds logic as Samsung - simple and direct
         // Clear existing subtitles
         $('#' + media_player.parent_id).find('.subtitle-container').html('');
@@ -15,10 +19,16 @@ var SrtOperation={
         var srt = [];
         if(subtitle && subtitle.content) {
             try {
+                console.log("🎬 SUBTITLE DEBUG: Parsing SRT content...");
                 SrtParser.init();
                 srt = SrtParser.fromSrt(subtitle.content);
+                console.log("🎬 SUBTITLE DEBUG: SRT parsed successfully, total subtitles:", srt.length);
+                if(srt.length > 0) {
+                    console.log("🎬 SUBTITLE DEBUG: First subtitle:", srt[0]);
+                    console.log("🎬 SUBTITLE DEBUG: Last subtitle:", srt[srt.length - 1]);
+                }
             } catch(e) {
-                console.error('SRT parsing error:', e);
+                console.error('🎬 SUBTITLE DEBUG: SRT parsing error:', e);
             }
         }
         
@@ -28,15 +38,23 @@ var SrtOperation={
             // Find starting subtitle index using binary search - same as Samsung
             this.current_srt_index = this.findIndex(current_time, 0, srt.length - 1);
             if(this.current_srt_index < 0) this.current_srt_index = 0;
-            console.log("SRT initialized - found index:", this.current_srt_index, "for time:", current_time);
+            
+            console.log("🎬 SUBTITLE DEBUG: Binary search result:");
+            console.log("🎬 SUBTITLE DEBUG: - Found index:", this.current_srt_index);
+            console.log("🎬 SUBTITLE DEBUG: - Video time:", current_time);
+            if(srt[this.current_srt_index]) {
+                console.log("🎬 SUBTITLE DEBUG: - Current subtitle:", srt[this.current_srt_index]);
+                console.log("🎬 SUBTITLE DEBUG: - Time range:", srt[this.current_srt_index].startSeconds, "to", srt[this.current_srt_index].endSeconds);
+            }
         } else {
             this.stopped = true;
-            console.log("No subtitles available or parsing failed");
+            console.log("🎬 SUBTITLE DEBUG: No subtitles available or parsing failed");
         }
         this.next_srt_time = 0;
         
         // Apply global subtitle settings immediately after initialization
         this.applyUserStyles();
+        console.log("🎬 SUBTITLE DEBUG: === INITIALIZATION COMPLETED ===");
     },
     findIndex: function (time,start, end) {  // we will use binary search algorithm here
         if(time==0)
@@ -64,60 +82,83 @@ var SrtOperation={
             return this.findIndex(time, mid+1, end);
     },
     timeChange: function(current_time) {
-        // Same seconds logic as Samsung but with better progression handling
+        // Same seconds logic as Samsung but with better progression handling + DEBUG
         if(this.stopped || !this.srt || this.srt.length === 0) {
+            console.log("🕐 SUBTITLE SYNC: Stopped or no subtitles available");
             return;
         }
         
         var srt_index = this.current_srt_index;
         if(srt_index >= this.srt.length || srt_index < 0) {
+            console.log("🕐 SUBTITLE SYNC: Invalid index, searching...", {index: srt_index, length: this.srt.length});
             srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
             this.current_srt_index = Math.max(0, srt_index);
             return;
         }
         
         var srt_item = this.srt[srt_index];
+        console.log("🕐 SUBTITLE SYNC:", {
+            video_time: current_time,
+            current_index: srt_index,
+            subtitle_start: srt_item.startSeconds,
+            subtitle_end: srt_item.endSeconds,
+            subtitle_text: srt_item.text.substring(0, 30) + "...",
+            currently_shown: this.subtitle_shown
+        });
         
         // **SHOW SUBTITLE**: Current time within subtitle range - same timing as Samsung
         if(current_time >= srt_item.startSeconds && current_time < srt_item.endSeconds) {
+            console.log("🕐 SUBTITLE SYNC: ✅ Time within range - should show subtitle");
             if(!this.subtitle_shown) {
+                console.log("🕐 SUBTITLE SYNC: 🎯 Showing subtitle:", srt_item.text);
                 this.showSubtitle(srt_item.text);
                 this.subtitle_shown = true;
             }
         }
         // **HIDE SUBTITLE**: Time passed subtitle end - handle progression
         else if(current_time >= srt_item.endSeconds) {
+            console.log("🕐 SUBTITLE SYNC: ⏭️ Time past subtitle end, checking next...");
             var next_srt_item = this.srt[srt_index + 1];
+            
             if(next_srt_item && current_time < next_srt_item.startSeconds) {
                 // Gap between subtitles - hide current
+                console.log("🕐 SUBTITLE SYNC: 📝 In gap between subtitles - hiding");
                 if(this.subtitle_shown) {
                     this.hideSubtitle();
                     this.subtitle_shown = false;
                 }
             } else if(next_srt_item && current_time >= next_srt_item.startSeconds && current_time < next_srt_item.endSeconds) {
                 // Show next subtitle
+                console.log("🕐 SUBTITLE SYNC: ⏭️ Moving to next subtitle:", next_srt_item.text);
                 this.showSubtitle(next_srt_item.text);
                 this.current_srt_index += 1;
                 this.subtitle_shown = true;
             } else {
                 // **SEEK DETECTION**: Use binary search to find correct index
+                console.log("🕐 SUBTITLE SYNC: 🔍 SEEK DETECTED - searching for correct position");
                 if(this.subtitle_shown) {
                     this.hideSubtitle();
                     this.subtitle_shown = false;
                 }
-                this.current_srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
+                var new_index = this.findIndex(current_time, 0, this.srt.length - 1);
+                console.log("🕐 SUBTITLE SYNC: 🔍 Search result: index", new_index);
+                this.current_srt_index = new_index;
             }
         }
         // **BACKWARDS SEEK**: Current time before subtitle start  
         else if(current_time < srt_item.startSeconds) {
+            console.log("🕐 SUBTITLE SYNC: ⏪ BACKWARD SEEK DETECTED");
             if(this.subtitle_shown) {
                 this.hideSubtitle();
                 this.subtitle_shown = false;
             }
-            this.current_srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            var new_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            console.log("🕐 SUBTITLE SYNC: ⏪ Backward search result: index", new_index);
+            this.current_srt_index = new_index;
         }
     },
     showSubtitle: function(text) {
+        console.log("🎯 SUBTITLE SHOW: Displaying subtitle:", text);
         // Enhanced subtitle display with better formatting
         var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
@@ -126,6 +167,7 @@ var SrtOperation={
         
         // Apply user settings AFTER inserting the HTML so styles apply to new elements
         this.applyUserStyles();
+        console.log("🎯 SUBTITLE SHOW: Subtitle displayed and styled");
     },
     
     applyUserStyles: function() {
@@ -243,6 +285,7 @@ var SrtOperation={
     },
     
     hideSubtitle: function() {
+        console.log("🚫 SUBTITLE HIDE: Hiding subtitle");
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.html('');
         // Keep container visible but empty - don't hide it as it may be needed again

@@ -250,11 +250,24 @@ function initPlayer() {
                     },
                     oncurrentplaytime: function(currentTime) {
                         that.current_time=currentTime;
+                        var currentTimeSeconds = currentTime/1000;
+                        
+                        // DEBUG: Log every 1 second to avoid spam
+                        if(Math.floor(currentTimeSeconds) !== Math.floor(that.last_debug_time || 0)) {
+                            console.log("📺 VIDEO TIME UPDATE:", {
+                                currentTime: currentTimeSeconds,
+                                currentTimeMs: currentTime,
+                                route: current_route,
+                                platform: "Samsung Tizen"
+                            });
+                            that.last_debug_time = currentTimeSeconds;
+                        }
+                        
                         if(current_route==='vod-series-player-video') {
-                            vod_series_player.current_time=currentTime/1000;
+                            vod_series_player.current_time=currentTimeSeconds;
                             // Samsung subtitle timing - convert ms to seconds
                             if(typeof SrtOperation !== 'undefined') {
-                                SrtOperation.timeChange(currentTime/1000);
+                                SrtOperation.timeChange(currentTimeSeconds);
                             }
                         }
                         $('#'+that.parent_id).find('.video-error').hide();
@@ -474,6 +487,18 @@ function initPlayer() {
                     $('#'+that.parent_id).find('.video-error').hide();
                     var duration =  videoObj.duration;
                     var currentTime=videoObj.currentTime;
+                    
+                    // DEBUG: Log every 1 second to avoid spam
+                    if(Math.floor(currentTime) !== Math.floor(that.last_debug_time || 0)) {
+                        console.log("📺 VIDEO TIME UPDATE:", {
+                            currentTime: currentTime,
+                            duration: duration,
+                            route: current_route,
+                            platform: "LG WebOS"
+                        });
+                        that.last_debug_time = currentTime;
+                    }
+                    
                     if(current_route==='vod-series-player-video') {
                         // Use same seconds logic as Samsung - store original time
                         that.current_time=currentTime;
