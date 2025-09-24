@@ -1058,12 +1058,19 @@ var vod_series_player={
             this.currentSubtitlePosition = Math.max(-5, this.currentSubtitlePosition - step);
         }
         
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
+        
         this.applyLiveSubtitleStyles();
         this.updateAllDisplays();
     },
     
     setSubtitlePosition: function(position) {
         this.currentSubtitlePosition = parseInt(position);
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
+        
         this.applyLiveSubtitleStyles();
         this.updateAllDisplays();
     },
@@ -1076,18 +1083,29 @@ var vod_series_player={
             this.currentSubtitleSize = Math.max(10, this.currentSubtitleSize - step);
         }
         
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_size', this.currentSubtitleSize);
+        
         this.applyLiveSubtitleStyles();
         this.updateAllDisplays();
     },
     
     setSubtitleSize: function(size) {
         this.currentSubtitleSize = parseInt(size);
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_size', this.currentSubtitleSize);
+        
         this.applyLiveSubtitleStyles();
         this.updateAllDisplays();
     },
     
     setSubtitleBackground: function(bgType) {
         this.currentSubtitleBackground = bgType;
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_background', this.currentSubtitleBackground);
+        
         this.applyLiveSubtitleStyles();
         this.updateAllDisplays();
     },
@@ -1207,16 +1225,11 @@ var vod_series_player={
     },
     
     saveSubtitlePosition: function() {
-        // Save all subtitle settings to localStorage
-        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
-        localStorage.setItem('subtitle_size', this.currentSubtitleSize);
-        localStorage.setItem('subtitle_background', this.currentSubtitleBackground);
-        
-        // Close overlay and return to player
+        // Settings are already auto-saved, just close overlay and confirm global save
         $('#subtitle-position-overlay').hide();
         this.keys.focused_part = "control_bar";
         
-        showToast("Success", "Subtitle settings saved!");
+        showToast("Success", "Subtitle settings saved globally!");
     },
     
     cancelSubtitlePosition: function() {

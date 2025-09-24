@@ -34,6 +34,9 @@ var SrtOperation={
             console.log("No subtitles available or parsing failed");
         }
         this.next_srt_time = 0;
+        
+        // Apply global subtitle settings immediately after initialization
+        this.applyUserStyles();
     },
     findIndex: function (time,start, end) {  // we will use binary search algorithm here
         if(time==0)
