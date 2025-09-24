@@ -1489,10 +1489,28 @@ var vod_series_player={
             this.hoverSubtitleAudioModal(keys.subtitle_audio_selection_modal);
         }
         if(keys.focused_part==="subtitle_position_overlay"){
-            // Disable left/right navigation in subtitle modal - only vertical navigation allowed
-            // This prevents interference with down/up navigation
-            console.log('Left/Right navigation disabled in subtitle modal');
-            return;
+            // Navigate horizontally within the same control row
+            var currentRow = this.getControlRow(this.positionControlIndex);
+            var rowRange = this.getRowRange(currentRow);
+            
+            if(increment>0) {
+                // Move right within same row
+                if(this.positionControlIndex < rowRange.end) {
+                    this.positionControlIndex++;
+                } else {
+                    // Wrap to start of row
+                    this.positionControlIndex = rowRange.start;
+                }
+            } else {
+                // Move left within same row
+                if(this.positionControlIndex > rowRange.start) {
+                    this.positionControlIndex--;
+                } else {
+                    // Wrap to end of row
+                    this.positionControlIndex = rowRange.end;
+                }
+            }
+            this.hoverPositionControl(this.positionControlIndex);
         }
     },
     handleMenuUpDown:function(increment){
@@ -1575,17 +1593,60 @@ var vod_series_player={
             $(buttons[keys.operation_modal]).addClass('active');
         }
         else if(keys.focused_part==="subtitle_position_overlay"){
-            // Simple linear navigation - down goes to next item in sequence
-            var maxIndex = 17; // 0-17 total controls
-            this.positionControlIndex += increment;
+            // Navigate vertically between control sections
+            var currentIndex = this.positionControlIndex;
+            console.log('Down navigation from index:', currentIndex);
             
-            // Wrap around if needed
-            if(this.positionControlIndex < 0)
-                this.positionControlIndex = maxIndex;
-            if(this.positionControlIndex > maxIndex)
-                this.positionControlIndex = 0;
-                
-            console.log('Linear navigation to index:', this.positionControlIndex);
+            if(increment > 0) {
+                // Move down to next row
+                if(currentIndex >= 0 && currentIndex <= 1) {
+                    // From position buttons (0-1) to position presets (2-5)
+                    // Map column: 0->2(bottom), 1->4(center)
+                    this.positionControlIndex = currentIndex === 0 ? 2 : 4;
+                } else if(currentIndex >= 2 && currentIndex <= 5) {
+                    // From position presets (2-5) to size buttons (6-7)
+                    // Map to closest size button
+                    this.positionControlIndex = currentIndex <= 3 ? 6 : 7;
+                } else if(currentIndex >= 6 && currentIndex <= 7) {
+                    // From size buttons (6-7) to size presets (8-11)
+                    // Map column: 6->8(small), 7->10(large)
+                    this.positionControlIndex = currentIndex === 6 ? 8 : 10;
+                } else if(currentIndex >= 8 && currentIndex <= 11) {
+                    // From size presets (8-11) to background (12-15)
+                    // Map directly: 8->12, 9->13, 10->14, 11->15
+                    this.positionControlIndex = 12 + (currentIndex - 8);
+                } else if(currentIndex >= 12 && currentIndex <= 15) {
+                    // From background (12-15) to action buttons (16-17)
+                    // Map to closest action button
+                    this.positionControlIndex = currentIndex <= 13 ? 16 : 17;
+                } else if(currentIndex >= 16 && currentIndex <= 17) {
+                    // Wrap to position buttons
+                    this.positionControlIndex = currentIndex - 16;
+                }
+            } else {
+                // Move up to previous row
+                if(currentIndex >= 0 && currentIndex <= 1) {
+                    // Wrap to action buttons
+                    this.positionControlIndex = currentIndex + 16;
+                } else if(currentIndex >= 2 && currentIndex <= 5) {
+                    // From position presets to position buttons
+                    this.positionControlIndex = currentIndex <= 3 ? 0 : 1;
+                } else if(currentIndex >= 6 && currentIndex <= 7) {
+                    // From size buttons to position presets
+                    this.positionControlIndex = currentIndex === 6 ? 2 : 4;
+                } else if(currentIndex >= 8 && currentIndex <= 11) {
+                    // From size presets to size buttons
+                    this.positionControlIndex = currentIndex <= 9 ? 6 : 7;
+                } else if(currentIndex >= 12 && currentIndex <= 15) {
+                    // From background to size presets
+                    this.positionControlIndex = 8 + (currentIndex - 12);
+                } else if(currentIndex >= 16 && currentIndex <= 17) {
+                    // From action buttons to background
+                    this.positionControlIndex = currentIndex === 16 ? 12 : 14;
+                }
+            }
+            
+            console.log('New index after down navigation:', this.positionControlIndex);
             this.hoverPositionControl(this.positionControlIndex);
         }
         if(keys.focused_part==="subtitle_audio_selection_modal"){
