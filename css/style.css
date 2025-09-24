@@ -374,9 +374,11 @@
 
 .position-control-panel {
     position: absolute;
-    top: 50px;
-    right: 50px;
-    width: 300px;
+    top: 30px;
+    right: 30px;
+    width: 350px;
+    max-height: 90vh;
+    overflow-y: auto;
     background: rgba(22, 25, 30, 0.95);
     border: 2px solid #988d8d;
     border-radius: 10px;
@@ -397,10 +399,30 @@
     color: #fff;
 }
 
-.position-value-display {
-    font-size: 18px;
+.current-values {
+    font-size: 16px;
     color: #f77b05;
     margin-bottom: 15px;
+    text-align: center;
+}
+
+.control-section {
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.control-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.control-section h7 {
+    display: block;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 .position-controls {
@@ -481,6 +503,72 @@
 .position-action-btn:hover {
     background: #e56a04;
     transform: translateY(-1px);
+}
+
+/* Size Controls */
+.size-controls {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.size-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    min-width: 80px;
+}
+
+.size-button.active,
+.size-button:hover {
+    border-color: #f77b05;
+    background: rgba(247, 123, 5, 0.2);
+    color: #fff;
+}
+
+.size-button i {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.size-presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* Background Controls */
+.background-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.bg-color-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    font-size: 14px;
+}
+
+.bg-color-button.active,
+.bg-color-button:hover {
+    border-color: #f77b05;
+    background: rgba(247, 123, 5, 0.2);
+    color: #fff;
 }
 
 .modal-operation-menu-type-2 {
