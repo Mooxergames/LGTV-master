@@ -1262,6 +1262,29 @@ var vod_series_player={
         }
     },
     
+    // Helper functions for 2D navigation in subtitle position overlay
+    getControlRow: function(index) {
+        if(index >= 0 && index <= 1) return 'position'; // Position up/down
+        if(index >= 2 && index <= 5) return 'position_presets'; // Position presets (bottom, middle, center, upper)
+        if(index >= 6 && index <= 7) return 'size'; // Size larger/smaller
+        if(index >= 8 && index <= 11) return 'size_presets'; // Size presets (small, medium, large, extra-large)
+        if(index >= 12 && index <= 15) return 'background'; // Background options
+        if(index >= 16 && index <= 17) return 'action'; // Save/Cancel buttons
+        return 'position'; // Default fallback
+    },
+    
+    getRowRange: function(row) {
+        switch(row) {
+            case 'position': return { start: 0, end: 1 };
+            case 'position_presets': return { start: 2, end: 5 };
+            case 'size': return { start: 6, end: 7 };
+            case 'size_presets': return { start: 8, end: 11 };
+            case 'background': return { start: 12, end: 15 };
+            case 'action': return { start: 16, end: 17 };
+            default: return { start: 0, end: 1 };
+        }
+    },
+    
     removeAllActiveClass:function(hide_episode){
         $(this.video_info_doms).removeClass('active');
         $(this.episode_doms).removeClass('active');
@@ -1459,11 +1482,26 @@ var vod_series_player={
             this.hoverSubtitleAudioModal(keys.subtitle_audio_selection_modal);
         }
         if(keys.focused_part==="subtitle_position_overlay"){
-            // Navigate horizontally between all controls
+            // Navigate horizontally within the same control row
+            var currentRow = this.getControlRow(this.positionControlIndex);
+            var rowRange = this.getRowRange(currentRow);
+            
             if(increment>0) {
-                this.positionControlIndex = Math.min(17, this.positionControlIndex + 1);
+                // Move right within same row
+                if(this.positionControlIndex < rowRange.end) {
+                    this.positionControlIndex++;
+                } else {
+                    // Wrap to start of row
+                    this.positionControlIndex = rowRange.start;
+                }
             } else {
-                this.positionControlIndex = Math.max(0, this.positionControlIndex - 1);
+                // Move left within same row
+                if(this.positionControlIndex > rowRange.start) {
+                    this.positionControlIndex--;
+                } else {
+                    // Wrap to end of row
+                    this.positionControlIndex = rowRange.end;
+                }
             }
             this.hoverPositionControl(this.positionControlIndex);
         }
@@ -1548,13 +1586,30 @@ var vod_series_player={
             $(buttons[keys.operation_modal]).addClass('active');
         }
         else if(keys.focused_part==="subtitle_position_overlay"){
-            // Navigate vertically through all control sections
-            var maxIndex = 17; // 0-1: position, 2-5: position presets, 6-7: size, 8-11: size presets, 12-15: background, 16-17: save/cancel
-            this.positionControlIndex += increment;
-            if(this.positionControlIndex < 0)
-                this.positionControlIndex = maxIndex;
-            if(this.positionControlIndex > maxIndex)
-                this.positionControlIndex = 0;
+            // Navigate vertically between control sections
+            var currentRow = this.getControlRow(this.positionControlIndex);
+            
+            if(increment > 0) {
+                // Move down to next row
+                switch(currentRow) {
+                    case 'position': this.positionControlIndex = 2; break; // Go to position presets
+                    case 'position_presets': this.positionControlIndex = 6; break; // Go to size
+                    case 'size': this.positionControlIndex = 8; break; // Go to size presets
+                    case 'size_presets': this.positionControlIndex = 12; break; // Go to background
+                    case 'background': this.positionControlIndex = 16; break; // Go to save/cancel
+                    case 'action': this.positionControlIndex = 0; break; // Wrap to position
+                }
+            } else {
+                // Move up to previous row
+                switch(currentRow) {
+                    case 'position': this.positionControlIndex = 16; break; // Wrap to save/cancel
+                    case 'position_presets': this.positionControlIndex = 0; break; // Go to position
+                    case 'size': this.positionControlIndex = 2; break; // Go to position presets
+                    case 'size_presets': this.positionControlIndex = 6; break; // Go to size
+                    case 'background': this.positionControlIndex = 8; break; // Go to size presets
+                    case 'action': this.positionControlIndex = 12; break; // Go to background
+                }
+            }
             this.hoverPositionControl(this.positionControlIndex);
         }
         if(keys.focused_part==="subtitle_audio_selection_modal"){
