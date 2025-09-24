@@ -208,7 +208,6 @@ var EnhancedSubtitleWorkflow = {
             return;
         }
         
-        console.log('Loading API subtitle:', subtitleUrl);
         
         if(loadingCallback) loadingCallback();
         

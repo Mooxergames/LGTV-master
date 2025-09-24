@@ -43,7 +43,6 @@ var vod_series_player={
     fw_timer:null,
     current_movie_type:'',
     init:function(movie,movie_type,back_url ){
-        console.log(movie);
         this.last_key_time=0;
         this.video_duration=0;
         var that=this;
@@ -256,7 +255,6 @@ var vod_series_player={
             if(duration-current_time>=dt){
                 if(this.current_movie_type==='movies')
                 {
-                    console.log("here save current time", movie, current_time);
                     VodModel.saveVideoTime(movie,current_time);
                 }
                 if(this.current_movie_type==='series')
@@ -288,7 +286,6 @@ var vod_series_player={
                     SeriesModel.removeVideoTime(movie.id);
             }
         }catch (e) {
-            console.log("here saving video time error",e);
         }
     },
     goBack:function(){
@@ -319,7 +316,6 @@ var vod_series_player={
                     search_page.hoverMovie(search_page.keys.hor_keys[1],1);
                 }
                 if(this.back_url==='storage-page') {
-                    console.log('here');
                     $('#storage-page').show();
                     storage_page.hoverMenuItem(storage_page.keys.menu_selection);
                 }
@@ -968,18 +964,15 @@ var vod_series_player={
             this.current_subtitle_index=$('#subtitle-selection-modal').find('input[type=radio]:checked').val();
             var selectedIndex = parseInt(this.current_subtitle_index);
             
-            console.log('Selected subtitle index:', selectedIndex);
             
             // Use enhanced subtitle workflow for selection
             var that = this;
             EnhancedSubtitleWorkflow.selectSubtitle(selectedIndex,
                 function() {
                     // Loading callback
-                    console.log('Loading subtitle...');
                 },
                 function() {
                     // Success callback
-                    console.log('Subtitle loaded successfully');
                     $("#vod-series-player-page").find('.subtitle-container').css({visibility:'visible'});
                 },
                 function(error) {
@@ -997,7 +990,6 @@ var vod_series_player={
             }catch(e){
                 console.error('Audio track selection error:', e);
             }
-            console.log('Selected audio track:', this.current_audio_track_index);
         }
     },
     
