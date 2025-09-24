@@ -121,12 +121,15 @@ var SrtOperation={
             var next_srt_item = this.srt[srt_index + 1];
             
             if(next_srt_item && current_time < next_srt_item.startSeconds) {
-                // Gap between subtitles - hide current
-                console.log("🕐 SUBTITLE SYNC: 📝 In gap between subtitles - hiding");
+                // Gap between subtitles - hide current and advance index
+                console.log("🕐 SUBTITLE SYNC: 📝 In gap between subtitles - hiding and advancing index");
                 if(this.subtitle_shown) {
                     this.hideSubtitle();
                     this.subtitle_shown = false;
                 }
+                // FIX: Advance to next subtitle index to avoid getting stuck
+                this.current_srt_index = srt_index + 1;
+                console.log("🕐 SUBTITLE SYNC: 🔧 Advanced index to:", this.current_srt_index);
             } else if(next_srt_item && current_time >= next_srt_item.startSeconds && current_time < next_srt_item.endSeconds) {
                 // Show next subtitle
                 console.log("🕐 SUBTITLE SYNC: ⏭️ Moving to next subtitle:", next_srt_item.text);
