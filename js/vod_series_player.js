@@ -1489,27 +1489,49 @@ var vod_series_player={
             this.hoverSubtitleAudioModal(keys.subtitle_audio_selection_modal);
         }
         if(keys.focused_part==="subtitle_position_overlay"){
-            // Navigate horizontally within the same control row
-            var currentRow = this.getControlRow(this.positionControlIndex);
-            var rowRange = this.getRowRange(currentRow);
+            // Simple horizontal navigation within rows
+            var maxIndex = 17; // 0-17 total controls
             
-            if(increment>0) {
-                // Move right within same row
-                if(this.positionControlIndex < rowRange.end) {
-                    this.positionControlIndex++;
-                } else {
-                    // Wrap to start of row
-                    this.positionControlIndex = rowRange.start;
-                }
-            } else {
-                // Move left within same row
-                if(this.positionControlIndex > rowRange.start) {
-                    this.positionControlIndex--;
-                } else {
-                    // Wrap to end of row
-                    this.positionControlIndex = rowRange.end;
+            // Define row boundaries for horizontal navigation
+            var rowRanges = [
+                {start: 0, end: 1},   // Position buttons: Up, Down
+                {start: 2, end: 5},   // Position presets: Bottom, Middle, Center, Upper  
+                {start: 6, end: 7},   // Size buttons: Smaller, Larger
+                {start: 8, end: 11},  // Size presets: Small, Normal, Large, Extra-Large
+                {start: 12, end: 15}, // Background: None, Black, Gray, Dark
+                {start: 16, end: 17}  // Actions: Save, Cancel
+            ];
+            
+            // Find current row
+            var currentRow = null;
+            for(var i = 0; i < rowRanges.length; i++) {
+                if(this.positionControlIndex >= rowRanges[i].start && this.positionControlIndex <= rowRanges[i].end) {
+                    currentRow = rowRanges[i];
+                    break;
                 }
             }
+            
+            if(currentRow) {
+                if(increment > 0) {
+                    // Move right within same row
+                    if(this.positionControlIndex < currentRow.end) {
+                        this.positionControlIndex++;
+                    } else {
+                        // Wrap to start of row
+                        this.positionControlIndex = currentRow.start;
+                    }
+                } else {
+                    // Move left within same row  
+                    if(this.positionControlIndex > currentRow.start) {
+                        this.positionControlIndex--;
+                    } else {
+                        // Wrap to end of row
+                        this.positionControlIndex = currentRow.end;
+                    }
+                }
+            }
+            
+            console.log('Horizontal navigation to index:', this.positionControlIndex);
             this.hoverPositionControl(this.positionControlIndex);
         }
     },
