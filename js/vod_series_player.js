@@ -1598,50 +1598,52 @@ var vod_series_player={
             var currentIndex = this.positionControlIndex;
             
             if(increment > 0) {
-                // Down navigation follows specific path
+                // Down navigation follows exact path: up→bottom→center→smaller→small→large→none→gray→save
                 switch(currentIndex) {
-                    case 0: this.positionControlIndex = 2; break; // up -> bottom
-                    case 1: this.positionControlIndex = 4; break; // down -> center
-                    case 2: this.positionControlIndex = 6; break; // bottom -> smaller
-                    case 3: this.positionControlIndex = 6; break; // middle -> smaller  
-                    case 4: this.positionControlIndex = 6; break; // center -> smaller
-                    case 5: this.positionControlIndex = 7; break; // upper -> larger
-                    case 6: this.positionControlIndex = 8; break; // smaller -> small
-                    case 7: this.positionControlIndex = 10; break; // larger -> large
-                    case 8: this.positionControlIndex = 12; break; // small -> none
-                    case 9: this.positionControlIndex = 12; break; // normal -> none
-                    case 10: this.positionControlIndex = 14; break; // large -> gray
-                    case 11: this.positionControlIndex = 15; break; // extra-large -> dark
-                    case 12: this.positionControlIndex = 16; break; // none -> save
-                    case 13: this.positionControlIndex = 16; break; // black -> save
-                    case 14: this.positionControlIndex = 16; break; // gray -> save
-                    case 15: this.positionControlIndex = 17; break; // dark -> cancel
-                    case 16: this.positionControlIndex = 0; break; // save -> up (wrap)
-                    case 17: this.positionControlIndex = 0; break; // cancel -> up (wrap)
+                    case 0: this.positionControlIndex = 2; break; // up → bottom
+                    case 2: this.positionControlIndex = 4; break; // bottom → center
+                    case 4: this.positionControlIndex = 6; break; // center → smaller
+                    case 6: this.positionControlIndex = 8; break; // smaller → small
+                    case 8: this.positionControlIndex = 10; break; // small → large
+                    case 10: this.positionControlIndex = 12; break; // large → none
+                    case 12: this.positionControlIndex = 14; break; // none → gray
+                    case 14: this.positionControlIndex = 16; break; // gray → save
+                    case 16: this.positionControlIndex = 0; break; // save → up (wrap)
+                    // For all other items, use left/right or jump to nearest main path
+                    case 1: this.positionControlIndex = 2; break; // down → bottom
+                    case 3: this.positionControlIndex = 4; break; // middle → center
+                    case 5: this.positionControlIndex = 6; break; // upper → smaller
+                    case 7: this.positionControlIndex = 8; break; // larger → small
+                    case 9: this.positionControlIndex = 10; break; // normal → large
+                    case 11: this.positionControlIndex = 12; break; // extra-large → none
+                    case 13: this.positionControlIndex = 14; break; // black → gray
+                    case 15: this.positionControlIndex = 16; break; // dark → save
+                    case 17: this.positionControlIndex = 0; break; // cancel → up
                     default: this.positionControlIndex = 0; break; // fallback
                 }
             } else {
-                // Up navigation (reverse of down)
+                // Up navigation (reverse path): save→gray→none→large→small→smaller→center→bottom→up
                 switch(currentIndex) {
-                    case 0: this.positionControlIndex = 16; break; // up -> save (wrap)
-                    case 1: this.positionControlIndex = 17; break; // down -> cancel (wrap)
-                    case 2: this.positionControlIndex = 0; break; // bottom -> up
-                    case 3: this.positionControlIndex = 0; break; // middle -> up
-                    case 4: this.positionControlIndex = 1; break; // center -> down
-                    case 5: this.positionControlIndex = 1; break; // upper -> down
-                    case 6: this.positionControlIndex = 2; break; // smaller -> bottom
-                    case 7: this.positionControlIndex = 5; break; // larger -> upper
-                    case 8: this.positionControlIndex = 6; break; // small -> smaller
-                    case 9: this.positionControlIndex = 6; break; // normal -> smaller
-                    case 10: this.positionControlIndex = 7; break; // large -> larger
-                    case 11: this.positionControlIndex = 7; break; // extra-large -> larger
-                    case 12: this.positionControlIndex = 8; break; // none -> small
-                    case 13: this.positionControlIndex = 8; break; // black -> small
-                    case 14: this.positionControlIndex = 10; break; // gray -> large
-                    case 15: this.positionControlIndex = 11; break; // dark -> extra-large
-                    case 16: this.positionControlIndex = 12; break; // save -> none
-                    case 17: this.positionControlIndex = 15; break; // cancel -> dark
-                    default: this.positionControlIndex = 0; break; // fallback
+                    case 16: this.positionControlIndex = 14; break; // save → gray
+                    case 14: this.positionControlIndex = 12; break; // gray → none
+                    case 12: this.positionControlIndex = 10; break; // none → large
+                    case 10: this.positionControlIndex = 8; break; // large → small
+                    case 8: this.positionControlIndex = 6; break; // small → smaller
+                    case 6: this.positionControlIndex = 4; break; // smaller → center
+                    case 4: this.positionControlIndex = 2; break; // center → bottom
+                    case 2: this.positionControlIndex = 0; break; // bottom → up
+                    case 0: this.positionControlIndex = 16; break; // up → save (wrap)
+                    // For all other items, use left/right or jump to nearest main path
+                    case 1: this.positionControlIndex = 0; break; // down → up
+                    case 3: this.positionControlIndex = 2; break; // middle → bottom
+                    case 5: this.positionControlIndex = 4; break; // upper → center
+                    case 7: this.positionControlIndex = 6; break; // larger → smaller
+                    case 9: this.positionControlIndex = 8; break; // normal → small
+                    case 11: this.positionControlIndex = 10; break; // extra-large → large
+                    case 13: this.positionControlIndex = 12; break; // black → none
+                    case 15: this.positionControlIndex = 14; break; // dark → gray
+                    case 17: this.positionControlIndex = 16; break; // cancel → save
+                    default: this.positionControlIndex = 16; break; // fallback
                 }
             }
             
