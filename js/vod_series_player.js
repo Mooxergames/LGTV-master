@@ -1047,9 +1047,9 @@ var vod_series_player={
     adjustSubtitlePosition: function(direction) {
         var step = 5; // 5% adjustment
         if(direction === 'up') {
-            this.currentSubtitlePosition = Math.max(5, this.currentSubtitlePosition - step);
-        } else if(direction === 'down') {
             this.currentSubtitlePosition = Math.min(95, this.currentSubtitlePosition + step);
+        } else if(direction === 'down') {
+            this.currentSubtitlePosition = Math.max(5, this.currentSubtitlePosition - step);
         }
         
         this.updatePositionPreview();
