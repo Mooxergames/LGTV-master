@@ -8,6 +8,7 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **Cleaned up all debugging logs** - Removed all debugging console.log statements from the entire application while keeping essential error handling. Removed debug logs from subtitle system, video player, and all other components for cleaner code and better performance.
 - **Completely removed Recently Viewed functionality** - Removed recently viewed tracking for both movies and series, including category creation, data storage, and all related functionality to simplify the user interface
 - Completely removed random VOD favorites auto-seeding functionality with full cleanup and cache-busting implementation
 - Fixed favorites removal empty space issue with automatic grid refresh for both direct removal and detail page removal scenarios
