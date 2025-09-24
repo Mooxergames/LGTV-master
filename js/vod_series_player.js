@@ -1269,7 +1269,7 @@ var vod_series_player={
                 };
             case 'gray':
                 return {
-                    background: 'rgba(128,128,128,0.8)',
+                    background: 'rgba(255,0,0,0.8)', // Changed grey to red
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
@@ -1277,7 +1277,7 @@ var vod_series_player={
                 };
             case 'dark':
                 return {
-                    background: 'rgba(22,25,30,0.9)',
+                    background: 'rgba(0,128,0,0.8)', // Changed dark to green
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
@@ -1295,8 +1295,8 @@ var vod_series_player={
         var bgLabels = {
             'transparent': 'None',
             'black': 'Black',
-            'gray': 'Gray',
-            'dark': 'Dark'
+            'gray': 'Red', // Updated label from Gray to Red
+            'dark': 'Green' // Updated label from Dark to Green
         };
         $('#background-value').text(bgLabels[this.currentSubtitleBackground] || 'Black');
     },
@@ -1452,7 +1452,7 @@ var vod_series_player={
             var that = this;
             requestAnimationFrame(function() {
                 if(that.subtitle_audio_menus && that.subtitle_audio_menus.length > 0) {
-                    that.subtitle_audio_menus.removeClass('active focused');
+                    $(that.subtitle_audio_menus).removeClass('active focused');
                     if(index < that.subtitle_audio_menus.length) {
                         $(that.subtitle_audio_menus[index]).addClass('active focused');
                         // Only scroll if needed - throttled
@@ -1466,7 +1466,7 @@ var vod_series_player={
             var that = this;
             requestAnimationFrame(function() {
                 if(that.subtitle_audio_menus) {
-                    that.subtitle_audio_menus.removeClass('active focused');
+                    $(that.subtitle_audio_menus).removeClass('active focused');
                     var targetIndex = that.subtitle_audio_menus.length + index;
                     if(targetIndex >= 0 && targetIndex < that.subtitle_audio_menus.length) {
                         $(that.subtitle_audio_menus[targetIndex]).addClass('active focused');
