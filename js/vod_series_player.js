@@ -334,6 +334,10 @@ var vod_series_player={
             keys.focused_part=keys.prev_focus;
             $('#subtitle-selection-modal').modal('hide');
         }
+        if(keys.focused_part==="subtitle_position_modal"){
+            keys.focused_part=keys.prev_focus;
+            $('#subtitle-position-modal').modal('hide');
+        }
         if(keys.focused_part==='vod_info'){
             $('#vod-video-info-container').hide();
             clearTimeout(this.vod_info_timer);
@@ -997,6 +1001,122 @@ var vod_series_player={
             console.log('Selected audio track:', this.current_audio_track_index);
         }
     },
+    
+    // Subtitle Position Functions
+    showSubtitlePositionModal: function() {
+        this.hideControlBar();
+        var keys = this.keys;
+        if(keys.focused_part != "subtitle_position_modal") {
+            keys.prev_focus = keys.focused_part;
+        }
+        keys.focused_part = "subtitle_position_modal";
+        
+        // Initialize position controls
+        this.currentSubtitlePosition = parseInt(localStorage.getItem('subtitle_position') || '85');
+        this.updatePositionPreview();
+        this.updatePositionDisplay();
+        
+        // Hide movie player operation modal and show position modal
+        $('#vod-series-player-operation-modal').modal('hide');
+        $('#subtitle-position-modal').modal('show');
+        
+        // Initialize focus
+        this.positionControlIndex = 0;
+        this.hoverPositionControl(0);
+    },
+    
+    adjustSubtitlePosition: function(direction) {
+        var step = 5; // 5% adjustment
+        if(direction === 'up') {
+            this.currentSubtitlePosition = Math.max(5, this.currentSubtitlePosition - step);
+        } else if(direction === 'down') {
+            this.currentSubtitlePosition = Math.min(95, this.currentSubtitlePosition + step);
+        }
+        
+        this.updatePositionPreview();
+        this.updatePositionDisplay();
+    },
+    
+    setSubtitlePosition: function(position) {
+        this.currentSubtitlePosition = parseInt(position);
+        this.updatePositionPreview();
+        this.updatePositionDisplay();
+    },
+    
+    updatePositionPreview: function() {
+        $('#position-preview-text').css('bottom', this.currentSubtitlePosition + '%');
+    },
+    
+    updatePositionDisplay: function() {
+        $('#position-value').text(this.currentSubtitlePosition + '%');
+    },
+    
+    hoverPositionControl: function(index) {
+        var controls = [
+            '.position-button', // up button
+            '.position-button', // down button  
+            '.preset-button', // bottom preset
+            '.preset-button', // middle preset
+            '.preset-button', // center preset
+            '.preset-button', // upper preset
+            '.subtitle-action-btn', // save button
+            '.subtitle-action-btn'  // cancel button
+        ];
+        
+        this.positionControlIndex = index;
+        
+        // Remove active classes
+        $('.position-button, .preset-button, .subtitle-action-btn').removeClass('active');
+        
+        // Add active class to selected element
+        if(index >= 0 && index < 2) {
+            $('.position-button').eq(index).addClass('active');
+        } else if(index >= 2 && index < 6) {
+            $('.preset-button').eq(index - 2).addClass('active');
+        } else if(index >= 6) {
+            $('.subtitle-action-btn').eq(index - 6).addClass('active');
+        }
+    },
+    
+    saveSubtitlePosition: function() {
+        // Save position to localStorage
+        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
+        
+        // Apply position to actual subtitles if any are active
+        this.applySubtitlePosition();
+        
+        // Close modal and return to player
+        $('#subtitle-position-modal').modal('hide');
+        this.keys.focused_part = "control_bar";
+        
+        showToast("Success", "Subtitle position saved: " + this.currentSubtitlePosition + "%");
+    },
+    
+    cancelSubtitlePosition: function() {
+        // Reset to saved position
+        this.currentSubtitlePosition = parseInt(localStorage.getItem('subtitle_position') || '85');
+        this.updatePositionPreview();
+        
+        // Close modal and return to player
+        $('#subtitle-position-modal').modal('hide');
+        this.keys.focused_part = "control_bar";
+    },
+    
+    applySubtitlePosition: function() {
+        // Apply position to all subtitle containers
+        var position = this.currentSubtitlePosition;
+        $('#' + media_player.parent_id).find('.subtitle-container').css({
+            'bottom': position + '%',
+            'top': 'auto'
+        });
+        
+        // Also apply to any custom subtitle displays
+        $('.subtitle-text, .subtitle-display').css({
+            'bottom': position + '%',
+            'top': 'auto'
+        });
+    },
+    
     removeAllActiveClass:function(hide_episode){
         $(this.video_info_doms).removeClass('active');
         $(this.episode_doms).removeClass('active');
@@ -1088,6 +1208,24 @@ var vod_series_player={
                 $(this.subtitle_audio_menus[keys.subtitle_audio_selection_modal]).find('input').prop('checked',true);
             }
         }
+        else if(keys.focused_part==="subtitle_position_modal"){
+            // Handle subtitle position modal clicks
+            if(this.positionControlIndex >= 0 && this.positionControlIndex < 2) {
+                // Position buttons (up/down)
+                var direction = this.positionControlIndex === 0 ? 'up' : 'down';
+                this.adjustSubtitlePosition(direction);
+            } else if(this.positionControlIndex >= 2 && this.positionControlIndex < 6) {
+                // Preset buttons
+                var presets = [85, 70, 50, 30]; // bottom, middle, center, upper
+                this.setSubtitlePosition(presets[this.positionControlIndex - 2]);
+            } else if(this.positionControlIndex === 6) {
+                // Save button
+                this.saveSubtitlePosition();
+            } else if(this.positionControlIndex === 7) {
+                // Cancel button
+                this.cancelSubtitlePosition();
+            }
+        }
         else if(keys.focused_part==='resume_bar'){
             this.goBack();
             if(keys.resume_bar==0){
@@ -1162,6 +1300,15 @@ var vod_series_player={
             else
                 keys.subtitle_audio_selection_modal=this.subtitle_audio_menus.length-2;
             this.hoverSubtitleAudioModal(keys.subtitle_audio_selection_modal);
+        }
+        if(keys.focused_part==="subtitle_position_modal"){
+            // Navigate horizontally between Up/Down buttons and presets
+            if(increment>0) {
+                this.positionControlIndex = Math.min(7, this.positionControlIndex + 1);
+            } else {
+                this.positionControlIndex = Math.max(0, this.positionControlIndex - 1);
+            }
+            this.hoverPositionControl(this.positionControlIndex);
         }
     },
     handleMenuUpDown:function(increment){
@@ -1242,6 +1389,16 @@ var vod_series_player={
                 keys.operation_modal=0;
             $(buttons).removeClass('active');
             $(buttons[keys.operation_modal]).addClass('active');
+        }
+        else if(keys.focused_part==="subtitle_position_modal"){
+            // Navigate vertically through position control sections
+            var maxIndex = 7; // 0-1: up/down, 2-5: presets, 6-7: save/cancel
+            this.positionControlIndex += increment;
+            if(this.positionControlIndex < 0)
+                this.positionControlIndex = maxIndex;
+            if(this.positionControlIndex > maxIndex)
+                this.positionControlIndex = 0;
+            this.hoverPositionControl(this.positionControlIndex);
         }
         if(keys.focused_part==="subtitle_audio_selection_modal"){
             if(keys.subtitle_audio_selection_modal<this.subtitle_audio_menus.length-2)
