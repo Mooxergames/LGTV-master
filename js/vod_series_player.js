@@ -1607,18 +1607,18 @@ var vod_series_player={
                     case 6: this.positionControlIndex = 8; break; // smaller → small
                     case 8: this.positionControlIndex = 16; break; // small → save
                     
-                    // Main down path: down→middle→upper→large→normal→extra-large→black→dark→cancel
+                    // Main down path: down→middle→upper→larger→normal→extra-large→black→dark→cancel
                     case 1: this.positionControlIndex = 3; break; // down → middle
                     case 3: this.positionControlIndex = 5; break; // middle → upper
-                    case 5: this.positionControlIndex = 10; break; // upper → large
-                    case 10: this.positionControlIndex = 9; break; // large → normal
+                    case 5: this.positionControlIndex = 7; break; // upper → larger
+                    case 7: this.positionControlIndex = 9; break; // larger → normal
                     case 9: this.positionControlIndex = 11; break; // normal → extra-large
                     case 11: this.positionControlIndex = 13; break; // extra-large → black
                     case 13: this.positionControlIndex = 15; break; // black → dark
                     case 15: this.positionControlIndex = 17; break; // dark → cancel
                     
                     // Other items continue their paths
-                    case 7: this.positionControlIndex = 10; break; // larger → large
+                    case 10: this.positionControlIndex = 9; break; // large → normal
                     case 12: this.positionControlIndex = 14; break; // none → gray
                     case 14: this.positionControlIndex = 16; break; // gray → save
                     case 16: this.positionControlIndex = 0; break; // save → up (wrap)
@@ -1636,19 +1636,19 @@ var vod_series_player={
                     case 2: this.positionControlIndex = 0; break; // bottom → up
                     case 0: this.positionControlIndex = 16; break; // up → save (wrap)
                     
-                    // Reverse down path: cancel→dark→black→extra-large→normal→large→upper→middle→down
+                    // Reverse down path: cancel→dark→black→extra-large→normal→larger→upper→middle→down
                     case 17: this.positionControlIndex = 15; break; // cancel → dark
                     case 15: this.positionControlIndex = 13; break; // dark → black
                     case 13: this.positionControlIndex = 11; break; // black → extra-large
                     case 11: this.positionControlIndex = 9; break; // extra-large → normal
-                    case 9: this.positionControlIndex = 10; break; // normal → large
-                    case 10: this.positionControlIndex = 5; break; // large → upper
+                    case 9: this.positionControlIndex = 7; break; // normal → larger
+                    case 7: this.positionControlIndex = 5; break; // larger → upper
                     case 5: this.positionControlIndex = 3; break; // upper → middle
                     case 3: this.positionControlIndex = 1; break; // middle → down
                     case 1: this.positionControlIndex = 17; break; // down → cancel (wrap)
                     
                     // Other items
-                    case 7: this.positionControlIndex = 5; break; // larger → upper
+                    case 10: this.positionControlIndex = 7; break; // large → larger
                     case 12: this.positionControlIndex = 10; break; // none → large
                     case 14: this.positionControlIndex = 12; break; // gray → none
                     default: this.positionControlIndex = 0; break; // fallback
