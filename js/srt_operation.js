@@ -194,7 +194,10 @@ var SrtOperation={
                     color: '#fff',
                     textShadow: 'none', // No shadows/outlines for transparent background
                     padding: '0px',     // No padding to avoid visible borders
-                    borderRadius: '0px'
+                    borderRadius: '0px',
+                    border: 'none',     // Remove any borders
+                    boxShadow: 'none',  // Remove any shadows
+                    outline: 'none'     // Remove any outlines
                 };
             case 'black':
                 return {
@@ -206,7 +209,7 @@ var SrtOperation={
                 };
             case 'gray':
                 return {
-                    background: 'rgba(128,128,128,0.8)',
+                    background: 'rgba(255,0,0,0.8)', // Changed to red
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
@@ -214,11 +217,11 @@ var SrtOperation={
                 };
             case 'dark':
                 return {
-                    background: 'rgba(22,25,30,0.9)',
+                    background: 'rgba(0,128,0,0.8)', // Changed to green
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '6px'
+                    borderRadius: '4px'
                 };
             default:
                 return this.getBackgroundStyleFromType('black');

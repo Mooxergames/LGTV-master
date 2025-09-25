@@ -1255,9 +1255,12 @@ var vod_series_player={
                 return {
                     background: 'transparent',
                     color: '#fff',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                    padding: '2px 6px',
-                    borderRadius: '0px'
+                    textShadow: 'none', // Remove shadow for true transparency
+                    padding: '0px',     // Remove padding to avoid any borders
+                    borderRadius: '0px',
+                    border: 'none',     // Remove any borders
+                    boxShadow: 'none',  // Remove any shadows
+                    outline: 'none'     // Remove any outlines
                 };
             case 'black':
                 return {
@@ -1281,7 +1284,7 @@ var vod_series_player={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '6px'
+                    borderRadius: '4px'
                 };
             default:
                 return this.getBackgroundStyle('black');
