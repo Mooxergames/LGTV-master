@@ -181,6 +181,8 @@ var SrtOperation={
             'text-shadow': backgroundStyle.textShadow,
             'padding': backgroundStyle.padding,
             'border-radius': backgroundStyle.borderRadius,
+            'box-shadow': backgroundStyle.boxShadow || 'none', // Add box-shadow control
+            'border': backgroundStyle.border || 'none',        // Add border control
             'display': 'inline-block' // Ensure background only covers text area
         });
     },
@@ -205,7 +207,9 @@ var SrtOperation={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             case 'gray':
                 return {
@@ -213,7 +217,9 @@ var SrtOperation={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             case 'dark':
                 return {
@@ -221,7 +227,9 @@ var SrtOperation={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             default:
                 return this.getBackgroundStyleFromType('black');

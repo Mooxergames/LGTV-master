@@ -594,7 +594,7 @@
 /* Background Color Previews */
 .transparent-bg {
     background: transparent;
-    border: 2px dashed rgba(255, 255, 255, 0.5);
+    border: none; /* Remove dashed border completely */
 }
 
 .black-bg {

@@ -1245,7 +1245,9 @@ var vod_series_player={
             'color': backgroundStyle.color,
             'text-shadow': backgroundStyle.textShadow,
             'padding': backgroundStyle.padding,
-            'border-radius': backgroundStyle.borderRadius
+            'border-radius': backgroundStyle.borderRadius,
+            'box-shadow': backgroundStyle.boxShadow || 'none', // Add box-shadow control
+            'border': backgroundStyle.border || 'none'        // Add border control
         });
     },
     
@@ -1268,7 +1270,9 @@ var vod_series_player={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             case 'gray':
                 return {
@@ -1276,7 +1280,9 @@ var vod_series_player={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             case 'dark':
                 return {
@@ -1284,7 +1290,9 @@ var vod_series_player={
                     color: '#fff',
                     textShadow: 'none',
                     padding: '4px 8px',
-                    borderRadius: '4px'
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
                 };
             default:
                 return this.getBackgroundStyle('black');
