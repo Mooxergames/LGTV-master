@@ -156,7 +156,9 @@ var SrtOperation={
     applyUserStyles: function() {
         // Apply user subtitle settings from localStorage (saved by subtitle settings modal)
         var position = parseInt(localStorage.getItem('subtitle_position') || '10');
-        var size = parseInt(localStorage.getItem('subtitle_size') || '18');
+        // Use level-based size system for consistency
+        var level = this.getSubtitleLevel();
+        var size = this.getSubtitleSizeFromLevel(level);
         var bgType = localStorage.getItem('subtitle_background') || 'black';
         
         // Get background style based on saved setting
@@ -185,6 +187,17 @@ var SrtOperation={
             'border': backgroundStyle.border || 'none',        // Add border control
             'display': 'inline-block' // Ensure background only covers text area
         });
+    },
+    
+    // Subtitle level system (matching vod_series_player.js)
+    getSubtitleLevel: function() {
+        var level = parseInt(localStorage.getItem('subtitle_level') || '2'); // Default to 'normal' (24px)
+        return Number.isFinite(level) ? Math.max(0, Math.min(4, level)) : 2;
+    },
+    
+    getSubtitleSizeFromLevel: function(level) {
+        var sizes = [14, 18, 24, 32, 40]; // small, normal, large, extra-large, maximum
+        return sizes[level] || 24; // Default to normal size
     },
     
     getBackgroundStyleFromType: function(bgType) {
