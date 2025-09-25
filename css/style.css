@@ -779,7 +779,7 @@
 .video-resolution {
     position: fixed;
     bottom: 2vh; /* Responsive: 2% of viewport height */
-    right: 3vw;  /* Responsive: 3% of viewport width */
+    right: 1.5vw;  /* Responsive: 1.5% of viewport width */
     color: #fff;
     font-size: clamp(20px, 2.5vw, 30px); /* Responsive font size that scales with screen */
     letter-spacing: 2px;
