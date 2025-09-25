@@ -223,10 +223,6 @@ function initPlayer() {
                         
                         webapis.avplay.setDisplayMethod(selectedMode);
                         
-                        // Show user feedback
-                        var modeNames = ['Auto', 'Fit Screen', 'Fill Screen'];
-                        showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
-                        
                     } else if(platform === 'lg'){
                         // Cycle through LG CSS object-fit modes
                         var modes = this.aspect_ratio_modes.lg;
@@ -235,10 +231,6 @@ function initPlayer() {
                         
                         // Apply CSS object-fit to video element
                         $(this.videoObj).css('object-fit', selectedMode);
-                        
-                        // Show user feedback
-                        var modeNames = ['Fit Screen', 'Fill & Crop', 'Stretch'];
-                        showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
                     }
                 }catch (e) {
                     console.log('Aspect ratio change failed:', e);
@@ -635,10 +627,6 @@ function initPlayer() {
                     
                     // Apply CSS object-fit to video element
                     $(this.videoObj).css('object-fit', selectedMode);
-                    
-                    // Show user feedback
-                    var modeNames = ['Fit Screen', 'Fill & Crop', 'Stretch'];
-                    showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
                     
                 }catch (e) {
                     console.log('LG aspect ratio change failed:', e);
