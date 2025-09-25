@@ -198,20 +198,50 @@ function initPlayer() {
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
+            // Aspect ratio cycling system
+            aspect_ratio_modes: {
+                samsung: [
+                    'PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO',
+                    'PLAYER_DISPLAY_MODE_LETTER_BOX', 
+                    'PLAYER_DISPLAY_MODE_FULL_SCREEN'
+                ],
+                lg: [
+                    'contain',  // Letterbox equivalent
+                    'cover',    // Fill/zoom to cover
+                    'fill'      // Stretch to fill
+                ]
+            },
+            current_aspect_ratio_index: 0,
+            
             toggleScreenRatio:function(){
-                if(this.full_screen_state==1){
-                    try{
-                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO');
-                        this.full_screen_state=0;
-                    }catch (e) {
+                try{
+                    if(platform === 'samsung'){
+                        // Cycle through Samsung display modes
+                        var modes = this.aspect_ratio_modes.samsung;
+                        this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
+                        var selectedMode = modes[this.current_aspect_ratio_index];
+                        
+                        webapis.avplay.setDisplayMethod(selectedMode);
+                        
+                        // Show user feedback
+                        var modeNames = ['Auto', 'Fit Screen', 'Fill Screen'];
+                        showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
+                        
+                    } else if(platform === 'lg'){
+                        // Cycle through LG CSS object-fit modes
+                        var modes = this.aspect_ratio_modes.lg;
+                        this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
+                        var selectedMode = modes[this.current_aspect_ratio_index];
+                        
+                        // Apply CSS object-fit to video element
+                        $(this.videoObj).css('object-fit', selectedMode);
+                        
+                        // Show user feedback
+                        var modeNames = ['Fit Screen', 'Fill & Crop', 'Stretch'];
+                        showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
                     }
-                }else{
-                    try{
-                        // Keep AUTO_ASPECT_RATIO for consistent aspect ratio handling
-                        // webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                        this.full_screen_state=1;
-                    }catch (e) {
-                    }
+                }catch (e) {
+                    console.log('Aspect ratio change failed:', e);
                 }
             },
             formatTime:function(seconds) {
@@ -590,8 +620,29 @@ function initPlayer() {
                 SrtOperation.deStruct();
                 this.subtitles=[];
             },
+            // LG TV aspect ratio cycling (uses same system as Samsung player)
+            aspect_ratio_modes: {
+                lg: ['contain', 'cover', 'fill']
+            },
+            current_aspect_ratio_index: 0,
+            
             toggleScreenRatio:function(){
-
+                try{
+                    // Cycle through LG CSS object-fit modes
+                    var modes = this.aspect_ratio_modes.lg;
+                    this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
+                    var selectedMode = modes[this.current_aspect_ratio_index];
+                    
+                    // Apply CSS object-fit to video element
+                    $(this.videoObj).css('object-fit', selectedMode);
+                    
+                    // Show user feedback
+                    var modeNames = ['Fit Screen', 'Fill & Crop', 'Stretch'];
+                    showToast('Aspect Ratio', modeNames[this.current_aspect_ratio_index]);
+                    
+                }catch (e) {
+                    console.log('LG aspect ratio change failed:', e);
+                }
             },
             setDisplayArea:function(){
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
