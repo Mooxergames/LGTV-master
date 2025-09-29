@@ -635,8 +635,13 @@ var channel_page={
         
         // Check if TV supports the detected resolution (Samsung only)
         var uhd_capabilities = {supports_4k: false, supports_8k: false}; // Default fallback
-        if(platform === 'samsung' && typeof media_player.getUHDSupport === 'function') {
-            uhd_capabilities = media_player.getUHDSupport();
+        try {
+            if(platform === 'samsung' && typeof media_player !== 'undefined' && 
+               typeof media_player.getUHDSupport === 'function') {
+                uhd_capabilities = media_player.getUHDSupport();
+            }
+        } catch(e) {
+            console.log('[UHD DEBUG] Error getting UHD capabilities:', e);
         }
         var finalResolution = this.validateResolutionSupport(resolution, detailedResolution, uhd_capabilities);
         

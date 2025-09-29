@@ -40,9 +40,6 @@ function initPlayer() {
                 }
                 $('.video-resolution').text('Live');
                 this.reconnect_count = 0;
-                
-                // Check Samsung TV UHD capabilities
-                this.checkUHDSupport();
             },
             playAsync:function(url){
                 console.log('[PLAYER DEBUG] playAsync called with URL:', url);
@@ -797,7 +794,15 @@ function initPlayer() {
             // Get UHD capabilities for external use
             getUHDSupport: function() {
                 if(!this.uhd_support.checked) {
-                    this.checkUHDSupport();
+                    try {
+                        this.checkUHDSupport();
+                    } catch(e) {
+                        console.log('[UHD DEBUG] Error calling checkUHDSupport:', e);
+                        // Safe fallback
+                        this.uhd_support.supports_4k = false;
+                        this.uhd_support.supports_8k = false;
+                        this.uhd_support.checked = true;
+                    }
                 }
                 return this.uhd_support;
             }
