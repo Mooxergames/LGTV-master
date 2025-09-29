@@ -57,7 +57,7 @@ function initPlayer() {
                 try{
                     webapis.avplay.open(url);
                     this.setupEventListeners();
-                    this.setDisplayArea();
+                    // setDisplayArea() will be called after buffering completes to avoid Samsung InvalidStateError
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
@@ -150,6 +150,8 @@ function initPlayer() {
                 }
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
+                // Clear any pending setDisplayArea timers to prevent late calls
+                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
@@ -163,6 +165,8 @@ function initPlayer() {
                 $(this.parent_id).find('.video-error').hide();
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
+                // Clear any pending setDisplayArea timers to prevent late calls
+                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
@@ -256,8 +260,8 @@ function initPlayer() {
                     },
                     onbufferingcomplete: function() {
                         $('#'+that.parent_id).find('.video-loader').hide();
-                        // Reapply display area after buffering for proper sizing
-                        setTimeout(function() {
+                        // Reapply display area after buffering for proper sizing - store timer for cleanup
+                        that.display_area_timer = setTimeout(function() {
                             that.setDisplayArea();
                         }, 100);
                         // console.log('Buffering Complete, Can play now!');
