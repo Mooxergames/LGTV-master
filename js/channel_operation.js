@@ -629,10 +629,18 @@ var channel_page={
         // Add channel name to compact header
         $('#full-screen-channel-name-compact').text(current_movie.name);
         
-        // Extract resolution from channel name and show detailed format
+        // Extract resolution from channel name and show detailed format with UHD capability check
         var resolution = this.extractResolution(current_movie.name);
         var detailedResolution = this.getDetailedResolution(resolution);
-        $('#full-screen-resolution').text(detailedResolution);
+        
+        // Check if TV supports the detected resolution (Samsung only)
+        var uhd_capabilities = {supports_4k: false, supports_8k: false}; // Default fallback
+        if(platform === 'samsung' && typeof media_player.getUHDSupport === 'function') {
+            uhd_capabilities = media_player.getUHDSupport();
+        }
+        var finalResolution = this.validateResolutionSupport(resolution, detailedResolution, uhd_capabilities);
+        
+        $('#full-screen-resolution').text(finalResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -673,6 +681,39 @@ var channel_page={
                 return '720x480 SD';
             default:
                 return '1280x720 HD';
+        }
+    },
+    validateResolutionSupport:function(resolution, detailedResolution, uhd_capabilities){
+        // Validate if Samsung TV supports the detected resolution and provide fallbacks
+        console.log('[UHD DEBUG] Validating resolution support for:', resolution);
+        console.log('[UHD DEBUG] TV capabilities - 4K:', uhd_capabilities.supports_4k, '8K:', uhd_capabilities.supports_8k);
+        
+        switch(resolution) {
+            case '8K':
+                if(uhd_capabilities.supports_8k) {
+                    console.log('[UHD DEBUG] 8K content supported - displaying native 8K');
+                    return detailedResolution + ' ✓';
+                } else if(uhd_capabilities.supports_4k) {
+                    console.log('[UHD DEBUG] 8K content not supported - will downscale to 4K');
+                    return detailedResolution + ' → 4K';
+                } else {
+                    console.log('[UHD DEBUG] 8K content not supported - will downscale to FHD');
+                    return detailedResolution + ' → FHD';
+                }
+                
+            case '4K':
+                if(uhd_capabilities.supports_4k) {
+                    console.log('[UHD DEBUG] 4K content supported - displaying native 4K');
+                    return detailedResolution + ' ✓';
+                } else {
+                    console.log('[UHD DEBUG] 4K content not supported - will downscale to FHD');
+                    return detailedResolution + ' → FHD';
+                }
+                
+            default:
+                // FHD, HD, SD are supported by all Samsung TVs
+                console.log('[UHD DEBUG] Standard resolution - no validation needed');
+                return detailedResolution;
         }
     },
     showNextChannel:function(increment){

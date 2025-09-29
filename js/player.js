@@ -40,6 +40,9 @@ function initPlayer() {
                 }
                 $('.video-resolution').text('Live');
                 this.reconnect_count = 0;
+                
+                // Check Samsung TV UHD capabilities
+                this.checkUHDSupport();
             },
             playAsync:function(url){
                 console.log('[PLAYER DEBUG] playAsync called with URL:', url);
@@ -742,6 +745,61 @@ function initPlayer() {
                 } catch(e) {
                     console.error('LG subtitle/audio track error:', e);
                 }
+            },
+            
+            // Samsung 4K/8K UHD capability detection according to Samsung documentation
+            uhd_support: {
+                supports_4k: false,
+                supports_8k: false,
+                checked: false
+            },
+            
+            checkUHDSupport: function() {
+                if(this.uhd_support.checked) return;
+                
+                try {
+                    console.log('[UHD DEBUG] Checking Samsung TV UHD capabilities...');
+                    
+                    // Check 4K UHD support
+                    if(typeof webapis !== 'undefined' && webapis.productinfo && typeof webapis.productinfo.isUdPanelSupported === 'function') {
+                        this.uhd_support.supports_4k = webapis.productinfo.isUdPanelSupported();
+                        console.log('[UHD DEBUG] 4K UHD support:', this.uhd_support.supports_4k ? 'YES' : 'NO');
+                    } else {
+                        console.log('[UHD DEBUG] Samsung ProductInfo API not available - conservative fallback');
+                        this.uhd_support.supports_4k = false; // Conservative fallback
+                    }
+                    
+                    // Check 8K UHD support
+                    if(typeof webapis !== 'undefined' && webapis.productinfo && typeof webapis.productinfo.is8KPanelSupported === 'function') {
+                        this.uhd_support.supports_8k = webapis.productinfo.is8KPanelSupported();
+                        console.log('[UHD DEBUG] 8K UHD support:', this.uhd_support.supports_8k ? 'YES' : 'NO');
+                    } else {
+                        console.log('[UHD DEBUG] Samsung 8K ProductInfo API not available - assuming no 8K support');
+                        this.uhd_support.supports_8k = false;
+                    }
+                    
+                    this.uhd_support.checked = true;
+                    
+                    // Log final UHD capabilities
+                    console.log('[UHD DEBUG] Samsung TV UHD Capabilities Summary:');
+                    console.log('[UHD DEBUG] - 4K UHD (3840x2160):', this.uhd_support.supports_4k ? 'SUPPORTED' : 'NOT SUPPORTED');
+                    console.log('[UHD DEBUG] - 8K UHD (7680x4320):', this.uhd_support.supports_8k ? 'SUPPORTED' : 'NOT SUPPORTED');
+                    
+                } catch(e) {
+                    console.log('[UHD DEBUG] Error checking UHD support:', e);
+                    // Conservative fallback - don't assume UHD support
+                    this.uhd_support.supports_4k = false;
+                    this.uhd_support.supports_8k = false;
+                    this.uhd_support.checked = true;
+                }
+            },
+            
+            // Get UHD capabilities for external use
+            getUHDSupport: function() {
+                if(!this.uhd_support.checked) {
+                    this.checkUHDSupport();
+                }
+                return this.uhd_support;
             }
         }
     }
