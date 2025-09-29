@@ -1571,7 +1571,7 @@ var vod_series_player={
                 this.adjustSubtitlePosition(direction);
             } else if(this.positionControlIndex >= 2 && this.positionControlIndex < 6) {
                 // Position preset buttons
-                var presets = [5, 20, 30, 40]; // bottom, middle, center, upper
+                var presets = [2, 20, 30, 40]; // bottom, middle, center, upper
                 this.setSubtitlePosition(presets[this.positionControlIndex - 2]);
             } else if(this.positionControlIndex >= 6 && this.positionControlIndex < 8) {
                 // Size buttons (smaller/larger)
