@@ -42,32 +42,42 @@ function initPlayer() {
                 this.reconnect_count = 0;
             },
             playAsync:function(url){
-                console.log(url);
+                console.log('[PLAYER DEBUG] playAsync called with URL:', url);
+                console.log('[PLAYER DEBUG] Current state:', this.state, 'videoObj exists:', !!this.videoObj);
                 this.url=url;
                 $('#'+this.parent_id).find('.video-error').hide();
 
                 $('.video-loader').show();
                 if (this.state > this.STATES.STOPPED) {
+                    console.log('[PLAYER DEBUG] playAsync blocked - state too high:', this.state);
                     return;
                 }
                 if (!this.videoObj) {
+                    console.log('[PLAYER DEBUG] playAsync blocked - no videoObj');
                     return 0;
                 }
                 var that=this;
                 try{
+                    console.log('[PLAYER DEBUG] Opening Samsung webapis.avplay with URL');
                     webapis.avplay.open(url);
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.open() success');
                     this.setupEventListeners();
+                    console.log('[PLAYER DEBUG] Event listeners setup complete');
                     // setDisplayArea() will be called after buffering completes to avoid Samsung InvalidStateError
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
+                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.prepareAsync()');
                     webapis.avplay.prepareAsync(
                         function(){
+                            console.log('[PLAYER DEBUG] prepareAsync SUCCESS callback - Samsung player is now PREPARED');
                             that.reconnect_count = 0;
                             $('#' + that.parent_id).find('.video-reconnect-message').hide();
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
+                            console.log('[PLAYER DEBUG] Player state set to PLAYING:', that.state);
+                            console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.play()');
                             webapis.avplay.play();
                             try{
                                 that.full_screen_state=1;
@@ -106,6 +116,8 @@ function initPlayer() {
                             }
                         },
                         function(e){
+                            console.log('[PLAYER DEBUG] prepareAsync FAILED callback - Samsung player preparation failed');
+                            console.log('[PLAYER DEBUG] Samsung webapis error:', e);
                             console.log('video loading failed',e);
                             $('.video-loader').hide();
                             $('#'+that.parent_id).find('.video-error').show();
@@ -114,6 +126,9 @@ function initPlayer() {
                         }
                     );
                 }catch(e){
+                    console.log('[PLAYER DEBUG] playAsync() caught exception during Samsung webapis setup');
+                    console.log('[PLAYER DEBUG] Samsung webapis exception:', e);
+                    console.log('[PLAYER DEBUG] Exception code:', e.code, 'name:', e.name, 'message:', e.message);
                     console.log('video loading failed',e);
                     $('.video-loader').hide();
                     $('#'+that.parent_id).find('.video-error').show();
@@ -143,33 +158,45 @@ function initPlayer() {
                 }
             },
             stop:function() {
+                console.log('[PLAYER DEBUG] stop() called - current state:', this.state);
                 this.state = this.STATES.STOPPED;
                 try{
+                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.stop()');
                     webapis.avplay.stop();
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.stop() SUCCESS');
                 }catch (e) {
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.stop() FAILED:', e);
                 }
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
                 // Clear any pending setDisplayArea timers to prevent late calls
+                console.log('[PLAYER DEBUG] Clearing display_area_timer to prevent late setDisplayArea calls');
                 clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
+                console.log('[PLAYER DEBUG] stop() complete - state now STOPPED');
             },
             close:function(){
+                console.log('[PLAYER DEBUG] close() called - current state:', this.state);
                 this.state = this.STATES.STOPPED;
                 try{
+                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.close()');
                     webapis.avplay.close();
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.close() SUCCESS');
                 }catch (e) {
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.close() FAILED:', e);
                 }
                 $(this.parent_id).find('.video-error').hide();
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
                 // Clear any pending setDisplayArea timers to prevent late calls
+                console.log('[PLAYER DEBUG] Clearing display_area_timer to prevent late setDisplayArea calls');
                 clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
+                console.log('[PLAYER DEBUG] close() complete - state now STOPPED');
             },
             tryReconnect: function () {
                 if (current_route !== 'channel-page' && !(current_route=='home-page' && home_page.current_preview_type==='live'))
@@ -192,13 +219,29 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
+                console.log('[PLAYER DEBUG] setDisplayArea() called from:', (new Error().stack.split('\n')[2] || 'unknown'));
+                console.log('[PLAYER DEBUG] setDisplayArea() called - checking videoObj and Samsung player state');
+                console.log('[PLAYER DEBUG] Current player state:', this.state);
+                
                 var top_position=$(this.videoObj).offset().top;
                 var left_position=$(this.videoObj).offset().left;
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
-                console.log(top_position,left_position,width,height);
-                // console.log(this.videoObj);
-                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
+                
+                console.log('[PLAYER DEBUG] Calculated display coordinates:');
+                console.log('[PLAYER DEBUG] Position:', left_position, top_position);
+                console.log('[PLAYER DEBUG] Dimensions:', width + 'x' + height);
+                console.log('[PLAYER DEBUG] Full rect:', left_position, top_position, width, height);
+                
+                try {
+                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.setDisplayRect()');
+                    webapis.avplay.setDisplayRect(left_position,top_position,width,height);
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.setDisplayRect() SUCCESS');
+                } catch (e) {
+                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.setDisplayRect() FAILED:', e);
+                    console.log('[PLAYER DEBUG] Error code:', e.code, 'name:', e.name, 'message:', e.message);
+                    throw e;
+                }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
@@ -259,9 +302,12 @@ function initPlayer() {
                         // console.log("Buffering progress: "+percent);
                     },
                     onbufferingcomplete: function() {
+                        console.log('[PLAYER DEBUG] onbufferingcomplete fired - Samsung player buffering complete');
                         $('#'+that.parent_id).find('.video-loader').hide();
                         // Reapply display area after buffering for proper sizing - store timer for cleanup
+                        console.log('[PLAYER DEBUG] Setting 100ms timer for delayed setDisplayArea() call');
                         that.display_area_timer = setTimeout(function() {
+                            console.log('[PLAYER DEBUG] 100ms timer expired - calling setDisplayArea() now');
                             that.setDisplayArea();
                         }, 100);
                         // console.log('Buffering Complete, Can play now!');
