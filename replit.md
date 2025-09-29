@@ -8,7 +8,6 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
-- **Removed debug back button from detail pages** - Eliminated debug back button functionality from both movies detail page and series detail page by removing RETURN key event handlers, cleaning up the user experience and preventing unintended navigation behavior.
 - **Improved subtitle "bottom" position placement** - Adjusted the subtitle position "bottom" preset from 5vh to 2vh, moving subtitles closer to the actual bottom of the screen for better readability and positioning. This change maintains all down button navigation functionality while providing improved subtitle placement at the lowest screen position.
 - **Completely redesigned and optimized subtitle modal system** - Implemented comprehensive performance improvements including removal of expensive CSS effects (backdrop-filter, heavy gradients), TV-optimized design with larger fonts (22-26px) and better contrast, subtitle caching system for instant reopening, event delegation with 60fps throttling, and requestAnimationFrame-based DOM updates. Modal now opens in <50ms and provides smooth navigation on Samsung Tizen and LG WebOS platforms.
 - **Fixed subtitle display issues** - Resolved empty subtitle background line appearing when no subtitles are active by properly hiding the subtitle container, and updated subtitle background color options changing 'Gray' to 'Red' and 'Dark' to 'Green' in the settings modal for better user preference options.

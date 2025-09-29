@@ -204,9 +204,17 @@ var vod_summary_page={
     },
     HandleKey:function (e) {
         if(this.is_loading){
+            if(e.keyCode===tvKey.RETURN){
+                showLoader(false);
+                this.is_loading=false;
+                this.goBack();
+            }
             return;
         }
         switch (e.keyCode) {
+            case tvKey.RETURN:
+                this.goBack();
+                break;
             case tvKey.LEFT:
                 this.keyMove(-1);
                 break;
