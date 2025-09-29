@@ -424,6 +424,7 @@
 }
 
 #full-screen-resolution {
+    /* Positioned directly under LIVE indicator with same right alignment */
     font-size: 16px;
     padding: 6px 12px;
     background: rgba(0, 0, 0, 0.7);
