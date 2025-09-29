@@ -776,22 +776,7 @@
     color:#ccc;
 }
 
-.video-resolution {
-    position: fixed;
-    bottom: 2vh; /* Responsive: 2% of viewport height */
-    right: 1.5vw;  /* Responsive: 1.5% of viewport width */
-    color: #fff;
-    font-size: clamp(20px, 2.5vw, 30px); /* Responsive font size that scales with screen */
-    letter-spacing: 2px;
-    z-index: 1000; /* Ensure it stays above other elements */
-    /* Add background for better visibility on all screen sizes */
-    background: rgba(0, 0, 0, 0.7);
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    /* Ensure text doesn't break */
-    white-space: nowrap;
-}
+/* Video resolution positioning moved to channel_page.css for proper player bar containment */
 .video-loader{
     position:absolute;
     left:0;
