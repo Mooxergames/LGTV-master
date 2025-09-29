@@ -424,10 +424,6 @@
 }
 
 #full-screen-resolution {
-    /* Positioned at bottom-right of player area */
-    position: absolute;
-    bottom: 2vh;
-    right: 1.8vw;
     font-size: 16px;
     padding: 6px 12px;
     background: rgba(0, 0, 0, 0.7);
@@ -443,7 +439,6 @@
     max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
-    z-index: 110;
 }
 /* Removed - now handled by .channel-logo class */
 
