@@ -755,97 +755,85 @@ function initPlayer() {
                 if(this.uhd_support.checked) return;
                 
                 try {
-                    console.log('[UHD DEBUG] Checking Samsung TV UHD capabilities...');
+                    console.log('========================================');
+                    console.log('[UHD DEBUG] SAMSUNG TV 4K DETECTION TEST');
+                    console.log('========================================');
                     
-                    // Test the exact Samsung API call the user provided
-                    if(typeof webapis !== 'undefined' && webapis.productinfo) {
-                        console.log('[UHD DEBUG] Samsung ProductInfo API is available');
-                        
-                        // User's requested test - direct Samsung API call
-                        if (webapis.productinfo.isUdPanelSupported()) {
-                            console.log("4K UHD is supported");
-                            this.uhd_support.supports_4k = true;
+                    // Screen info
+                    console.log('[UHD DEBUG] Screen Resolution:', (screen.width || 0) + 'x' + (screen.height || 0));
+                    console.log('[UHD DEBUG] Window Size:', window.innerWidth + 'x' + window.innerHeight);
+                    console.log('[UHD DEBUG] Device Pixel Ratio:', window.devicePixelRatio);
+                    
+                    // Check if Samsung webapis exists
+                    if(typeof webapis === 'undefined') {
+                        console.log('[UHD DEBUG] ✗ webapis NOT available - not on Samsung TV');
+                        this.uhd_support.supports_4k = false;
+                        this.uhd_support.supports_8k = false;
+                        this.uhd_support.checked = true;
+                        return;
+                    }
+                    
+                    console.log('[UHD DEBUG] ✓ webapis is available');
+                    
+                    // Check if productinfo exists
+                    if(!webapis.productinfo) {
+                        console.log('[UHD DEBUG] ✗ webapis.productinfo NOT available');
+                        this.uhd_support.supports_4k = false;
+                        this.uhd_support.supports_8k = false;
+                        this.uhd_support.checked = true;
+                        return;
+                    }
+                    
+                    console.log('[UHD DEBUG] ✓ webapis.productinfo is available');
+                    console.log('[UHD DEBUG] Available ProductInfo methods:');
+                    for(var key in webapis.productinfo) {
+                        console.log('[UHD DEBUG]   - ' + key + ' (type: ' + typeof webapis.productinfo[key] + ')');
+                    }
+                    
+                    // Official Samsung 4K detection using isUdPanelSupported()
+                    console.log('========================================');
+                    console.log('[UHD DEBUG] Testing: webapis.productinfo.isUdPanelSupported()');
+                    console.log('[UHD DEBUG] (true = 4K or higher, false = up to FHD)');
+                    console.log('========================================');
+                    
+                    if (webapis.productinfo.isUdPanelSupported()) {
+                        console.log("✓✓✓ 4K UHD is supported ✓✓✓");
+                        this.uhd_support.supports_4k = true;
+                    } else {
+                        console.log("✗✗✗ 4K UHD is not supported ✗✗✗");
+                        this.uhd_support.supports_4k = false;
+                    }
+                    
+                    // Check 8K support
+                    if(typeof webapis.productinfo.is8KPanelSupported === 'function') {
+                        console.log('[UHD DEBUG] Testing: webapis.productinfo.is8KPanelSupported()');
+                        if (webapis.productinfo.is8KPanelSupported()) {
+                            console.log("✓✓✓ 8K UHD is supported ✓✓✓");
+                            this.uhd_support.supports_8k = true;
                         } else {
-                            console.log("4K UHD is not supported");
-                            this.uhd_support.supports_4k = false;
-                        }
-                        
-                        // Check 8K UHD support with similar direct call
-                        if(typeof webapis.productinfo.is8KPanelSupported === 'function') {
-                            if (webapis.productinfo.is8KPanelSupported()) {
-                                console.log("8K UHD is supported");
-                                this.uhd_support.supports_8k = true;
-                            } else {
-                                console.log("8K UHD is not supported");
-                                this.uhd_support.supports_8k = false;
-                            }
-                        } else {
-                            console.log('[UHD DEBUG] is8KPanelSupported function not available - assuming no 8K');
+                            console.log("✗ 8K UHD is not supported");
                             this.uhd_support.supports_8k = false;
                         }
-                        
                     } else {
-                        console.log('[UHD DEBUG] Samsung ProductInfo API not available - using fallback detection');
-                        this.uhd_support.supports_4k = this.detectUHDFallback();
-                        this.uhd_support.supports_8k = false; // Conservative for 8K without API
+                        console.log('[UHD DEBUG] is8KPanelSupported() not available');
+                        this.uhd_support.supports_8k = false;
                     }
                     
                     this.uhd_support.checked = true;
                     
-                    // Log final UHD capabilities
-                    console.log('[UHD DEBUG] Samsung TV UHD Capabilities Final Results:');
-                    console.log('[UHD DEBUG] - 4K UHD (3840x2160):', this.uhd_support.supports_4k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
-                    console.log('[UHD DEBUG] - 8K UHD (7680x4320):', this.uhd_support.supports_8k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
+                    // Final summary
+                    console.log('========================================');
+                    console.log('[UHD DEBUG] FINAL RESULTS:');
+                    console.log('[UHD DEBUG] 4K (3840x2160):', this.uhd_support.supports_4k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
+                    console.log('[UHD DEBUG] 8K (7680x4320):', this.uhd_support.supports_8k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
+                    console.log('========================================');
                     
                 } catch(e) {
-                    console.log('[UHD DEBUG] Error in checkUHDSupport:', e);
-                    // Smart fallback based on platform
-                    this.uhd_support.supports_4k = this.detectUHDFallback();
+                    console.log('[UHD DEBUG] ✗ ERROR during UHD detection:', e);
+                    console.log('[UHD DEBUG] Error details:', e.message, e.stack);
+                    this.uhd_support.supports_4k = false;
                     this.uhd_support.supports_8k = false;
                     this.uhd_support.checked = true;
-                    console.log('[UHD DEBUG] Using fallback 4K detection:', this.uhd_support.supports_4k);
-                }
-            },
-            
-            detectUHDFallback: function() {
-                console.log('[UHD DEBUG] Running fallback 4K detection...');
-                
-                try {
-                    // Method 1: Check if we're on Samsung platform with webapis available
-                    if(typeof webapis !== 'undefined') {
-                        console.log('[UHD DEBUG] Samsung webapis available - likely modern Samsung TV');
-                        
-                        // Method 2: Screen resolution detection
-                        var screenWidth = screen.width || window.screen.width || 0;
-                        var screenHeight = screen.height || window.screen.height || 0;
-                        console.log('[UHD DEBUG] Screen resolution detected:', screenWidth + 'x' + screenHeight);
-                        
-                        // If screen resolution is 4K or higher, assume 4K support
-                        if(screenWidth >= 3840 && screenHeight >= 2160) {
-                            console.log('[UHD DEBUG] 4K+ screen resolution detected - assuming 4K support');
-                            return true;
-                        }
-                        
-                        // Method 3: For Samsung TVs with webapis but no ProductInfo, assume modern 4K capability
-                        // Most Samsung smart TVs from 2016+ support 4K
-                        if(webapis.avplay) {
-                            console.log('[UHD DEBUG] Samsung AVPlay available - assuming 4K capable TV (modern Samsung)');
-                            return true;
-                        }
-                    }
-                    
-                    // Method 4: Platform-specific detection
-                    if(typeof platform !== 'undefined' && platform === 'samsung') {
-                        console.log('[UHD DEBUG] Platform detected as Samsung - assuming 4K capability');
-                        return true;
-                    }
-                    
-                    console.log('[UHD DEBUG] Fallback detection: No clear 4K indicators found');
-                    return false;
-                    
-                } catch(e) {
-                    console.log('[UHD DEBUG] Error in fallback detection:', e);
-                    return false;
                 }
             },
             
