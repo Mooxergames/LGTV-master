@@ -598,17 +598,6 @@ var channel_page={
             current_movie.num+' : '+current_movie.name
         );
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
-        
-        // Update new channel identity elements
-        $('#full-screen-channel-number').text(current_movie.num);
-        
-        // Add channel name to compact header
-        $('#full-screen-channel-name-compact').text(current_movie.name);
-        
-        // Extract resolution from channel name and show detailed format
-        var resolution = this.extractResolution(current_movie.name);
-        var detailedResolution = this.getDetailedResolution(resolution);
-        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
