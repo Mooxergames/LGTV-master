@@ -42,7 +42,7 @@ var channel_page={
         var category=current_category;
         
         // Check UHD support once at initialization (Samsung only)
-        if(platform === 'samsung' && typeof media_player !== 'undefined') {
+        if(platform === 'samsung' && typeof media_player !== 'undefined' && typeof media_player.checkUHDSupport === 'function') {
             media_player.checkUHDSupport();
         }
 

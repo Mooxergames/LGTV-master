@@ -174,7 +174,6 @@ var LiveModel={
                     }
                 }
             }
-            console.log("here sorted movies=",movies1);
         }
         // console.log(movies1);
         favourite_category.movies=movies1;
