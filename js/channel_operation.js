@@ -380,8 +380,8 @@ var channel_page={
         else
             $('#'+id).hide().html('');
 
-        var current_program,next_program, current_program_title="No Information",
-            current_program_time='', next_program_title="No Information", next_program_time='',program_desc='No Information';
+        var current_program,next_program, current_program_title="",
+            current_program_time='', next_program_title="", next_program_time='',program_desc='';
         if(current_program_exist){
             current_program=programmes[0];
             if(programmes.length>1)
@@ -452,7 +452,6 @@ var channel_page={
             }
         }
         else{
-            $('#full-screen-current-program').text("No Information");
             elements.map(function(item,index){
                 $(item).css({width:0});
             })
@@ -461,10 +460,35 @@ var channel_page={
             $('#full-screen-program-end-time').text('--:--');
             $('#full-screen-current-time-indicator').css({left: '0%'});
         }
-        $('#full-screen-current-program').text(current_program_title);
-        $('#full-screen-program-name').text(current_program_title);
-        $('#full-screen-next-program').text(next_program_title);
-        $('#full-screen-program-description').text(program_desc);
+        
+        // Show/hide elements based on whether we have EPG data
+        if(current_program_title && current_program_title.trim() !== '') {
+            $('#full-screen-current-program').text(current_program_title).show();
+            $('#full-screen-program-name').text(current_program_title).show();
+        } else {
+            $('#full-screen-current-program').hide();
+            $('#full-screen-program-name').hide();
+        }
+        
+        if(next_program_title && next_program_title.trim() !== '') {
+            $('#full-screen-next-program').text(next_program_title).show();
+        } else {
+            $('#full-screen-next-program').hide();
+        }
+        
+        if(program_desc && program_desc.trim() !== '') {
+            $('#full-screen-program-description').text(program_desc).show();
+        } else {
+            $('#full-screen-program-description').hide();
+        }
+        
+        // Hide programs container if no current or next program
+        if((!current_program_title || current_program_title.trim() === '') && 
+           (!next_program_title || next_program_title.trim() === '')) {
+            $('#full-screen-programs-container').hide();
+        } else {
+            $('#full-screen-programs-container').show();
+        }
         
         // Update current time display
         var now = new Date();
@@ -585,11 +609,54 @@ var channel_page={
         
         // Update new channel identity elements
         $('#full-screen-channel-number').text(current_movie.num);
-        $('#full-screen-channel-name-text').text(current_movie.name);
-        $('#full-screen-resolution').text('HD'); // Will be dynamic later
+        
+        // Add channel name to compact header
+        $('#full-screen-channel-name-compact').text(current_movie.name);
+        
+        // Extract resolution from channel name and show detailed format
+        var resolution = this.extractResolution(current_movie.name);
+        var detailedResolution = this.getDetailedResolution(resolution);
+        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
+        }
+    },
+    extractResolution:function(channelName){
+        // Extract resolution information from channel name
+        var name = channelName.toUpperCase();
+        
+        // Check for various resolution formats
+        if(name.includes('4K') || name.includes('UHD')) {
+            return '4K';
+        } else if(name.includes('8K')) {
+            return '8K';
+        } else if(name.includes('FHD') || name.includes('1080P')) {
+            return 'FHD';
+        } else if(name.includes('HD') || name.includes('720P')) {
+            return 'HD';
+        } else if(name.includes('SD') || name.includes('480P')) {
+            return 'SD';
+        } else {
+            // Default to HD if no resolution indicator found
+            return 'HD';
+        }
+    },
+    getDetailedResolution:function(resolution){
+        // Convert resolution type to detailed format with dimensions
+        switch(resolution) {
+            case '8K':
+                return '7680x4320 8K';
+            case '4K':
+                return '3840x2160 4K';
+            case 'FHD':
+                return '1920x1080 FHD';
+            case 'HD':
+                return '1280x720 HD';
+            case 'SD':
+                return '720x480 SD';
+            default:
+                return '1280x720 HD';
         }
     },
     showNextChannel:function(increment){

@@ -43,7 +43,6 @@ var vod_series_player={
     fw_timer:null,
     current_movie_type:'',
     init:function(movie,movie_type,back_url ){
-        console.log(movie);
         this.last_key_time=0;
         this.video_duration=0;
         var that=this;
@@ -256,7 +255,6 @@ var vod_series_player={
             if(duration-current_time>=dt){
                 if(this.current_movie_type==='movies')
                 {
-                    console.log("here save current time", movie, current_time);
                     VodModel.saveVideoTime(movie,current_time);
                 }
                 if(this.current_movie_type==='series')
@@ -288,7 +286,6 @@ var vod_series_player={
                     SeriesModel.removeVideoTime(movie.id);
             }
         }catch (e) {
-            console.log("here saving video time error",e);
         }
     },
     goBack:function(){
@@ -319,7 +316,6 @@ var vod_series_player={
                     search_page.hoverMovie(search_page.keys.hor_keys[1],1);
                 }
                 if(this.back_url==='storage-page') {
-                    console.log('here');
                     $('#storage-page').show();
                     storage_page.hoverMenuItem(storage_page.keys.menu_selection);
                 }
@@ -333,6 +329,9 @@ var vod_series_player={
             $('#subtitle-loader-container').hide();
             keys.focused_part=keys.prev_focus;
             $('#subtitle-selection-modal').modal('hide');
+        }
+        if(keys.focused_part==="subtitle_position_overlay"){
+            this.cancelSubtitlePosition();
         }
         if(keys.focused_part==='vod_info'){
             $('#vod-video-info-container').hide();
@@ -798,51 +797,164 @@ var vod_series_player={
         $(subtitle_audio_modal_buttons).removeClass('active');
     },
     
-    renderEnhancedSubtitles: function(kind, subtitles) {
-        // Enhanced subtitle rendering for combined API/Native subtitle list
+    // Subtitle cache per content ID to avoid repeated API calls
+    subtitleCache: {},
+    
+    // Clean old cache entries to prevent memory leaks
+    cleanSubtitleCache: function() {
+        var now = Date.now();
+        var maxAge = 10 * 60 * 1000; // 10 minutes
+        
+        for(var key in this.subtitleCache) {
+            if(this.subtitleCache.hasOwnProperty(key)) {
+                var entry = this.subtitleCache[key];
+                if(now - entry.timestamp > maxAge) {
+                    delete this.subtitleCache[key];
+                }
+            }
+        }
+    },
+    
+    // Get cached subtitles if available
+    getCachedSubtitles: function(contentId) {
+        if(contentId && this.subtitleCache[contentId]) {
+            var entry = this.subtitleCache[contentId];
+            var maxAge = 10 * 60 * 1000; // 10 minutes
+            
+            if(Date.now() - entry.timestamp < maxAge) {
+                return entry;
+            } else {
+                // Remove expired entry
+                delete this.subtitleCache[contentId];
+            }
+        }
+        return null;
+    },
+    
+    // Performance-optimized subtitle rendering with caching
+    renderEnhancedSubtitles: function(kind, subtitles, contentId) {
         var keys = this.keys;
         if(keys.focused_part === 'resume_bar') {
             $('#subtitle-selection-modal').modal('hide');
             return;
         }
         
+        // Check cache first for instant rendering
+        var cachedData = null;
+        if(contentId) {
+            cachedData = this.getCachedSubtitles(contentId);
+            if(cachedData && cachedData.kind === kind) {
+                subtitles = cachedData.subtitles;
+            }
+        }
+        
+        // Cache subtitle data for future reopening
+        if(contentId && subtitles && !cachedData) {
+            // Clean old cache entries periodically
+            this.cleanSubtitleCache();
+            
+            this.subtitleCache[contentId] = {
+                subtitles: subtitles,
+                kind: kind,
+                timestamp: Date.now()
+            };
+        }
+        
+        // Set modal title and state
         if(kind == "TEXT")
             $("#subtitle-modal-title").text("Subtitle");
         else
             $("#subtitle-modal-title").text("Audio Track");
             
         keys.focused_part = "subtitle_audio_selection_modal";
-        $('#subtitle-selection-modal .modal-operation-menu-type-2').removeClass('active');
         
-        // Create enhanced HTML for combined subtitle list
+        // Optimized DOM rendering - build in memory first
+        var container = document.getElementById('subtitle-selection-container');
+        container.style.display = 'none'; // Hide during update to prevent reflow
+        
         var htmlContent = this.makeEnhancedMediaTrackElement(subtitles, kind);
-        $("#subtitle-selection-container").html(htmlContent);
-        $('#subtitle-selection-modal').modal('show');
+        container.innerHTML = htmlContent;
         
-        var subtitle_menus = $('#subtitle-selection-modal .subtitle-option');
-        this.subtitle_audio_menus = subtitle_menus;
-        
-        // Initialize selection state - always default to first option (Off)
-        keys.subtitle_audio_selection_modal = 0;
-        $(subtitle_menus[0]).addClass('active');
-        $(subtitle_menus[0]).find('input').prop('checked', true);
-        
-        // Find and activate currently selected subtitle if any
-        var current_selected_index = kind === "TEXT" ? this.current_subtitle_index : this.current_audio_track_index;
-        if(current_selected_index !== undefined && current_selected_index !== null && 
-           current_selected_index >= 0 && current_selected_index < subtitle_menus.length) {
-            // Clear previous selection
-            $(subtitle_menus).removeClass('active');
-            $(subtitle_menus).find('input').prop('checked', false);
+        // Batch DOM updates in requestAnimationFrame
+        var that = this;
+        requestAnimationFrame(function() {
+            container.style.display = ''; // Show after update
             
-            // Set current selection
-            $(subtitle_menus[current_selected_index]).addClass('active');
-            $(subtitle_menus[current_selected_index]).find('input').prop('checked', true);
-            keys.subtitle_audio_selection_modal = current_selected_index;
-        }
+            // Setup event delegation instead of individual handlers
+            that.setupSubtitleEventDelegation();
+            
+            // Initialize modal with animation
+            $('#subtitle-selection-modal').addClass('show').modal('show');
+            
+            var subtitle_menus = $('.subtitle-option');
+            that.subtitle_audio_menus = subtitle_menus;
+            
+            // Set default selection (Off/None) - batch class updates
+            that.setActiveSubtitleOption(0, subtitle_menus);
+            keys.subtitle_audio_selection_modal = 0;
+            
+            // Find and set current selection if applicable
+            var current_selected_index = kind === "TEXT" ? that.current_subtitle_index : that.current_audio_track_index;
+            
+            if(current_selected_index !== undefined && current_selected_index !== null && 
+               current_selected_index >= 0 && current_selected_index < subtitle_menus.length) {
+                that.setActiveSubtitleOption(current_selected_index, subtitle_menus);
+                keys.subtitle_audio_selection_modal = current_selected_index;
+            }
+        });
+    },
+    
+    // Optimized batch selection update
+    setActiveSubtitleOption: function(index, options) {
+        // Batch DOM updates to minimize reflow
+        var that = this;
+        requestAnimationFrame(function() {
+            options.removeClass('active selected focused');
+            options.find('input').prop('checked', false);
+            
+            if(index >= 0 && index < options.length) {
+                $(options[index]).addClass('active focused');
+                $(options[index]).find('input').prop('checked', true);
+            }
+        });
+    },
+    
+    // Setup event delegation for better performance  
+    setupSubtitleEventDelegation: function() {
+        var that = this;
+        var container = $('#subtitle-selection-container');
         
-        var subtitle_audio_modal_buttons = $('#subtitle-selection-modal .modal-btn-1');
-        $(subtitle_audio_modal_buttons).removeClass('active');
+        // Remove any existing delegation to avoid duplicates
+        container.off('focus mouseenter click', '.subtitle-option');
+        
+        // Use event delegation with proper throttling
+        var lastUpdate = 0;
+        var throttleDelay = 16; // ~60fps
+        
+        container.on('focus mouseenter', '.subtitle-option', function(e) {
+            e.preventDefault();
+            
+            var now = Date.now();
+            if(now - lastUpdate < throttleDelay) {
+                return; // Throttle to 60fps
+            }
+            lastUpdate = now;
+            
+            var index = $('.subtitle-option').index(this);
+            
+            // Use rAF for smooth DOM updates
+            requestAnimationFrame(function() {
+                that.hoverSubtitleAudioModal(index);
+            });
+        });
+        
+        // Handle click events
+        container.on('click', '.subtitle-option', function(e) {
+            e.preventDefault();
+            var index = $('.subtitle-option').index(this);
+            that.hoverSubtitleAudioModal(index);
+            that.confirmSubtitle();
+        });
     },
     showEmptySubtitleMessage: function (kind) {
         $('#subtitle-selection-modal').modal('hide');
@@ -965,18 +1077,15 @@ var vod_series_player={
             this.current_subtitle_index=$('#subtitle-selection-modal').find('input[type=radio]:checked').val();
             var selectedIndex = parseInt(this.current_subtitle_index);
             
-            console.log('Selected subtitle index:', selectedIndex);
             
             // Use enhanced subtitle workflow for selection
             var that = this;
             EnhancedSubtitleWorkflow.selectSubtitle(selectedIndex,
                 function() {
                     // Loading callback
-                    console.log('Loading subtitle...');
                 },
                 function() {
                     // Success callback
-                    console.log('Subtitle loaded successfully');
                     $("#vod-series-player-page").find('.subtitle-container').css({visibility:'visible'});
                 },
                 function(error) {
@@ -994,9 +1103,343 @@ var vod_series_player={
             }catch(e){
                 console.error('Audio track selection error:', e);
             }
-            console.log('Selected audio track:', this.current_audio_track_index);
         }
     },
+    
+    // Settings Modal Function
+    showSettingsModal: function() {
+        this.hideControlBar();
+        var keys = this.keys;
+        if(keys.focused_part != "operation_modal") {
+            keys.prev_focus = keys.focused_part;
+        }
+        keys.focused_part = "operation_modal";
+        keys.operation_modal = 0;
+        
+        // Show the settings modal
+        $('#vod-series-player-operation-modal').modal('show');
+        
+        // Set focus to first option
+        var buttons = $('#vod-series-player-operation-modal').find('.modal-operation-menu-type-1');
+        $(buttons).removeClass('active');
+        $(buttons[0]).addClass('active');
+    },
+    
+    // Subtitle Position Functions
+    showSubtitlePositionModal: function() {
+        this.hideControlBar();
+        var keys = this.keys;
+        if(keys.focused_part != "subtitle_position_overlay") {
+            keys.prev_focus = keys.focused_part;
+        }
+        keys.focused_part = "subtitle_position_overlay";
+        
+        // Store original settings for cancel functionality
+        this.originalSubtitlePosition = parseInt(localStorage.getItem('subtitle_position') || '10');
+        this.originalSubtitleLevel = this.getSubtitleLevel();
+        this.originalSubtitleSize = this.SUBTITLE_LEVELS.SIZES[this.originalSubtitleLevel];
+        this.originalSubtitleBackground = localStorage.getItem('subtitle_background') || 'black';
+        
+        this.currentSubtitlePosition = this.originalSubtitlePosition;
+        this.currentSubtitleSize = this.originalSubtitleSize;
+        this.currentSubtitleBackground = this.originalSubtitleBackground;
+        
+        this.updateAllDisplays();
+        
+        // Hide movie player operation modal and show position overlay
+        $('#vod-series-player-operation-modal').modal('hide');
+        $('#subtitle-position-overlay').show();
+        
+        // Initialize focus
+        this.positionControlIndex = 0;
+        this.hoverPositionControl(0);
+    },
+    
+    adjustSubtitlePosition: function(direction) {
+        var step = 2; // 2vh adjustment for smoother control
+        if(direction === 'up') {
+            this.currentSubtitlePosition = Math.min(50, this.currentSubtitlePosition + step);
+        } else if(direction === 'down') {
+            // Remove bottom limit - allow subtitles to go to very bottom
+            this.currentSubtitlePosition = Math.max(-5, this.currentSubtitlePosition - step);
+        }
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
+        
+        this.applyLiveSubtitleStyles();
+        this.updateAllDisplays();
+    },
+    
+    setSubtitlePosition: function(position) {
+        this.currentSubtitlePosition = parseInt(position);
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_position', this.currentSubtitlePosition);
+        
+        this.applyLiveSubtitleStyles();
+        this.updateAllDisplays();
+    },
+    
+    // Subtitle size level constants
+    SUBTITLE_LEVELS: {
+        MIN: 0,
+        MAX: 4,
+        DEFAULT: 2,
+        SIZES: [14, 18, 24, 32, 40] // small, normal, large, extra-large, maximum
+    },
+    
+    getSubtitleLevel: function() {
+        var level = parseInt(localStorage.getItem('subtitle_level') || this.SUBTITLE_LEVELS.DEFAULT);
+        return Number.isFinite(level) ? Math.max(this.SUBTITLE_LEVELS.MIN, Math.min(this.SUBTITLE_LEVELS.MAX, level)) : this.SUBTITLE_LEVELS.DEFAULT;
+    },
+    
+    setSubtitleLevel: function(level) {
+        level = Math.max(this.SUBTITLE_LEVELS.MIN, Math.min(this.SUBTITLE_LEVELS.MAX, level));
+        localStorage.setItem('subtitle_level', level);
+        this.currentSubtitleSize = this.SUBTITLE_LEVELS.SIZES[level];
+        localStorage.setItem('subtitle_size', this.currentSubtitleSize); // Keep for backward compatibility
+        this.applyLiveSubtitleStyles();
+        this.updateAllDisplays();
+    },
+    
+    adjustSubtitleSize: function(direction) {
+        var currentLevel = this.getSubtitleLevel();
+        if(direction === 'larger') {
+            this.setSubtitleLevel(currentLevel + 1); // Automatically clamped to MAX
+        } else if(direction === 'smaller') {
+            this.setSubtitleLevel(currentLevel - 1); // Automatically clamped to MIN
+        }
+    },
+    
+    setSubtitleSize: function(size) {
+        // Convert absolute size to level for consistent handling
+        var level = this.SUBTITLE_LEVELS.SIZES.indexOf(parseInt(size));
+        if(level === -1) {
+            // If size not in presets, find closest level
+            var targetSize = parseInt(size);
+            level = this.SUBTITLE_LEVELS.DEFAULT;
+            var minDiff = Infinity;
+            for(var i = 0; i < this.SUBTITLE_LEVELS.SIZES.length; i++) {
+                var diff = Math.abs(this.SUBTITLE_LEVELS.SIZES[i] - targetSize);
+                if(diff < minDiff) {
+                    minDiff = diff;
+                    level = i;
+                }
+            }
+        }
+        this.setSubtitleLevel(level);
+    },
+    
+    setSubtitleBackground: function(bgType) {
+        this.currentSubtitleBackground = bgType;
+        
+        // Auto-save to localStorage immediately
+        localStorage.setItem('subtitle_background', this.currentSubtitleBackground);
+        
+        this.applyLiveSubtitleStyles();
+        this.updateAllDisplays();
+    },
+    
+    applyLiveSubtitleStyles: function() {
+        // Apply all subtitle styles in real-time
+        var position = this.currentSubtitlePosition;
+        var size = this.currentSubtitleSize;
+        var bgType = this.currentSubtitleBackground;
+        
+        // Get background style
+        var backgroundStyle = this.getBackgroundStyle(bgType);
+        
+        // Apply to subtitle containers
+        $('#' + media_player.parent_id).find('.subtitle-container').css({
+            'bottom': position + 'vh',
+            'top': 'auto',
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius
+        });
+        
+        // Also apply to any custom subtitle displays
+        $('.subtitle-text, .subtitle-display').css({
+            'bottom': position + 'vh',
+            'top': 'auto',
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius,
+            'box-shadow': backgroundStyle.boxShadow || 'none', // Add box-shadow control
+            'border': backgroundStyle.border || 'none'        // Add border control
+        });
+    },
+    
+    getBackgroundStyle: function(bgType) {
+        switch(bgType) {
+            case 'transparent':
+                return {
+                    background: 'transparent',
+                    color: '#fff',
+                    textShadow: 'none', // Remove shadow for true transparency
+                    padding: '0px',     // Remove padding to avoid any borders
+                    borderRadius: '0px',
+                    border: 'none',     // Remove any borders
+                    boxShadow: 'none',  // Remove any shadows
+                    outline: 'none'     // Remove any outlines
+                };
+            case 'black':
+                return {
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
+                };
+            case 'gray':
+                return {
+                    background: 'rgba(255,0,0,0.8)', // Changed grey to red
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
+                };
+            case 'dark':
+                return {
+                    background: 'rgba(0,128,0,0.8)', // Changed dark to green
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    boxShadow: 'none',
+                    border: 'none'
+                };
+            default:
+                return this.getBackgroundStyle('black');
+        }
+    },
+    
+    updateAllDisplays: function() {
+        $('#position-value').text(this.currentSubtitlePosition + 'vh');
+        $('#size-value').text(this.currentSubtitleSize + 'px');
+        
+        var bgLabels = {
+            'transparent': 'None',
+            'black': 'Black',
+            'gray': 'Red', // Updated label from Gray to Red
+            'dark': 'Green' // Updated label from Dark to Green
+        };
+        $('#background-value').text(bgLabels[this.currentSubtitleBackground] || 'Black');
+    },
+    
+    hoverPositionControl: function(index) {
+        this.positionControlIndex = index;
+        
+        // Remove active classes
+        $('.position-button, .preset-button, .position-action-btn, .size-button, .bg-color-button').removeClass('active');
+        
+        // Add active class to selected element
+        if(index >= 0 && index < 2) {
+            // Position buttons (up/down)
+            $('.position-button').eq(index).addClass('active');
+        } else if(index >= 2 && index < 6) {
+            // Position preset buttons
+            $('.preset-button').eq(index - 2).addClass('active');
+        } else if(index >= 6 && index < 8) {
+            // Size buttons (smaller/larger)
+            $('.size-button').eq(index - 6).addClass('active');
+        } else if(index >= 8 && index < 12) {
+            // Size preset buttons
+            $('.size-presets .preset-button').eq(index - 8).addClass('active');
+        } else if(index >= 12 && index < 16) {
+            // Background color buttons
+            $('.bg-color-button').eq(index - 12).addClass('active');
+        } else if(index >= 16) {
+            // Save/Cancel buttons
+            $('.position-action-btn').eq(index - 16).addClass('active');
+        }
+    },
+    
+    saveSubtitlePosition: function() {
+        // Settings are already auto-saved, just close overlay and confirm global save
+        $('#subtitle-position-overlay').hide();
+        this.keys.focused_part = "control_bar";
+        
+        showToast("Success", "Subtitle settings saved globally!");
+    },
+    
+    cancelSubtitlePosition: function() {
+        // Reset to original settings
+        this.currentSubtitlePosition = this.originalSubtitlePosition;
+        this.currentSubtitleSize = this.originalSubtitleSize;
+        this.currentSubtitleBackground = this.originalSubtitleBackground;
+        // Reset level storage to match
+        var level = this.SUBTITLE_LEVELS.SIZES.indexOf(this.originalSubtitleSize);
+        if(level !== -1) {
+            localStorage.setItem('subtitle_level', level);
+        }
+        this.applyLiveSubtitleStyles();
+        
+        // Close overlay and return to player
+        $('#subtitle-position-overlay').hide();
+        this.keys.focused_part = "control_bar";
+    },
+    
+    applySubtitlePosition: function() {
+        // Apply all saved subtitle settings on initial load
+        var position = parseInt(localStorage.getItem('subtitle_position') || '10');
+        var level = this.getSubtitleLevel();
+        var size = this.SUBTITLE_LEVELS.SIZES[level];
+        var bgType = localStorage.getItem('subtitle_background') || 'black';
+        
+        this.currentSubtitlePosition = position;
+        this.currentSubtitleSize = size;
+        this.currentSubtitleBackground = bgType;
+        
+        this.applyLiveSubtitleStyles();
+        
+        // Also ensure srt_operation uses these settings for future subtitle display
+        if(typeof srt_operation !== 'undefined') {
+            srt_operation.applyUserStyles();
+        }
+    },
+    
+    // Helper functions for 2D navigation in subtitle position overlay
+    getControlRow: function(index) {
+        if(index >= 0 && index <= 1) return 'position'; // Position up/down
+        if(index >= 2 && index <= 5) return 'position_presets'; // Position presets (bottom, middle, center, upper)
+        if(index >= 6 && index <= 7) return 'size'; // Size larger/smaller
+        if(index >= 8 && index <= 11) return 'size_presets'; // Size presets (small, medium, large, extra-large)
+        if(index >= 12 && index <= 15) return 'background'; // Background options
+        if(index >= 16 && index <= 17) return 'action'; // Save/Cancel buttons
+        return 'position'; // Default fallback
+    },
+    
+    getRowRange: function(row) {
+        switch(row) {
+            case 'position': return { start: 0, end: 1 };
+            case 'position_presets': return { start: 2, end: 5 };
+            case 'size': return { start: 6, end: 7 };
+            case 'size_presets': return { start: 8, end: 11 };
+            case 'background': return { start: 12, end: 15 };
+            case 'action': return { start: 16, end: 17 };
+            default: return { start: 0, end: 1 };
+        }
+    },
+    
+    getColumnInRow: function(index) {
+        // Calculate column position within the current row (0-based)
+        var row = this.getControlRow(index);
+        var range = this.getRowRange(row);
+        return index - range.start;
+    },
+    
     removeAllActiveClass:function(hide_episode){
         $(this.video_info_doms).removeClass('active');
         $(this.episode_doms).removeClass('active');
@@ -1032,16 +1475,48 @@ var vod_series_player={
         $(this.episode_doms[keys.episode_selection]).addClass('active');
         moveScrollPosition($('#player-seasons-container'),this.episode_doms[keys.episode_selection],'horizontal',false)
     },
-    hoverSubtitleAudioModal:function(index){
-        var keys=this.keys;
-        if(index>=0){
-            keys.subtitle_audio_selection_modal=index;
-            moveScrollPosition($('#subtitle-selection-container'),this.subtitle_audio_menus[index],'vertical',false);
+    // Throttled hover handler for better performance
+    hoverTimeout: null,
+    lastHoveredIndex: -1,
+    
+    hoverSubtitleAudioModal: function(index) {
+        var keys = this.keys;
+        
+        // Skip if same index to avoid unnecessary DOM updates
+        if(index === this.lastHoveredIndex) {
+            return;
         }
-        else
-            keys.subtitle_audio_selection_modal=this.subtitle_audio_menus.length+index;
-        $(this.subtitle_audio_menus).removeClass('active');
-        $(this.subtitle_audio_menus[index]).addClass('active');
+        this.lastHoveredIndex = index;
+        
+        if(index >= 0) {
+            keys.subtitle_audio_selection_modal = index;
+            
+            // Batch DOM updates for better performance
+            var that = this;
+            requestAnimationFrame(function() {
+                if(that.subtitle_audio_menus && that.subtitle_audio_menus.length > 0) {
+                    $(that.subtitle_audio_menus).removeClass('active focused');
+                    if(index < that.subtitle_audio_menus.length) {
+                        $(that.subtitle_audio_menus[index]).addClass('active focused');
+                        // Only scroll if needed - throttled
+                        moveScrollPosition($('#subtitle-selection-container'), that.subtitle_audio_menus[index], 'vertical', false);
+                    }
+                }
+            });
+        } else {
+            // Handle negative indexes (buttons)
+            keys.subtitle_audio_selection_modal = this.subtitle_audio_menus.length + index;
+            var that = this;
+            requestAnimationFrame(function() {
+                if(that.subtitle_audio_menus) {
+                    $(that.subtitle_audio_menus).removeClass('active focused');
+                    var targetIndex = that.subtitle_audio_menus.length + index;
+                    if(targetIndex >= 0 && targetIndex < that.subtitle_audio_menus.length) {
+                        $(that.subtitle_audio_menus[targetIndex]).addClass('active focused');
+                    }
+                }
+            });
+        }
     },
     hoverResumeBar:function(index){
         var keys=this.keys;
@@ -1086,6 +1561,36 @@ var vod_series_player={
             else{
                 $(this.subtitle_audio_menus).find('input').prop('checked',false);
                 $(this.subtitle_audio_menus[keys.subtitle_audio_selection_modal]).find('input').prop('checked',true);
+            }
+        }
+        else if(keys.focused_part==="subtitle_position_overlay"){
+            // Handle subtitle position overlay clicks
+            if(this.positionControlIndex >= 0 && this.positionControlIndex < 2) {
+                // Position buttons (up/down)
+                var direction = this.positionControlIndex === 0 ? 'up' : 'down';
+                this.adjustSubtitlePosition(direction);
+            } else if(this.positionControlIndex >= 2 && this.positionControlIndex < 6) {
+                // Position preset buttons
+                var presets = [5, 20, 30, 40]; // bottom, middle, center, upper
+                this.setSubtitlePosition(presets[this.positionControlIndex - 2]);
+            } else if(this.positionControlIndex >= 6 && this.positionControlIndex < 8) {
+                // Size buttons (smaller/larger)
+                var direction = this.positionControlIndex === 6 ? 'smaller' : 'larger';
+                this.adjustSubtitleSize(direction);
+            } else if(this.positionControlIndex >= 8 && this.positionControlIndex < 12) {
+                // Size preset buttons
+                var sizePresets = [14, 18, 24, 32]; // small, normal, large, extra large
+                this.setSubtitleSize(sizePresets[this.positionControlIndex - 8]);
+            } else if(this.positionControlIndex >= 12 && this.positionControlIndex < 16) {
+                // Background buttons
+                var bgTypes = ['transparent', 'black', 'gray', 'dark'];
+                this.setSubtitleBackground(bgTypes[this.positionControlIndex - 12]);
+            } else if(this.positionControlIndex === 16) {
+                // Save button
+                this.saveSubtitlePosition();
+            } else if(this.positionControlIndex === 17) {
+                // Cancel button
+                this.cancelSubtitlePosition();
             }
         }
         else if(keys.focused_part==='resume_bar'){
@@ -1162,6 +1667,30 @@ var vod_series_player={
             else
                 keys.subtitle_audio_selection_modal=this.subtitle_audio_menus.length-2;
             this.hoverSubtitleAudioModal(keys.subtitle_audio_selection_modal);
+        }
+        if(keys.focused_part==="subtitle_position_overlay"){
+            // Navigate horizontally within the same control row
+            var currentRow = this.getControlRow(this.positionControlIndex);
+            var rowRange = this.getRowRange(currentRow);
+            
+            if(increment>0) {
+                // Move right within same row
+                if(this.positionControlIndex < rowRange.end) {
+                    this.positionControlIndex++;
+                } else {
+                    // Wrap to start of row
+                    this.positionControlIndex = rowRange.start;
+                }
+            } else {
+                // Move left within same row
+                if(this.positionControlIndex > rowRange.start) {
+                    this.positionControlIndex--;
+                } else {
+                    // Wrap to end of row
+                    this.positionControlIndex = rowRange.end;
+                }
+            }
+            this.hoverPositionControl(this.positionControlIndex);
         }
     },
     handleMenuUpDown:function(increment){
@@ -1242,6 +1771,71 @@ var vod_series_player={
                 keys.operation_modal=0;
             $(buttons).removeClass('active');
             $(buttons[keys.operation_modal]).addClass('active');
+        }
+        else if(keys.focused_part==="subtitle_position_overlay"){
+            // Simple column-based down navigation: up->bottom->smaller->small->none->save
+            // Left/right navigation works within each row
+            var currentIndex = this.positionControlIndex;
+            
+            if(increment > 0) {
+                // Down navigation paths: up→bottom→center→smaller→small path AND down→middle→upper→large→normal→extra-large→black→dark→cancel path
+                switch(currentIndex) {
+                    // Main up path: up→bottom→center→smaller→small→large→none→gray→save
+                    case 0: this.positionControlIndex = 2; break; // up → bottom
+                    case 2: this.positionControlIndex = 4; break; // bottom → center
+                    case 4: this.positionControlIndex = 6; break; // center → smaller
+                    case 6: this.positionControlIndex = 8; break; // smaller → small
+                    case 8: this.positionControlIndex = 10; break; // small → large
+                    case 10: this.positionControlIndex = 12; break; // large → none (from up path)
+                    case 12: this.positionControlIndex = 14; break; // none → gray
+                    case 14: this.positionControlIndex = 16; break; // gray → save
+                    
+                    // Main down path: down→middle→upper→larger→normal→extra-large→black→dark→cancel
+                    case 1: this.positionControlIndex = 3; break; // down → middle
+                    case 3: this.positionControlIndex = 5; break; // middle → upper
+                    case 5: this.positionControlIndex = 7; break; // upper → larger
+                    case 7: this.positionControlIndex = 9; break; // larger → normal
+                    case 9: this.positionControlIndex = 11; break; // normal → extra-large
+                    case 11: this.positionControlIndex = 13; break; // extra-large → black
+                    case 13: this.positionControlIndex = 15; break; // black → dark
+                    case 15: this.positionControlIndex = 17; break; // dark → cancel
+                    
+                    // Other navigation points
+                    case 16: this.positionControlIndex = 0; break; // save → up (wrap)
+                    case 17: this.positionControlIndex = 1; break; // cancel → down (wrap)
+                    default: this.positionControlIndex = 0; break; // fallback
+                }
+            } else {
+                // Up navigation (reverse paths)
+                switch(currentIndex) {
+                    // Reverse up path: save→gray→none→large→small→smaller→center→bottom→up
+                    case 16: this.positionControlIndex = 14; break; // save → gray
+                    case 14: this.positionControlIndex = 12; break; // gray → none
+                    case 12: this.positionControlIndex = 10; break; // none → large
+                    case 10: this.positionControlIndex = 8; break; // large → small
+                    case 8: this.positionControlIndex = 6; break; // small → smaller
+                    case 6: this.positionControlIndex = 4; break; // smaller → center
+                    case 4: this.positionControlIndex = 2; break; // center → bottom
+                    case 2: this.positionControlIndex = 0; break; // bottom → up
+                    case 0: this.positionControlIndex = 16; break; // up → save (wrap)
+                    
+                    // Reverse down path: cancel→dark→black→extra-large→normal→larger→upper→middle→down
+                    case 17: this.positionControlIndex = 15; break; // cancel → dark
+                    case 15: this.positionControlIndex = 13; break; // dark → black
+                    case 13: this.positionControlIndex = 11; break; // black → extra-large
+                    case 11: this.positionControlIndex = 9; break; // extra-large → normal
+                    case 9: this.positionControlIndex = 7; break; // normal → larger
+                    case 7: this.positionControlIndex = 5; break; // larger → upper
+                    case 5: this.positionControlIndex = 3; break; // upper → middle
+                    case 3: this.positionControlIndex = 1; break; // middle → down
+                    case 1: this.positionControlIndex = 17; break; // down → cancel (wrap)
+                    
+                    // Other items (no conflicts with main paths)
+                    default: this.positionControlIndex = 0; break; // fallback
+                }
+            }
+            
+            this.hoverPositionControl(this.positionControlIndex);
         }
         if(keys.focused_part==="subtitle_audio_selection_modal"){
             if(keys.subtitle_audio_selection_modal<this.subtitle_audio_menus.length-2)
