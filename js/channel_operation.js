@@ -531,8 +531,8 @@ var channel_page={
         }
     },
     zoomInOut:function(){
-        if(!this.full_screen_video){
-            // Going TO fullscreen
+        if(this.full_screen_video){
+            // Flag is TRUE = apply FULLSCREEN CSS
             $('#live_channels_home .player-container').css({
                 position:'fixed',
                 left:0,
@@ -543,7 +543,6 @@ var channel_page={
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
-            this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
@@ -552,16 +551,9 @@ var channel_page={
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
-            // Call setDisplayArea for fullscreen
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                }
-            },100);
         }
         else{
-            // Going TO preview
+            // Flag is FALSE = apply PREVIEW CSS
             $('#live_channels_home .player-container').css({
                 position:'relative',
                 left:0,
@@ -575,15 +567,14 @@ var channel_page={
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
             $('#live_channels_home').find('.video-skin').show();
-            this.full_screen_video=false;
-            // Call setDisplayArea for preview
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                }
-            },100);
         }
+        // Always call setDisplayArea after CSS changes
+        setTimeout(function () {
+            try{
+                media_player.setDisplayArea();
+            }catch (e) {
+            }
+        },100);
     },
     showLiveChannelMovie:function(movie_id){
         var url
