@@ -755,82 +755,35 @@ function initPlayer() {
                 if(this.uhd_support.checked) return;
                 
                 try {
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] SAMSUNG TV 4K DETECTION TEST');
-                    console.log('========================================');
-                    
-                    // Screen info
-                    console.log('[UHD DEBUG] Screen Resolution:', (screen.width || 0) + 'x' + (screen.height || 0));
-                    console.log('[UHD DEBUG] Window Size:', window.innerWidth + 'x' + window.innerHeight);
-                    console.log('[UHD DEBUG] Device Pixel Ratio:', window.devicePixelRatio);
-                    
-                    // Check if Samsung webapis exists
-                    if(typeof webapis === 'undefined') {
-                        console.log('[UHD DEBUG] ✗ webapis NOT available - not on Samsung TV');
+                    if(typeof webapis === 'undefined' || !webapis.productinfo) {
                         this.uhd_support.supports_4k = false;
                         this.uhd_support.supports_8k = false;
                         this.uhd_support.checked = true;
                         return;
                     }
-                    
-                    console.log('[UHD DEBUG] ✓ webapis is available');
-                    
-                    // Check if productinfo exists
-                    if(!webapis.productinfo) {
-                        console.log('[UHD DEBUG] ✗ webapis.productinfo NOT available');
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                        return;
-                    }
-                    
-                    console.log('[UHD DEBUG] ✓ webapis.productinfo is available');
-                    console.log('[UHD DEBUG] Available ProductInfo methods:');
-                    for(var key in webapis.productinfo) {
-                        console.log('[UHD DEBUG]   - ' + key + ' (type: ' + typeof webapis.productinfo[key] + ')');
-                    }
-                    
-                    // Official Samsung 4K detection using isUdPanelSupported()
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] Testing: webapis.productinfo.isUdPanelSupported()');
-                    console.log('[UHD DEBUG] (true = 4K or higher, false = up to FHD)');
-                    console.log('========================================');
                     
                     if (webapis.productinfo.isUdPanelSupported()) {
-                        console.log("✓✓✓ 4K UHD is supported ✓✓✓");
+                        console.log("4K UHD is supported");
                         this.uhd_support.supports_4k = true;
                     } else {
-                        console.log("✗✗✗ 4K UHD is not supported ✗✗✗");
+                        console.log("4K UHD is not supported");
                         this.uhd_support.supports_4k = false;
                     }
                     
-                    // Check 8K support
                     if(typeof webapis.productinfo.is8KPanelSupported === 'function') {
-                        console.log('[UHD DEBUG] Testing: webapis.productinfo.is8KPanelSupported()');
                         if (webapis.productinfo.is8KPanelSupported()) {
-                            console.log("✓✓✓ 8K UHD is supported ✓✓✓");
+                            console.log("8K UHD is supported");
                             this.uhd_support.supports_8k = true;
                         } else {
-                            console.log("✗ 8K UHD is not supported");
                             this.uhd_support.supports_8k = false;
                         }
                     } else {
-                        console.log('[UHD DEBUG] is8KPanelSupported() not available');
                         this.uhd_support.supports_8k = false;
                     }
                     
                     this.uhd_support.checked = true;
                     
-                    // Final summary
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] FINAL RESULTS:');
-                    console.log('[UHD DEBUG] 4K (3840x2160):', this.uhd_support.supports_4k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
-                    console.log('[UHD DEBUG] 8K (7680x4320):', this.uhd_support.supports_8k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
-                    console.log('========================================');
-                    
                 } catch(e) {
-                    console.log('[UHD DEBUG] ✗ ERROR during UHD detection:', e);
-                    console.log('[UHD DEBUG] Error details:', e.message, e.stack);
                     this.uhd_support.supports_4k = false;
                     this.uhd_support.supports_8k = false;
                     this.uhd_support.checked = true;
