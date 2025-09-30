@@ -1,0 +1,128 @@
+Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+env.js:1 Failed to load resource: net::ERR_<unknown>
+common.js:894 
+Object
+2
+webOSTV.js:126 PalmServiceBridge is not found.
+main.js:8 Samsung Tizen platform detected
+login_operation.js:219 Samsung: Using Ethernet MAC address
+login_operation.js:149 
+{mac_registered: true, epg_urls: Array(0), youtube_api_key: "AIzaSyDah7Y_f30m5qLRa_oTWUnferVy4PzcufE", themes: Array(3), adverts: Array(1), …}
+login_operation.js:32 
+{mac_registered: true, epg_urls: Array(0), youtube_api_key: "AIzaSyDah7Y_f30m5qLRa_oTWUnferVy4PzcufE", themes: Array(3), adverts: Array(1), …}
+jquery.3.4.1.min.js:2 GET https://flixapp.tv/images/upload/303512.png 403
+561956.png:1 GET https://flixapp.tv/images/upload/561956.png 403
+The resource https://flixapp.net/images/activation-qr-code.svg was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+player.js:45 http://galaiptv.shop:2095/movie/dogubeyyeni2/ev7tHk0Atg/346051.mkv
+VM63:1 adding listener
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …us> (file:///js/libs/jquery.3.4.1.min.js:2:71222)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/40721.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …each (file:///js/libs/jquery.3.4.1.min.js:2:1419)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/40693.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …each (file:///js/libs/jquery.3.4.1.min.js:2:1419)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/51387.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:769 
+[]
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+player.js:45 http://galaiptv.shop:2095/movie/dogubeyyeni2/ev7tHk0Atg/346051.mkv
+VM63:1 adding listener
+player.js:195 0 0 639 359
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …us> (file:///js/libs/jquery.3.4.1.min.js:2:71222)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/64571.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …each (file:///js/libs/jquery.3.4.1.min.js:2:1419)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/170644.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+player.js:195 0 0 1920 1080
+VM63:1 Entering setDisplayRect
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+channel_operation.js:597 
+WebAPIException {code: 11, name: "InvalidStateError", message: "PLAYER_ERROR_INVALID_STATE", stack: "InvalidStateError: PLAYER_ERROR_INVALID_STATE↵    …each (file:///js/libs/jquery.3.4.1.min.js:2:1419)"}
+player.js:45 http://galaiptv.shop:2095/live/dogubeyyeni2/ev7tHk0Atg/170646.ts
+VM63:1 adding listener
+player.js:195 0 804.234375 1119 629
+VM63:1 Entering setDisplayRect
+VM63:1 Entered AVPlayManager.prepareAsync()
+player.js:195 0 0 1920 1080
+﻿
