@@ -1119,6 +1119,7 @@ var home_page={
         $('#sort-modal-container').hide();
         var category=current_movie_categories[keys.submenu_selection];
         
+        console.log('🎯 changeSortKey called with key:', key, 'current_sort_key:', current_sort_key, 'category:', category.category_id);
         
         // Always save the new sort preference
         settings.saveSettings(current_sort_key, key, '');

@@ -61,10 +61,12 @@ function initPlayer() {
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
+                    console.log('here trying to open');
                     webapis.avplay.prepareAsync(
                         function(){
                             that.reconnect_count = 0;
                             $('#' + that.parent_id).find('.video-reconnect-message').hide();
+                            console.log('here video loaded');
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
@@ -166,6 +168,7 @@ function initPlayer() {
                     return;
                 clearTimeout(this.reconnect_timer);
                 var reconnect_count=this.reconnect_count + 1;
+                console.log("here reconnecting", this.reconnect_count);
                 if (reconnect_count >= this.reconnect_max_count) {
                     $('#' + this.parent_id).find('.video-reconnect-message').hide();
                     return;
@@ -247,14 +250,11 @@ function initPlayer() {
                     },
                     oncurrentplaytime: function(currentTime) {
                         that.current_time=currentTime;
-                        var currentTimeSeconds = currentTime/1000;
-                        
-                        
                         if(current_route==='vod-series-player-video') {
-                            vod_series_player.current_time=currentTimeSeconds;
+                            vod_series_player.current_time=currentTime/1000;
                             // Samsung subtitle timing - convert ms to seconds
                             if(typeof SrtOperation !== 'undefined') {
-                                SrtOperation.timeChange(currentTimeSeconds);
+                                SrtOperation.timeChange(currentTime/1000);
                             }
                         }
                         $('#'+that.parent_id).find('.video-error').hide();
@@ -450,9 +450,6 @@ function initPlayer() {
                     $('#'+that.parent_id).find('.video-error').hide();
                     // console.log('Video can start, but not sure it will play through.');
                 });
-                this.videoObj.addEventListener('playing', function(event){
-                    // Video is playing after buffering
-                });
                 this.videoObj.addEventListener('durationchange', function(event){
                     $('#'+that.parent_id).find('.video-error').hide();
                     // console.log('Not sure why, but the duration of the video has changed.');
@@ -474,17 +471,9 @@ function initPlayer() {
                     $('#'+that.parent_id).find('.video-error').hide();
                     var duration =  videoObj.duration;
                     var currentTime=videoObj.currentTime;
-                    
-                    
                     if(current_route==='vod-series-player-video') {
-                        // Use same seconds logic as Samsung - store original time
-                        that.current_time=currentTime;
                         vod_series_player.current_time=currentTime;
-                        
-                        // LG subtitle timing - same logic as Samsung (already in seconds)
-                        if(typeof SrtOperation !== 'undefined') {
-                            SrtOperation.timeChange(currentTime);
-                        }
+                        SrtOperation.timeChange(currentTime);
                     }
                     if (duration > 0) {
                         $('#'+that.parent_id).find('.video-progress-bar-slider').val(currentTime).change();
