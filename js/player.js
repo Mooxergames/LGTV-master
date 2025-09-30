@@ -18,6 +18,7 @@ function initPlayer() {
             reconnect_max_count: 20,
             url:'',
             id:'',
+            uhd_checked: false,
             init:function(id, parent_id) {
                 this.id=id;
                 this.parent_id=parent_id;
@@ -40,6 +41,25 @@ function initPlayer() {
                 }
                 $('.video-resolution').text('Live');
                 this.reconnect_count = 0;
+                
+                // Check 4K support once at startup
+                if(!this.uhd_checked) {
+                    this.check4KSupport();
+                    this.uhd_checked = true;
+                }
+            },
+            check4KSupport: function() {
+                try {
+                    if(typeof webapis !== 'undefined' && webapis.productinfo) {
+                        if(webapis.productinfo.isUdPanelSupported()) {
+                            console.log("✓ 4K UHD is supported");
+                        } else {
+                            console.log("✗ 4K UHD is not supported");
+                        }
+                    }
+                } catch(e) {
+                    // Silent fail if API not available
+                }
             },
             playAsync:function(url){
                 console.log(url);
