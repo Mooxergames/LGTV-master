@@ -555,7 +555,6 @@ var channel_page={
             }, 150);
             $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
-            $('#fullscreen-back-button').removeClass('visible');
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
             $('#live_channels_home').find('.video-skin').show();
@@ -576,11 +575,9 @@ var channel_page={
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
-            $('#fullscreen-back-button').addClass('visible');
             this.full_screen_timer=setTimeout(function(){
                 $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
-                $('#fullscreen-back-button').removeClass('visible');
             },5000)
             this.keys.focused_part="full_screen";
         }
