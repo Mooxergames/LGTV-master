@@ -1,0 +1,304 @@
+========================================
+LIVE TV PLAYER BAR - ANDROID LAYOUT SPECS
+========================================
+
+This document provides exact styling specifications for the live TV player bar 
+from the FLIX IPTV Smart TV app for Android implementation.
+
+========================================
+LAYOUT STRUCTURE
+========================================
+
+The player bar uses a 3-section horizontal flexbox layout:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [LEFT]           [CENTER]                          [RIGHT]             │
+│  Channel Logo     Program Info                      LIVE + Resolution   │
+│  Channel #                                                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+========================================
+CONTAINER SPECIFICATIONS
+========================================
+
+Main Container (#full-screen-information):
+- Position: Fixed at bottom of screen
+- Bottom: 1.5vh (viewport height)
+- Left: 8vw (viewport width)
+- Right: 8vw (viewport width)
+- Background: rgba(0, 0, 0, 0.75) - semi-transparent black
+- Border-radius: 14px
+- Border: 1px solid rgba(255, 255, 255, 0.1)
+- Padding: 12px 20px
+- Display: flex
+- Flex-direction: row
+- Align-items: center
+- Gap: 16px
+- Z-index: 100
+
+Enhanced Background (if blur supported):
+- Background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(20, 20, 30, 0.9) 100%)
+- Backdrop-filter: blur(12px)
+- Box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3)
+
+Show/Hide Animation:
+- Transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)
+- Hidden: opacity: 0, visibility: hidden
+- Visible: opacity: 1, visibility: visible
+
+========================================
+LEFT SECTION - CHANNEL IDENTITY
+========================================
+
+Container (.player-info-left):
+- Flex: 0 0 auto
+- Min-width: 0
+- Max-width: 280px
+- Width: fit-content
+
+Channel Logo (.channel-logo):
+- Height: 160px
+- Width: auto
+- Border-radius: 6px
+- Box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5)
+
+Channel Number (.channel-number):
+- Font-size: 24px
+- Font-weight: 700 (bold)
+- Color: #00d4ff (cyan blue)
+- Text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+- Line-height: 1
+
+Channel Name (.channel-name):
+- Font-size: 28px
+- Font-weight: 500 (medium)
+- Color: rgba(255, 255, 255, 0.9)
+- Text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7)
+- Max-width: 180px
+- White-space: nowrap
+- Overflow: hidden
+- Text-overflow: ellipsis
+
+========================================
+CENTER SECTION - PROGRAM INFORMATION
+========================================
+
+Container (.player-info-center):
+- Flex: 1 1 auto
+- Min-width: 0
+- Max-width: 60%
+
+Channel Name Compact (.channel-name-compact):
+- Color: #007bff (blue)
+- Font-weight: 600
+- Font-size: 32px
+- Margin-bottom: 4px
+
+Program Title (.program-title):
+- Font-size: 24px
+- Font-weight: 600
+- Color: #ffffff
+- Text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7)
+- Letter-spacing: 0.5px
+- Line-height: 1.2
+
+Program Description (.program-description):
+- Font-size: 14px
+- Color: rgba(255, 255, 255, 0.8)
+- Font-weight: 400
+- Text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
+- Line-height: 1.3
+- Letter-spacing: 0.25px
+- Max lines: 2 (use -webkit-line-clamp: 2)
+
+Current/Next Programs Container (.current-next-programs):
+- Display: flex
+- Gap: 6px
+- Margin-top: 6px
+
+Current Program Box (#full-screen-current-program):
+- Flex: 1
+- Padding: 8px 16px
+- Font-size: 26px
+- Font-weight: 500
+- Border-radius: 8px
+- Background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+- Border-left: 4px solid #00d4ff
+- Text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6)
+- White-space: nowrap
+- Overflow: hidden
+- Text-overflow: ellipsis
+- Text-align: center
+
+Next Program Box (#full-screen-next-program):
+- Same as Current Program except:
+- Background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%)
+- Border-left: 4px solid rgba(0, 212, 255, 0.6)
+
+========================================
+RIGHT SECTION - STATUS INDICATORS
+========================================
+
+Container (.player-info-right):
+- Flex: 0 0 auto
+- Display: flex
+- Align-items: center
+
+Stack Container (.live-resolution-stack):
+- Display: flex
+- Flex-direction: column
+- Align-items: flex-end
+- Gap: 8px
+
+LIVE Indicator (.live-indicator):
+- Background: linear-gradient(135deg, #ff3b30 0%, #ff6b35 100%)
+- Color: white
+- Padding: 8px 16px
+- Border-radius: 20px
+- Font-size: 16px
+- Font-weight: 700
+- Letter-spacing: 1px
+- Text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5)
+- Box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4)
+- Border: 2px solid rgba(255, 255, 255, 0.2)
+
+LIVE Indicator Animation (pulse-glow):
+- Duration: 2s infinite
+- 0%, 100%: opacity: 1, scale: 1
+- 50%: opacity: 0.8, scale: 1.05
+
+Resolution Display (#full-screen-resolution):
+- Font-size: 16px
+- Padding: 6px 12px
+- Background: rgba(0, 0, 0, 0.7)
+- Border-radius: 12px
+- Border: 1px solid rgba(255, 255, 255, 0.2)
+- Color: #fff
+- Font-weight: 500
+- Letter-spacing: 1px
+- White-space: nowrap
+- Text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5)
+- Max-width: 140px
+- Text-overflow: ellipsis
+
+========================================
+HTML STRUCTURE
+========================================
+
+<div id="full-screen-information">
+    <!-- Left section: Channel Identity -->
+    <div class="player-info-left">
+        <div class="channel-identity">
+            <img id="full-screen-channel-logo" class="channel-logo" />
+            <div class="channel-info">
+                <div class="channel-number" id="full-screen-channel-number">99</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Center section: Program Information -->
+    <div class="player-info-center">
+        <div class="program-info">
+            <div class="program-header">
+                <div id="full-screen-channel-name-compact" class="channel-name-compact">Channel Name</div>
+                <div id="full-screen-program-name" class="program-title">Program Name</div>
+            </div>
+            <p id="full-screen-program-description" class="program-description">Program Description</p>
+            <div id="full-screen-programs-container" class="current-next-programs">
+                <div id="full-screen-current-program" class="current-program">
+                    Current Program
+                </div>
+                <div id="full-screen-next-program" class="next-program">
+                    Next Program
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right section: Status Indicators -->
+    <div class="player-info-right">
+        <div class="live-resolution-stack">
+            <div class="live-indicator">LIVE</div>
+            <div class="video-resolution" id="full-screen-resolution">1280x720 HD</div>
+        </div>
+    </div>
+</div>
+
+========================================
+COLOR PALETTE
+========================================
+
+Primary Colors:
+- Cyan Blue: #00d4ff (channel number, borders)
+- Blue: #007bff (channel name)
+- Red-Orange Gradient: #ff3b30 to #ff6b35 (LIVE indicator)
+- Purple Gradient: #667eea to #764ba2 (current/next programs)
+
+Background Colors:
+- Main Container: rgba(0, 0, 0, 0.75)
+- Enhanced: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(20, 20, 30, 0.9) 100%)
+- Resolution Badge: rgba(0, 0, 0, 0.7)
+
+Text Colors:
+- Primary: #ffffff
+- Secondary: rgba(255, 255, 255, 0.9)
+- Tertiary: rgba(255, 255, 255, 0.8)
+
+========================================
+TYPOGRAPHY
+========================================
+
+Font Weights:
+- Regular: 400
+- Medium: 500
+- Semi-bold: 600
+- Bold: 700
+
+Font Sizes:
+- Channel Name Compact: 32px
+- Program Title: 24px
+- Channel Number: 24px
+- Current/Next Programs: 26px
+- Channel Name: 28px
+- Program Description: 14px
+- LIVE Indicator: 16px
+- Resolution: 16px
+
+Text Effects:
+- All text uses text-shadow for better visibility on video backgrounds
+- Primary shadow: 0 2px 4px rgba(0, 0, 0, 0.8)
+- Secondary shadow: 0 1px 3px rgba(0, 0, 0, 0.7)
+
+========================================
+ANDROID IMPLEMENTATION NOTES
+========================================
+
+1. Use ConstraintLayout for the main container
+2. Implement the 3-section layout with weighted LinearLayout or ConstraintLayout chains
+3. Use CardView for the main container to get rounded corners and shadow
+4. Implement fade in/out animations using Android's ObjectAnimator
+5. Use TextUtils.ellipsize for text overflow handling
+6. Implement the pulse animation using ValueAnimator for the LIVE indicator
+7. Use ViewGroup.setAlpha() for the backdrop transparency effect
+8. Consider using Material Design components for consistent styling
+9. Test on different screen sizes - use dp/sp units equivalent to vw/vh
+10. Implement auto-hide timer (show for 5 seconds, then fade out)
+
+========================================
+RESPONSIVE BREAKPOINTS
+========================================
+
+The layout is designed for TV screens (1920x1080 typical).
+For Android TV:
+- Use similar viewport-relative sizing (dp equivalent to vw/vh)
+- Maintain aspect ratios for the logo
+- Ensure text remains readable on all screen sizes
+
+For Android Mobile:
+- Consider reducing font sizes by 20-30%
+- Adjust padding to fit smaller screens
+- May need to stack sections vertically on portrait orientation
+
+========================================
+END OF SPECIFICATIONS
+========================================
