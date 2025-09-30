@@ -42,7 +42,6 @@ function initPlayer() {
                 this.reconnect_count = 0;
             },
             playAsync:function(url){
-                console.log(url);
                 this.url=url;
                 $('#'+this.parent_id).find('.video-error').hide();
 
@@ -192,8 +191,6 @@ function initPlayer() {
                 var left_position=$(this.videoObj).offset().left;
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
-                console.log(top_position,left_position,width,height);
-                // console.log(this.videoObj);
                 webapis.avplay.setDisplayRect(left_position,top_position,width,height);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
