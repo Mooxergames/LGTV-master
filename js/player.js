@@ -42,6 +42,7 @@ function initPlayer() {
                 this.reconnect_count = 0;
             },
             playAsync:function(url){
+                console.log(url);
                 this.url=url;
                 $('#'+this.parent_id).find('.video-error').hide();
 
@@ -56,6 +57,10 @@ function initPlayer() {
                 try{
                     webapis.avplay.open(url);
                     this.setupEventListeners();
+                    this.setDisplayArea();
+                    // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
+                    // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
+
                     webapis.avplay.prepareAsync(
                         function(){
                             that.reconnect_count = 0;
@@ -145,7 +150,6 @@ function initPlayer() {
                 }
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
-                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
@@ -159,7 +163,6 @@ function initPlayer() {
                 $(this.parent_id).find('.video-error').hide();
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
-                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
@@ -189,12 +192,9 @@ function initPlayer() {
                 var left_position=$(this.videoObj).offset().left;
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
-                
-                try {
-                    webapis.avplay.setDisplayRect(left_position,top_position,width,height);
-                } catch (e) {
-                    throw e;
-                }
+                console.log(top_position,left_position,width,height);
+                // console.log(this.videoObj);
+                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
@@ -256,9 +256,12 @@ function initPlayer() {
                     },
                     onbufferingcomplete: function() {
                         $('#'+that.parent_id).find('.video-loader').hide();
-                        that.display_area_timer = setTimeout(function() {
+                        // Reapply display area after buffering for proper sizing
+                        setTimeout(function() {
                             that.setDisplayArea();
                         }, 100);
+                        // console.log('Buffering Complete, Can play now!');
+                        // console.log("Buffereing complete time "+(new Date()).getTime()/1000)
                     },
                     onstreamcompleted: function() {
                         // console.log('video has ended.');
@@ -689,68 +692,6 @@ function initPlayer() {
                 } catch(e) {
                     console.error('LG subtitle/audio track error:', e);
                 }
-            },
-            
-            // Samsung 4K/8K UHD capability detection according to Samsung documentation
-            uhd_support: {
-                supports_4k: false,
-                supports_8k: false,
-                checked: false
-            },
-            
-            checkUHDSupport: function() {
-                if(this.uhd_support.checked) return;
-                
-                try {
-                    if(typeof webapis === 'undefined' || !webapis.productinfo) {
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                        return;
-                    }
-                    
-                    if (webapis.productinfo.isUdPanelSupported()) {
-                        console.log("4K UHD is supported");
-                        this.uhd_support.supports_4k = true;
-                    } else {
-                        console.log("4K UHD is not supported");
-                        this.uhd_support.supports_4k = false;
-                    }
-                    
-                    if(typeof webapis.productinfo.is8KPanelSupported === 'function') {
-                        if (webapis.productinfo.is8KPanelSupported()) {
-                            console.log("8K UHD is supported");
-                            this.uhd_support.supports_8k = true;
-                        } else {
-                            this.uhd_support.supports_8k = false;
-                        }
-                    } else {
-                        this.uhd_support.supports_8k = false;
-                    }
-                    
-                    this.uhd_support.checked = true;
-                    
-                } catch(e) {
-                    this.uhd_support.supports_4k = false;
-                    this.uhd_support.supports_8k = false;
-                    this.uhd_support.checked = true;
-                }
-            },
-            
-            // Get UHD capabilities for external use
-            getUHDSupport: function() {
-                if(!this.uhd_support.checked) {
-                    try {
-                        this.checkUHDSupport();
-                    } catch(e) {
-                        console.log('[UHD DEBUG] Error calling checkUHDSupport:', e);
-                        // Safe fallback
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                    }
-                }
-                return this.uhd_support;
             }
         }
     }

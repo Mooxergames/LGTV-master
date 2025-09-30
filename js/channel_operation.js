@@ -40,11 +40,6 @@ var channel_page={
         this.is_drawing=false;
         $("#channel-page").show();
         var category=current_category;
-        
-        // Check UHD support once at initialization (Samsung only)
-        if(platform === 'samsung' && typeof media_player !== 'undefined' && typeof media_player.checkUHDSupport === 'function') {
-            media_player.checkUHDSupport();
-        }
 
         $('.bottom-label-item').hide();
         if(category.category_id==='recent' || category.category_id==='favourite')
@@ -105,13 +100,6 @@ var channel_page={
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             that.keys.focused_part="full_screen";
-            // Ensure setDisplayArea() is called after CSS changes for initial fullscreen
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                }
-            },100);
         }
         else{
             that.full_screen_video=false;
@@ -550,6 +538,10 @@ var channel_page={
                 width:'58.3vw'
             });
             this.keys.focused_part="channel_selection";
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
             $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
@@ -564,6 +556,10 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
@@ -577,6 +573,12 @@ var channel_page={
             },5000)
             this.keys.focused_part="full_screen";
         }
+        setTimeout(function () {
+            try{
+                media_player.setDisplayArea();
+            }catch (e) {
+            }
+        },0)
     },
     showLiveChannelMovie:function(movie_id){
         var url
@@ -611,22 +613,10 @@ var channel_page={
         // Add channel name to compact header
         $('#full-screen-channel-name-compact').text(current_movie.name);
         
-        // Extract resolution from channel name and show detailed format with UHD capability check
+        // Extract resolution from channel name and show detailed format
         var resolution = this.extractResolution(current_movie.name);
         var detailedResolution = this.getDetailedResolution(resolution);
-        
-        // Check if TV supports the detected resolution (Samsung only)
-        var uhd_capabilities = {supports_4k: false, supports_8k: false};
-        try {
-            if(platform === 'samsung' && typeof media_player !== 'undefined' && 
-               typeof media_player.getUHDSupport === 'function') {
-                uhd_capabilities = media_player.getUHDSupport();
-            }
-        } catch(e) {
-        }
-        var finalResolution = this.validateResolutionSupport(resolution, detailedResolution, uhd_capabilities);
-        
-        $('#full-screen-resolution').text(finalResolution);
+        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -667,28 +657,6 @@ var channel_page={
                 return '720x480 SD';
             default:
                 return '1280x720 HD';
-        }
-    },
-    validateResolutionSupport:function(resolution, detailedResolution, uhd_capabilities){
-        switch(resolution) {
-            case '8K':
-                if(uhd_capabilities.supports_8k) {
-                    return detailedResolution + ' ✓';
-                } else if(uhd_capabilities.supports_4k) {
-                    return detailedResolution + ' → 4K';
-                } else {
-                    return detailedResolution + ' → FHD';
-                }
-                
-            case '4K':
-                if(uhd_capabilities.supports_4k) {
-                    return detailedResolution + ' ✓';
-                } else {
-                    return detailedResolution + ' → FHD';
-                }
-                
-            default:
-                return detailedResolution;
         }
     },
     showNextChannel:function(increment){
