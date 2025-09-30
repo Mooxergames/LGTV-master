@@ -777,8 +777,8 @@
 /* Modern LIVE indicator */
 .live-indicator {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 2vh;
+    right: 1.8vw;
     background: linear-gradient(135deg, #ff3b30 0%, #ff6b35 100%);
     color: white;
     padding: 8px 16px;
@@ -808,8 +808,8 @@
 /* Status indicators container */
 .player-status-indicators {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 2vh;
+    right: 1.8vw;
     display: flex;
     gap: 12px;
     align-items: center;
