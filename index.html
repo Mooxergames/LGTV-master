@@ -275,49 +275,49 @@
                         <div class="modal-body modal-body-bg-img-1 p-20" style="padding:20px 20px;">
                             <div id="setting-items-container" class="has-vertical-scroll">
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showUserAccounts(0)" onmouseenter="home_page.hoverSettingModal(0)">
-                                    <i class="fas fa-user-circle"></i><span class="" data-word_code="user_account">User Account</span>
+                                    <i class="fa fa-user"></i><span class="" data-word_code="user_account">User Account</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showHideCategoryModal('live',1)" onmouseenter="home_page.hoverSettingModal(1)">
-                                    <i class="fas fa-broadcast-tower"></i><span class="" data-word_code="hide_live_category">Hide Live Categories</span>
+                                    <i class="fa fa-eye-slash"></i><span class="" data-word_code="hide_live_category">Hide Live Categories</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showHideCategoryModal('movie',2)" onmouseenter="home_page.hoverSettingModal(2)">
-                                    <i class="fas fa-film"></i><span class="" data-word_code="hide_vod_category">Hide Vod Categories</span>
+                                    <i class="fa fa-eye-slash"></i><span class="" data-word_code="hide_vod_category">Hide Vod Categories</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showHideCategoryModal('series',3)" onmouseenter="home_page.hoverSettingModal(3)">
-                                    <i class="fas fa-tv"></i><span class="" data-word_code="hide_series_category">Hide Series Categories</span>
+                                    <i class="fa fa-eye-slash"></i><span class="" data-word_code="hide_series_category">Hide Series Categories</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showThemeModal(4)" onmouseenter="home_page.hoverSettingModal(4)">
-                                    <i class="fas fa-palette"></i><span class="" data-word_code="change_theme">Change Theme</span>
+                                    <i class="fas fa-square"></i><span class="" data-word_code="change_theme">Change Theme</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showSubtitleSettings()" onmouseenter="home_page.hoverSettingModal(5)">
-                                    <i class="fas fa-closed-captioning"></i><span data-word_code="subtitle_settings">Subtitle Settings</span>
+                                    <i class="fa fa-closed-captioning"></i><span data-word_code="subtitle_settings">Subtitle Settings</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showPlayListModal(6)" onmouseenter="home_page.hoverSettingModal(6)">
-                                    <i class="fas fa-list-ul"></i><span class="" data-word_code="change_playlist">Change PlayList</span>
+                                    <i class="fas fa-square"></i><span class="" data-word_code="change_playlist">Change PlayList</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showLiveChannelSort()" onmouseenter="home_page.hoverSettingModal(7)">
-                                    <i class="fas fa-sort-alpha-down"></i><span class="" data-word_code="live_sort">Live Channel Sort</span>
+                                    <i class="fas fa-sort"></i><span class="" data-word_code="live_sort">Live Channel Sort</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showLanguages()" onmouseenter="home_page.hoverSettingModal(8)">
-                                    <i class="fas fa-globe"></i><span class="" data-word_code="change_language">Change Language</span>
+                                    <i class="fas fa-language"></i><span class="" data-word_code="change_language">Change Language</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3"
                                      onclick="home_page.showFeaturedSetting()"
                                      onmouseenter="home_page.hoverSettingModal(9)"
                                 >
-                                    <i class="fas fa-star"></i><span class="" data-word_code="featured_setting">Featured Setting</span>
+                                    <i class="fas fa-user-cog"></i><span class="" data-word_code="featured_setting">Featured Setting</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3"
                                      onclick="home_page.showEpgSetting()"
                                      onmouseenter="home_page.hoverSettingModal(10)"
                                 >
-                                    <i class="fas fa-calendar-alt"></i><span class="" data-word_code="epg_time_setting">Epg Time Setting</span>
+                                    <i class="fas fa-clock"></i><span class="" data-word_code="epg_time_setting">Epg Time Setting</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showParentControlModal()" onmouseenter="home_page.hoverSettingModal(11)">
-                                    <i class="fas fa-shield-alt"></i><span data-word_code="parent_control">Parental Control</span>
+                                    <i class="fa fa-unlock-alt"></i><span data-word_code="parent_control">Parental Control</span>
                                 </div>
                                 <div class="modal-operation-menu-type-3" onclick="home_page.showCacheConfirmModal()" onmouseenter="home_page.hoverSettingModal(12)">
-                                    <i class="fas fa-broom"></i><span data-word_code="clear_cache">Clear Cache</span>
+                                    <i class="fa fa-trash"></i><span data-word_code="clear_cache">Clear Cache</span>
                                 </div>
                             </div>
                         </div>
@@ -764,40 +764,21 @@
                         </button>
                     </div>
                     <div id="full-screen-information">
-                        <!-- Left section: Channel Identity -->
-                        <div class="player-info-left">
-                            <div class="channel-identity">
-                                <img id="full-screen-channel-logo" class="channel-logo" onerror="this.src=default_movie_icon">
-                                <div class="channel-info">
-                                    <div class="channel-number" id="full-screen-channel-number">99</div>
-                                </div>
+                        <div class="position-relative">
+                            <img id="full-screen-channel-logo" onerror="this.src=default_movie_icon">
+                        </div>
+                        <p id="full-screen-program-name" class="channel-fullscreen-padding-text">Program Name</p>
+                        <p id="full-screen-program-description" class="channel-fullscreen-padding-text max-line-3" style="" >Program Discription</p>
+                        <div id="full-screen-information-progress">
+                            <span></span>
+                        </div>
+                        <div id="full-screen-programs-container" class="">
+                            <div id="full-screen-current-program" class="text-center">
+                            </div>
+                            <div id="full-screen-next-program" class="text-center">
                             </div>
                         </div>
-                        
-                        <!-- Center section: Program Information -->
-                        <div class="player-info-center">
-                            <div class="program-info">
-                                <div class="program-header">
-                                    <div id="full-screen-channel-name-compact" class="channel-name-compact">Channel Name</div>
-                                    <div id="full-screen-program-name" class="program-title">Program Name</div>
-                                </div>
-                                <p id="full-screen-program-description" class="program-description max-line-3">Program Description</p>
-                                <div id="full-screen-programs-container" class="current-next-programs">
-                                    <div id="full-screen-current-program" class="current-program">
-                                    </div>
-                                    <div id="full-screen-next-program" class="next-program">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right section: Status Indicators -->
-                        <div class="player-info-right">
-                            <div class="status-indicators">
-                                <div class="live-indicator">LIVE</div>
-                                <div class="video-resolution status-indicator" id="full-screen-resolution">1280x720 HD</div>
-                            </div>
-                        </div>
+                        <div class="video-resolution">LIVE</div>
                     </div>
                     <div class="bottom-label-item favourite">
                         <div class="bottom-label-icon bottom-item-blue"></div>
@@ -1258,14 +1239,6 @@
                         </div>
                         <div class="video-info-btn">
                             <div class="video-info-icon"
-                                 onmouseenter="vod_series_player.hoverVideoInfoBtn(5)"
-                                 onclick="vod_series_player.showSubtitlePositionModal()"
-                            >
-                                <i class="fa fa-cog"></i>
-                            </div>
-                        </div>
-                        <div class="video-info-btn">
-                            <div class="video-info-icon"
                                  onmouseenter="vod_series_player.hoverVideoInfoBtn(2)"
                                  onclick="vod_series_player.showSubtitleAudioModal('AUDIO')"
                             >
@@ -1330,7 +1303,20 @@
                             <h5 class="modal-title modal-title-text-2 text-center" data-word_code="select_menu">Select Menu Option</h5>
                         </div>
                         <div class="modal-body modal-body-bg-img-1">
-                            <!-- Settings modal now empty - gear icon opens subtitle settings directly -->
+                            <div class="modal-operation-menu-type-1 subtitle-audio-option"
+                                 onclick="vod_series_player.showSubtitleAudioModal('TEXT')"
+                                 onmouseenter="vod_series_player.hoverSubtitleAudioModal(0)"
+                                 data-word_code="subtitle"
+                            >
+                                Subtitle
+                            </div>
+                            <div class="modal-operation-menu-type-1 subtitle-audio-option"
+                                 onclick="vod_series_player.showSubtitleAudioModal('AUDIO')"
+                                 onmouseenter="vod_series_player.hoverSubtitleAudioModal(1)"
+                                 data-word_code="audio_track"
+                            >
+                                Audio Track
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1693,112 +1679,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Subtitle Settings Live Overlay -->
-    <div id="subtitle-position-overlay" style="display: none;">
-        <div class="position-control-panel">
-            <div class="panel-header">
-                <h6 data-word_code="subtitle_settings">Subtitle Settings</h6>
-                <div class="current-values">
-                    <span id="position-value">10vh</span> | 
-                    <span id="size-value">18px</span> | 
-                    <span id="background-value">Black</span>
-                </div>
-            </div>
-            
-            <!-- Position Controls -->
-            <div class="control-section">
-                <h7 data-word_code="position">Position</h7>
-                <div class="position-controls">
-                    <div class="position-button" onclick="vod_series_player.adjustSubtitlePosition('up')" onmouseenter="vod_series_player.hoverPositionControl(0)">
-                        <i class="fas fa-arrow-up"></i>
-                        <span data-word_code="move_up">Up</span>
-                    </div>
-                    
-                    <div class="position-button" onclick="vod_series_player.adjustSubtitlePosition('down')" onmouseenter="vod_series_player.hoverPositionControl(1)">
-                        <i class="fas fa-arrow-down"></i>
-                        <span data-word_code="move_down">Down</span>
-                    </div>
-                </div>
-                
-                <div class="preset-buttons">
-                    <div class="preset-button" onclick="vod_series_player.setSubtitlePosition(5)" onmouseenter="vod_series_player.hoverPositionControl(2)">
-                        <span data-word_code="bottom">Bottom</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitlePosition(20)" onmouseenter="vod_series_player.hoverPositionControl(3)">
-                        <span data-word_code="middle">Middle</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitlePosition(30)" onmouseenter="vod_series_player.hoverPositionControl(4)">
-                        <span data-word_code="center">Center</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitlePosition(40)" onmouseenter="vod_series_player.hoverPositionControl(5)">
-                        <span data-word_code="upper">Upper</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Size Controls -->
-            <div class="control-section">
-                <h7 data-word_code="size">Size</h7>
-                <div class="size-controls">
-                    <div class="size-button" onclick="vod_series_player.adjustSubtitleSize('smaller')" onmouseenter="vod_series_player.hoverPositionControl(6)">
-                        <i class="fas fa-minus"></i>
-                        <span>Smaller</span>
-                    </div>
-                    
-                    <div class="size-button" onclick="vod_series_player.adjustSubtitleSize('larger')" onmouseenter="vod_series_player.hoverPositionControl(7)">
-                        <i class="fas fa-plus"></i>
-                        <span>Larger</span>
-                    </div>
-                </div>
-                
-                <div class="size-presets">
-                    <div class="preset-button" onclick="vod_series_player.setSubtitleSize(14)" onmouseenter="vod_series_player.hoverPositionControl(8)">
-                        <span>Small</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitleSize(18)" onmouseenter="vod_series_player.hoverPositionControl(9)">
-                        <span>Normal</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitleSize(24)" onmouseenter="vod_series_player.hoverPositionControl(10)">
-                        <span>Large</span>
-                    </div>
-                    <div class="preset-button" onclick="vod_series_player.setSubtitleSize(32)" onmouseenter="vod_series_player.hoverPositionControl(11)">
-                        <span>Extra Large</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Background Controls -->
-            <div class="control-section">
-                <h7 data-word_code="background">Background</h7>
-                <div class="background-controls">
-                    <div class="bg-color-button" onclick="vod_series_player.setSubtitleBackground('transparent')" onmouseenter="vod_series_player.hoverPositionControl(12)">
-                        <span>None</span>
-                    </div>
-                    <div class="bg-color-button" onclick="vod_series_player.setSubtitleBackground('black')" onmouseenter="vod_series_player.hoverPositionControl(13)">
-                        <span>Black</span>
-                    </div>
-                    <div class="bg-color-button" onclick="vod_series_player.setSubtitleBackground('gray')" onmouseenter="vod_series_player.hoverPositionControl(14)">
-                        <span>Red</span>
-                    </div>
-                    <div class="bg-color-button" onclick="vod_series_player.setSubtitleBackground('dark')" onmouseenter="vod_series_player.hoverPositionControl(15)">
-                        <span>Green</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="action-buttons">
-                <button type="button" class="btn position-action-btn"
-                    onmouseenter="vod_series_player.hoverPositionControl(16)" onclick="vod_series_player.saveSubtitlePosition()">
-                    <span data-word_code="save">Save</span>
-                </button>
-                <button type="button" class="btn position-action-btn"
-                    onmouseenter="vod_series_player.hoverPositionControl(17)" onclick="vod_series_player.cancelSubtitlePosition()">
-                    <span data-word_code="cancel">Cancel</span>
-                </button>
             </div>
         </div>
     </div>

@@ -291,10 +291,6 @@ var home_page={
             extension=movie.container_extension;
         }
         var channel_class=movie_type=='live' ? ' channel' : '';
-        
-        // Featured movies are latest movies, so show NEW badge for featured movies
-        var is_featured_new = (movie_type === 'movie' && slider_index === 1);
-        
         var htmlContent=
             '<div class="movie-item-container">\
                 <div class="movie-item-wrapper '+channel_class+'"\
@@ -306,8 +302,7 @@ var home_page={
                     onclick="home_page.showPreviewVideo(this)"\
                 >\
                     <div class="movie-item-thumbernail">\
-                        <div class="movie-item-thumbernail-img-wrapper position-relative">\
-                            '+(is_featured_new ? '<div class="new-badge">NEW</div>' : '')+'\
+                        <div class="movie-item-thumbernail-img-wrapper">\
                             <img class="movie-item-thumbernail-img" src="'+movie.stream_icon+'" onerror="this.src=\''+fall_back_image+'\'"> \
                         </div> \
                         <div class="movie-thumbernail-title-wrapper">\
@@ -332,24 +327,20 @@ var home_page={
         }
         var current_render_count=this.current_render_count;
         
-        // Check if we should show NEW badge for last 10 added items
-        var current_sort_key=current_movie_type==='movies' ? settings.vod_sort : settings.series_sort;
-        var is_new_item = false;
+        // Check if this is one of the last 10 added items (show NEW badge)
+        var total_item_index = current_render_count + index;
+        var current_sort_key = current_movie_type === 'movies' ? settings.vod_sort : settings.series_sort;
         
-        if(current_sort_key === 'added' && this.movies && this.movies.length > 0) {
-            // Find the 10 highest "added" values from all movies  
-            var allAddedValues = this.movies.map(function(m) { 
-                return parseFloat(m.added) || 0; 
-            }).sort(function(a, b) { 
-                return b - a; 
-            }); // Sort descending to get highest values first
-            
-            var top10Threshold = allAddedValues.length >= 10 ? allAddedValues[9] : allAddedValues[allAddedValues.length - 1];
-            var currentMovieAdded = parseFloat(movie.added) || 0;
-            
-            // Item is "new" if its added value is in the top 10 highest
-            is_new_item = currentMovieAdded >= top10Threshold && currentMovieAdded > 0;
+        // For "All" category, sort is always 'added'
+        if(current_category && current_category.category_id === 'all') {
+            current_sort_key = 'added';
         }
+        
+        // When sorted by 'added' (ascending), newest items are at the END
+        // So we show NEW badge for the last 10 items in the total array
+        var total_movies_count = this.movies ? this.movies.length : 0;
+        var is_in_last_10 = (total_item_index >= (total_movies_count - 10));
+        var show_new_badge = is_in_last_10 && (current_sort_key === 'added');
         
         var htmlContent=
             '<div class="movie-item-container">\
@@ -358,8 +349,8 @@ var home_page={
                     onmouseenter="home_page.hoverMovieGridItem(this)"\
                     onclick="home_page.clickMovieGridItem(this)"\
                 >'+
+                (show_new_badge ? '<div class="new-badge">New</div>' : '')+
                 (current_model.favourite_ids.includes(movie[id_key]) ? '<div class="favourite-badge"><i class="fa fa-star"></i></div>' : '')+
-                (is_new_item ? '<div class="new-badge">NEW</div>' : '')+
                     '<img class="movie-grid-item-image movie-grid-item-image-'+current_render_count+'" src="'+img+'" onerror="this.src=\''+fall_back_image+'\'">\
                     <div class="movie-grid-item-title-wrapper position-relative">\
                         <p class="movie-thumbernail-title position-absolute">'+movie.name+'</p>\
@@ -1119,6 +1110,7 @@ var home_page={
         $('#sort-modal-container').hide();
         var category=current_movie_categories[keys.submenu_selection];
         
+        console.log('🎯 changeSortKey called with key:', key, 'current_sort_key:', current_sort_key, 'category:', category.category_id);
         
         // Always save the new sort preference
         settings.saveSettings(current_sort_key, key, '');

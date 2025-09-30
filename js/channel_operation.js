@@ -92,11 +92,11 @@ var channel_page={
             });
             that.full_screen_video=true;
             clearTimeout(that.full_screen_timer);
-            $('#full-screen-information').addClass('visible');
+            $('#full-screen-information').slideDown(400);
             $('#full-screen-channel-name').slideDown(400);
             $('#live-channel-button-container').hide();
             that.full_screen_timer=setTimeout(function(){
-                $('#full-screen-information').removeClass('visible');
+                $('#full-screen-information').slideUp(400);
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             that.keys.focused_part="full_screen";
@@ -192,10 +192,10 @@ var channel_page={
                         that.hover_channel_id=current_movie.stream_id;
                         that.hoverMenuItem(i);
                         if(that.full_screen_video){
-                            $('#full-screen-information').addClass('visible');
+                            $('#full-screen-information').slideDown(400);
                             $('#full-screen-channel-name').slideDown(400);
                             that.full_screen_timer=setTimeout(function(){
-                                $('#full-screen-information').removeClass('visible');
+                                $('#full-screen-information').slideUp(400);
                                 $('#full-screen-channel-name').slideUp(400);
                             },5000)
                             that.keys.focused_part="full_screen";
@@ -380,8 +380,8 @@ var channel_page={
         else
             $('#'+id).hide().html('');
 
-        var current_program,next_program, current_program_title="",
-            current_program_time='', next_program_title="", next_program_time='',program_desc='';
+        var current_program,next_program, current_program_title="No Information",
+            current_program_time='', next_program_title="No Information", next_program_time='',program_desc='No Information';
         if(current_program_exist){
             current_program=programmes[0];
             if(programmes.length>1)
@@ -401,99 +401,26 @@ var channel_page={
             next_program_time=next_program.start.substring(11)+' ~ '+next_program.stop.substring(11);
         }
 
-        var elements=[$('#full-screen-information-progress').find('.progress-fill')[0],$('#channel-page-right-part').find('.progress-amount')[0]]
+        var elements=[$('#full-screen-information-progress').find('span')[0],$('#channel-page-right-part').find('.progress-amount')[0]]
         clearInterval(this.progressbar_timer);
-        var that = this;
-        
         if(current_program_exist){
-            // Use robust date parsing with EPG offset
-            var epg_offset_hours = settings.epg_time_difference || 0;
-            var start_time = moment(current_program.start, 'YYYY-MM-DD HH:mm').add(epg_offset_hours, 'hours');
-            var end_time = moment(current_program.stop, 'YYYY-MM-DD HH:mm').add(epg_offset_hours, 'hours');
-            
-            // Validate dates and calculate progress
-            if(start_time.isValid() && end_time.isValid()){
-                var time_length = end_time.valueOf() - start_time.valueOf();
-                var now = moment();
-                var elapsed = now.valueOf() - start_time.valueOf();
-                var percentage = Math.max(0, Math.min(100, (elapsed / time_length) * 100));
-                
-                // Safely update progress elements
-                elements.map(function(item,index){
-                    if(item) $(item).css({width: percentage + '%'});
-                })
-                
-                // Update EPG time labels
-                $('#full-screen-program-start-time').text(start_time.format('HH:mm'));
-                $('#full-screen-program-end-time').text(end_time.format('HH:mm'));
-                
-                // Update current time indicator position
-                $('#full-screen-current-time-indicator').css({left: percentage + '%'});
-                
-                // Start real-time timer for progress updates
-                this.progressbar_timer = setInterval(function(){
-                    var current_moment = moment();
-                    var current_elapsed = current_moment.valueOf() - start_time.valueOf();
-                    var current_percentage = Math.max(0, Math.min(100, (current_elapsed / time_length) * 100));
-                    
-                    elements.map(function(item,index){
-                        if(item) $(item).css({width: current_percentage + '%'});
-                    })
-                    $('#full-screen-current-time-indicator').css({left: current_percentage + '%'});
-                }, 5000); // Update every 5 seconds
-            } else {
-                // Invalid dates - show no progress
-                elements.map(function(item,index){
-                    if(item) $(item).css({width: '0%'});
-                })
-                $('#full-screen-program-start-time').text('--:--');
-                $('#full-screen-program-end-time').text('--:--');
-                $('#full-screen-current-time-indicator').css({left: '0%'});
-            }
+            var time_length=(new Date(current_program.stop)).getTime()-(new Date(current_program.start)).getTime();
+            var current_time=(new Date()).getTime();
+            var percentage=(current_time-(new Date(current_program.start).getTime()))*100/time_length;
+            elements.map(function(item,index){
+                $(item).css({width:percentage+'%'});
+            })
         }
         else{
+            $('#full-screen-current-program').text("No Information");
             elements.map(function(item,index){
                 $(item).css({width:0});
             })
-            // Clear EPG labels when no program
-            $('#full-screen-program-start-time').text('--:--');
-            $('#full-screen-program-end-time').text('--:--');
-            $('#full-screen-current-time-indicator').css({left: '0%'});
         }
-        
-        // Show/hide elements based on whether we have EPG data
-        if(current_program_title && current_program_title.trim() !== '') {
-            $('#full-screen-current-program').text(current_program_title).show();
-            $('#full-screen-program-name').text(current_program_title).show();
-        } else {
-            $('#full-screen-current-program').hide();
-            $('#full-screen-program-name').hide();
-        }
-        
-        if(next_program_title && next_program_title.trim() !== '') {
-            $('#full-screen-next-program').text(next_program_title).show();
-        } else {
-            $('#full-screen-next-program').hide();
-        }
-        
-        if(program_desc && program_desc.trim() !== '') {
-            $('#full-screen-program-description').text(program_desc).show();
-        } else {
-            $('#full-screen-program-description').hide();
-        }
-        
-        // Hide programs container if no current or next program
-        if((!current_program_title || current_program_title.trim() === '') && 
-           (!next_program_title || next_program_title.trim() === '')) {
-            $('#full-screen-programs-container').hide();
-        } else {
-            $('#full-screen-programs-container').show();
-        }
-        
-        // Update current time display
-        var now = new Date();
-        var timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        $('#full-screen-current-time').text(timeString);
+        $('#full-screen-current-program').text(current_program_title);
+        $('#full-screen-program-name').text(current_program_title);
+        $('#full-screen-next-program').text(next_program_title);
+        $('#full-screen-program-description').text(program_desc);
     },
     updateNextProgrammes:function(){
         this.showNextProgrammes();
@@ -542,7 +469,7 @@ var channel_page={
             //     media_player.setDisplayArea();
             // }catch (e) {
             // }
-            $('#full-screen-information').removeClass('visible');
+            $('#full-screen-information').hide();
             $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
@@ -565,10 +492,10 @@ var channel_page={
             $('#live_channels_home').find('.video-skin').hide();
             this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
-            $('#full-screen-information').addClass('visible');
+            $('#full-screen-information').slideDown(400);
             $('#full-screen-channel-name').slideDown(400);
             this.full_screen_timer=setTimeout(function(){
-                $('#full-screen-information').removeClass('visible');
+                $('#full-screen-information').slideUp(400);
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
@@ -606,57 +533,9 @@ var channel_page={
             current_movie.num+' : '+current_movie.name
         );
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
-        
-        // Update new channel identity elements
-        $('#full-screen-channel-number').text(current_movie.num);
-        
-        // Add channel name to compact header
-        $('#full-screen-channel-name-compact').text(current_movie.name);
-        
-        // Extract resolution from channel name and show detailed format
-        var resolution = this.extractResolution(current_movie.name);
-        var detailedResolution = this.getDetailedResolution(resolution);
-        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
-        }
-    },
-    extractResolution:function(channelName){
-        // Extract resolution information from channel name
-        var name = channelName.toUpperCase();
-        
-        // Check for various resolution formats
-        if(name.includes('4K') || name.includes('UHD')) {
-            return '4K';
-        } else if(name.includes('8K')) {
-            return '8K';
-        } else if(name.includes('FHD') || name.includes('1080P')) {
-            return 'FHD';
-        } else if(name.includes('HD') || name.includes('720P')) {
-            return 'HD';
-        } else if(name.includes('SD') || name.includes('480P')) {
-            return 'SD';
-        } else {
-            // Default to HD if no resolution indicator found
-            return 'HD';
-        }
-    },
-    getDetailedResolution:function(resolution){
-        // Convert resolution type to detailed format with dimensions
-        switch(resolution) {
-            case '8K':
-                return '7680x4320 8K';
-            case '4K':
-                return '3840x2160 4K';
-            case 'FHD':
-                return '1920x1080 FHD';
-            case 'HD':
-                return '1280x720 HD';
-            case 'SD':
-                return '720x480 SD';
-            default:
-                return '1280x720 HD';
         }
     },
     showNextChannel:function(increment){
@@ -673,7 +552,7 @@ var channel_page={
             current_channel_index+=increment; // the opposite position
             if(current_channel_index>=0 && current_channel_index<menus.length){
                 var stream_id=$(menus[current_channel_index]).data('channel_id');
-                $('#full-screen-information').removeClass('visible');
+                $('#full-screen-information').slideUp(400);
                 $('#full-screen-channel-name').slideUp(400);
                 this.current_channel_id=stream_id;
                 clearTimeout(this.next_channel_timer);
@@ -685,10 +564,10 @@ var channel_page={
                 this.next_channel_timer=setTimeout(function () {
                     that.showLiveChannelMovie(stream_id);
                     clearTimeout(that.full_screen_timer);
-                    $('#full-screen-information').addClass('visible');
+                    $('#full-screen-information').slideDown(400);
                     $('#full-screen-channel-name').slideDown(400);
                     that.full_screen_timer=setTimeout(function(){
-                        $('#full-screen-information').removeClass('visible');
+                        $('#full-screen-information').slideUp(400);
                         $('#full-screen-channel-name').slideUp(400);
                     },5000)
                     that.changeActiveChannel();
