@@ -1,0 +1,64 @@
+env.js:1          Failed to load resource: net::ERR_ACCESS_DENIED
+i.picsum.photos/id/1020/500/300.jpg:1          Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+common.js:894 Object
+2webOSTV.js:126 PalmServiceBridge is not found.
+value @ webOSTV.js:126
+main.js:8 Samsung Tizen platform detected
+login_operation.js:219 Samsung: Using Ethernet MAC address
+login_operation.js:149 Object
+login_operation.js:32 Object
+303512.png:1          Failed to load resource: the server responded with a status of 403 ()
+561956.png:1          Failed to load resource: the server responded with a status of 403 ()
+VM50:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js?v=4k-check-20250930:53 Checking 4K support...
+player.js?v=4k-check-20250930:245 0 0 639 359
+VM50:1 Entering setDisplayRect
+player.js?v=4k-check-20250930:93 http://galaiptv.shop:4512/movie/yenideneme1/mWT6HVdjMZ/346051.mkv
+VM50:1 avplay_api.js adding listener for ID: [1]
+player.js?v=4k-check-20250930:245 0 0 639 359
+VM50:1 Entering setDisplayRect
+VM50:1 Entered AVPlayManager.prepareAsync()
+player.js?v=4k-check-20250930:58 Screen resolution: 1920x1080
+player.js?v=4k-check-20250930:63 ✗ 4K UHD is not supported (resolution below 3840x2160)
+player.js?v=4k-check-20250930:245 0 0 639 359
+VM50:1 Entering setDisplayRect
+DevTools failed to load source map: Could not load content for file:///js/libs/popper.min.js.map: Unknown error
+DevTools failed to load source map: Could not load content for file:///js/libs/bootstrap.min.js.map: Unknown error
+DevTools failed to load source map: Could not load content for file:///css/libs/bootstrap.min.css.map: Unknown error
+DevTools failed to load source map: Could not load content for file:///css/libs/rangeslider.min.css.map: Unknown error
+VM50:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js?v=4k-check-20250930:245 0 804.71875 1119 629
+VM50:1 Entering setDisplayRect
+channel_operation.js?v=4k-check-20250930:597 WebAPIException {code: 11, name: 'InvalidStateError', message: 'PLAYER_ERROR_INVALID_STATE', stack: 'InvalidStateError: PLAYER_ERROR_INVALID_STATE\n    …us> (file:///js/libs/jquery.3.4.1.min.js:2:71222)'}
+player.js?v=4k-check-20250930:93 http://galaiptv.shop:4512/live/yenideneme1/mWT6HVdjMZ/64571.ts
+VM50:1 setStreamingProperty:param[SET_MODE_4K],value[true],isValidValRestricted[true],validValues:[true,false]
+VM50:1 setStreamingProperty:param[ADAPTIVE_INFO],value[max_resolution=3840x2160],isValidValRestricted[false],validValues:[]
+player.js?v=4k-check-20250930:81 ✓ Configured for 4K UHD streaming (3840x2160)
+VM50:1 avplay_api.js adding listener for ID: [2]
+player.js?v=4k-check-20250930:245 0 804.71875 1119 629
+VM50:1 Entering setDisplayRect
+VM50:1 Entered AVPlayManager.prepareAsync()
+VM50:1 in getErrorObjectLocal code:11,name:InvalidStateError NaNmessage:PLAYER_ERROR_INVALID_STATE
+player.js?v=4k-check-20250930:245 0 804.71875 1119 629
+VM50:1 Entering setDisplayRect
+channel_operation.js?v=4k-check-20250930:597 WebAPIException {code: 11, name: 'InvalidStateError', message: 'PLAYER_ERROR_INVALID_STATE', stack: 'InvalidStateError: PLAYER_ERROR_INVALID_STATE\n    …each (file:///js/libs/jquery.3.4.1.min.js:2:1419)'}
+player.js?v=4k-check-20250930:93 http://galaiptv.shop:4512/live/yenideneme1/mWT6HVdjMZ/170646.ts
+VM50:1 setStreamingProperty:param[SET_MODE_4K],value[true],isValidValRestricted[true],validValues:[true,false]
+VM50:1 setStreamingProperty:param[ADAPTIVE_INFO],value[max_resolution=3840x2160],isValidValRestricted[false],validValues:[]
+player.js?v=4k-check-20250930:81 ✓ Configured for 4K UHD streaming (3840x2160)
+VM50:1 avplay_api.js adding listener for ID: [3]
+player.js?v=4k-check-20250930:245 0 804.71875 1119 629
+VM50:1 Entering setDisplayRect
+VM50:1 Entered AVPlayManager.prepareAsync()
+VM5:1 ########## exception
+(anonymous) @ VM5:1
+setTimeout (async)
+(anonymous) @ VM5:1
+VM5:1 WebAPIException {code: 11, name: 'InvalidStateError', message: 'PLAYER_ERROR_INVALID_STATE', stack: 'InvalidStateError: PLAYER_ERROR_INVALID_STATE\n    …k (<anonymous>:1:9336)\n    at <anonymous>:1:27274'}
+(anonymous) @ VM5:1
+setTimeout (async)
+(anonymous) @ VM5:1
+player.js?v=4k-check-20250930:245 0 0 1920 1080
+VM50:1 Entering setDisplayRect
+player.js?v=4k-check-20250930:245 0 0 1920 1080
+VM50:1 Entering setDisplayRect
