@@ -141,8 +141,12 @@ var vod_series_player={
         }catch (e) {
             console.log(e);
         }
+        
+        // Detect resolution from movie name for 4K optimization
+        var resolution = this.detectResolution(movie.name || movie.title || '');
+        
         try{
-            media_player.playAsync(url);
+            media_player.playAsync(url, resolution);
         }catch (e) {
             console.log(e);
         }
@@ -1934,5 +1938,23 @@ var vod_series_player={
                     goHomePageWithMovieType("series");
                 break;
         }
+    },
+    detectResolution: function(contentName) {
+        // Extract resolution information from content name
+        var name = contentName.toUpperCase();
+        
+        // Check for various resolution formats
+        if(name.includes('4K') || name.includes('UHD') || name.includes('2160P')) {
+            return '4K';
+        } else if(name.includes('8K')) {
+            return '8K';
+        } else if(name.includes('FHD') || name.includes('1080P')) {
+            return 'FHD';
+        } else if(name.includes('HD') || name.includes('720P')) {
+            return 'HD';
+        } else if(name.includes('SD') || name.includes('480P')) {
+            return 'SD';
+        }
+        return null;
     }
 }

@@ -19,6 +19,7 @@ function initPlayer() {
             url:'',
             id:'',
             uhd_checked: false,
+            lastResolution: null,
             init:function(id, parent_id) {
                 this.id=id;
                 this.parent_id=parent_id;
@@ -71,9 +72,27 @@ function initPlayer() {
                     console.log("⚠ 4K check failed:", e.message);
                 }
             },
-            playAsync:function(url){
+            configure4KStreaming: function(resolution) {
+                try {
+                    if(typeof webapis !== 'undefined' && webapis.avplay && webapis.avplay.setStreamingProperty) {
+                        if(resolution === '4K') {
+                            webapis.avplay.setStreamingProperty("SET_MODE_4K", "TRUE");
+                            webapis.avplay.setStreamingProperty("ADAPTIVE_INFO", "max_resolution=3840x2160");
+                            console.log("✓ Configured for 4K UHD streaming (3840x2160)");
+                        } else if(resolution === '8K') {
+                            webapis.avplay.setStreamingProperty("SET_MODE_4K", "TRUE");
+                            webapis.avplay.setStreamingProperty("ADAPTIVE_INFO", "max_resolution=7680x4320");
+                            console.log("✓ Configured for 8K UHD streaming (7680x4320)");
+                        }
+                    }
+                } catch(e) {
+                    console.log("⚠ Could not configure 4K streaming:", e.message);
+                }
+            },
+            playAsync:function(url, resolution){
                 console.log(url);
                 this.url=url;
+                this.lastResolution = resolution;
                 $('#'+this.parent_id).find('.video-error').hide();
 
                 $('.video-loader').show();
@@ -86,6 +105,7 @@ function initPlayer() {
                 var that=this;
                 try{
                     webapis.avplay.open(url);
+                    this.configure4KStreaming(resolution);
                     this.setupEventListeners();
                     this.setDisplayArea();
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
@@ -214,7 +234,7 @@ function initPlayer() {
                 }
                 this.reconnect_count = reconnect_count;
                 this.reconnect_timer = setTimeout(function () {
-                    that.playAsync(that.url);
+                    that.playAsync(that.url, that.lastResolution);
                 }, 4000)
             },
             setDisplayArea:function() {
