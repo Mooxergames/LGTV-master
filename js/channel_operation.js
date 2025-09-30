@@ -565,15 +565,16 @@ var channel_page={
             },5000)
             this.keys.focused_part="full_screen";
         }
-        // Use double requestAnimationFrame to ensure CSS layout is complete
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
+        // Only call setDisplayArea() when entering fullscreen mode
+        // For preview mode, setDisplayArea() is called immediately in showLiveChannelMovie()
+        if(this.full_screen_video){
+            setTimeout(function () {
                 try{
                     media_player.setDisplayArea();
                 }catch (e) {
                 }
-            });
-        });
+            },100);
+        }
     },
     showLiveChannelMovie:function(movie_id){
         var url
@@ -587,6 +588,11 @@ var channel_page={
         }
         try{
             media_player.init("channel-page-video","channel-page");
+            // For preview mode, call setDisplayArea() immediately
+            // For fullscreen mode, setDisplayArea() will be called after CSS positioning changes in zoomInOut()
+            if(!this.full_screen_video){
+                media_player.setDisplayArea();
+            }
         }catch (e) {
             console.log(e);
         }
