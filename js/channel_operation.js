@@ -766,6 +766,7 @@ var channel_page={
                 }
             }
         }
+        console.log(this.removed_favourite_ids);
         var movies=LiveModel.getRecentOrFavouriteMovies('favourite')
         for(var i=orders.length-1;i>=0;i--) {
             var exists=false;
@@ -1160,7 +1161,7 @@ var channel_page={
                 this.goChannelNum(0);
                 break;
             default:
-                break;
+                console.log("No matching")
         }
     }
 }
