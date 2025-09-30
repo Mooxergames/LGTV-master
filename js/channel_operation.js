@@ -592,21 +592,16 @@ var channel_page={
         }
         try{
             media_player.init("channel-page-video","channel-page");
+            media_player.setDisplayArea();
+        }catch (e) {
+            console.log(e);
+        }
+        try{
+            media_player.playAsync(url);
         }catch (e) {
             console.log(e);
         }
         var current_movie=getCurrentMovieFromId(movie_id, this.movies,'stream_id');
-        
-        // Extract resolution from channel name for both display and player configuration
-        var resolution = this.extractResolution(current_movie.name);
-        var detailedResolution = this.getDetailedResolution(resolution);
-        
-        try{
-            media_player.playAsync(url, resolution);
-        }catch (e) {
-            console.log(e);
-        }
-        
         $('#full-screen-channel-name').html(
             current_movie.num+' : '+current_movie.name
         );
@@ -618,7 +613,9 @@ var channel_page={
         // Add channel name to compact header
         $('#full-screen-channel-name-compact').text(current_movie.name);
         
-        // Show detailed resolution format
+        // Extract resolution from channel name and show detailed format
+        var resolution = this.extractResolution(current_movie.name);
+        var detailedResolution = this.getDetailedResolution(resolution);
         $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){

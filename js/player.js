@@ -18,8 +18,6 @@ function initPlayer() {
             reconnect_max_count: 20,
             url:'',
             id:'',
-            uhd_checked: false,
-            lastResolution: null,
             init:function(id, parent_id) {
                 this.id=id;
                 this.parent_id=parent_id;
@@ -42,57 +40,10 @@ function initPlayer() {
                 }
                 $('.video-resolution').text('Live');
                 this.reconnect_count = 0;
-                
-                // Check 4K support once at startup
-                if(!this.uhd_checked) {
-                    this.check4KSupport();
-                    this.uhd_checked = true;
-                }
             },
-            check4KSupport: function() {
-                console.log("Checking 4K support...");
-                try {
-                    if(typeof tizen !== 'undefined' && tizen.systeminfo) {
-                        tizen.systeminfo.getPropertyValue('DISPLAY', function(display) {
-                            var is4K = (display.resolutionWidth >= 3840 && display.resolutionHeight >= 2160);
-                            console.log("Screen resolution: " + display.resolutionWidth + "x" + display.resolutionHeight);
-                            
-                            if(is4K) {
-                                console.log("✓ 4K UHD is supported");
-                            } else {
-                                console.log("✗ 4K UHD is not supported (resolution below 3840x2160)");
-                            }
-                        }, function(error) {
-                            console.log("⚠ Could not get display info:", error.message);
-                        });
-                    } else {
-                        console.log("⚠ Not on Tizen platform - 4K check skipped");
-                    }
-                } catch(e) {
-                    console.log("⚠ 4K check failed:", e.message);
-                }
-            },
-            configure4KStreaming: function(resolution) {
-                try {
-                    if(typeof webapis !== 'undefined' && webapis.avplay && webapis.avplay.setStreamingProperty) {
-                        if(resolution === '4K') {
-                            webapis.avplay.setStreamingProperty("SET_MODE_4K", "TRUE");
-                            webapis.avplay.setStreamingProperty("ADAPTIVE_INFO", "max_resolution=3840x2160");
-                            console.log("✓ Configured for 4K UHD streaming (3840x2160)");
-                        } else if(resolution === '8K') {
-                            webapis.avplay.setStreamingProperty("SET_MODE_4K", "TRUE");
-                            webapis.avplay.setStreamingProperty("ADAPTIVE_INFO", "max_resolution=7680x4320");
-                            console.log("✓ Configured for 8K UHD streaming (7680x4320)");
-                        }
-                    }
-                } catch(e) {
-                    console.log("⚠ Could not configure 4K streaming:", e.message);
-                }
-            },
-            playAsync:function(url, resolution){
+            playAsync:function(url){
                 console.log(url);
                 this.url=url;
-                this.lastResolution = resolution;
                 $('#'+this.parent_id).find('.video-error').hide();
 
                 $('.video-loader').show();
@@ -105,8 +56,8 @@ function initPlayer() {
                 var that=this;
                 try{
                     webapis.avplay.open(url);
-                    this.configure4KStreaming(resolution);
                     this.setupEventListeners();
+                    this.setDisplayArea();
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
@@ -117,7 +68,6 @@ function initPlayer() {
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
-                            that.setDisplayArea();
                             webapis.avplay.play();
                             try{
                                 that.full_screen_state=1;
@@ -234,36 +184,17 @@ function initPlayer() {
                 }
                 this.reconnect_count = reconnect_count;
                 this.reconnect_timer = setTimeout(function () {
-                    that.playAsync(that.url, that.lastResolution);
+                    that.playAsync(that.url);
                 }, 4000)
             },
             setDisplayArea:function() {
-                var dpr = window.devicePixelRatio || 1;
-                var rect = this.videoObj.getBoundingClientRect();
-                var left = Math.round(rect.left * dpr);
-                var top = Math.round(rect.top * dpr);
-                var width = Math.round(rect.width * dpr);
-                var height = Math.round(rect.height * dpr);
-                
-                // Force native resolution for 4K/8K content if DPR doesn't reflect it
-                if((this.lastResolution === '4K' || this.lastResolution === '8K') && dpr === 1) {
-                    // Use screen dimensions for 4K content
-                    if(typeof tizen !== 'undefined' && tizen.systeminfo) {
-                        tizen.systeminfo.getPropertyValue('DISPLAY', function(display) {
-                            if(display.resolutionWidth >= 3840) {
-                                webapis.avplay.setDisplayRect(0, 0, display.resolutionWidth, display.resolutionHeight);
-                                console.log("DisplayRect 4K FORCED -> 0 0 " + display.resolutionWidth + " " + display.resolutionHeight);
-                            }
-                        });
-                    } else {
-                        // Fallback: assume 4K TV if 4K content is detected
-                        webapis.avplay.setDisplayRect(0, 0, 3840, 2160);
-                        console.log("DisplayRect 4K FALLBACK -> 0 0 3840 2160");
-                    }
-                } else {
-                    console.log("DisplayRect DPR=" + dpr + " -> " + left + " " + top + " " + width + " " + height);
-                    webapis.avplay.setDisplayRect(left, top, width, height);
-                }
+                var top_position=$(this.videoObj).offset().top;
+                var left_position=$(this.videoObj).offset().left;
+                var width=parseInt($(this.videoObj).width())
+                var height=parseInt($(this.videoObj).height());
+                console.log(top_position,left_position,width,height);
+                // console.log(this.videoObj);
+                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
