@@ -244,8 +244,26 @@ function initPlayer() {
                 var top = Math.round(rect.top * dpr);
                 var width = Math.round(rect.width * dpr);
                 var height = Math.round(rect.height * dpr);
-                console.log("DisplayRect DPR=" + dpr + " -> " + left + " " + top + " " + width + " " + height);
-                webapis.avplay.setDisplayRect(left, top, width, height);
+                
+                // Force native resolution for 4K/8K content if DPR doesn't reflect it
+                if((this.lastResolution === '4K' || this.lastResolution === '8K') && dpr === 1) {
+                    // Use screen dimensions for 4K content
+                    if(typeof tizen !== 'undefined' && tizen.systeminfo) {
+                        tizen.systeminfo.getPropertyValue('DISPLAY', function(display) {
+                            if(display.resolutionWidth >= 3840) {
+                                webapis.avplay.setDisplayRect(0, 0, display.resolutionWidth, display.resolutionHeight);
+                                console.log("DisplayRect 4K FORCED -> 0 0 " + display.resolutionWidth + " " + display.resolutionHeight);
+                            }
+                        });
+                    } else {
+                        // Fallback: assume 4K TV if 4K content is detected
+                        webapis.avplay.setDisplayRect(0, 0, 3840, 2160);
+                        console.log("DisplayRect 4K FALLBACK -> 0 0 3840 2160");
+                    }
+                } else {
+                    console.log("DisplayRect DPR=" + dpr + " -> " + left + " " + top + " " + width + " " + height);
+                    webapis.avplay.setDisplayRect(left, top, width, height);
+                }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
