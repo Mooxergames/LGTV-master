@@ -57,6 +57,7 @@ function initPlayer() {
                 try{
                     webapis.avplay.open(url);
                     this.setupEventListeners();
+                    this.setDisplayArea();
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
@@ -91,16 +92,10 @@ function initPlayer() {
                                     var stream_info=webapis.avplay.getCurrentStreamInfo();
                                     if(typeof stream_info[0]!='undefined'){
                                         var extra_info=JSON.parse(stream_info[0].extra_info);
-                                        // Only update if both width and height are valid
-                                        if(extra_info && typeof extra_info.Width !== 'undefined' && typeof extra_info.Height !== 'undefined' && 
-                                           extra_info.Width !== null && extra_info.Height !== null) {
-                                            var stream_summary=extra_info.Width+' * '+extra_info.Height;
-                                            $('.video-resolution').text(stream_summary);
-                                        }
-                                        // If Samsung API values are invalid, don't override the existing resolution display
+                                        var stream_summary=extra_info.Width+' * '+extra_info.Height;
+                                        $('.video-resolution').text(stream_summary);
                                     }
                                 }catch (e) {
-                                    // Samsung API failed, keep existing resolution display unchanged
                                 }
                             }
                         },
@@ -197,42 +192,20 @@ function initPlayer() {
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
-            // Aspect ratio cycling system
-            aspect_ratio_modes: {
-                samsung: [
-                    'PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO',
-                    'PLAYER_DISPLAY_MODE_LETTER_BOX', 
-                    'PLAYER_DISPLAY_MODE_FULL_SCREEN'
-                ],
-                lg: [
-                    'contain',  // Letterbox equivalent
-                    'cover',    // Fill/zoom to cover
-                    'fill'      // Stretch to fill
-                ]
-            },
-            current_aspect_ratio_index: 0,
-            
             toggleScreenRatio:function(){
-                try{
-                    if(platform === 'samsung'){
-                        // Cycle through Samsung display modes
-                        var modes = this.aspect_ratio_modes.samsung;
-                        this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
-                        var selectedMode = modes[this.current_aspect_ratio_index];
-                        
-                        webapis.avplay.setDisplayMethod(selectedMode);
-                        
-                    } else if(platform === 'lg'){
-                        // Cycle through LG CSS object-fit modes
-                        var modes = this.aspect_ratio_modes.lg;
-                        this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
-                        var selectedMode = modes[this.current_aspect_ratio_index];
-                        
-                        // Apply CSS object-fit to video element
-                        $(this.videoObj).css('object-fit', selectedMode);
+                if(this.full_screen_state==1){
+                    try{
+                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO');
+                        this.full_screen_state=0;
+                    }catch (e) {
                     }
-                }catch (e) {
-                    console.log('Aspect ratio change failed:', e);
+                }else{
+                    try{
+                        // Keep AUTO_ASPECT_RATIO for consistent aspect ratio handling
+                        // webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                        this.full_screen_state=1;
+                    }catch (e) {
+                    }
                 }
             },
             formatTime:function(seconds) {
@@ -611,25 +584,8 @@ function initPlayer() {
                 SrtOperation.deStruct();
                 this.subtitles=[];
             },
-            // LG TV aspect ratio cycling (uses same system as Samsung player)
-            aspect_ratio_modes: {
-                lg: ['contain', 'cover', 'fill']
-            },
-            current_aspect_ratio_index: 0,
-            
             toggleScreenRatio:function(){
-                try{
-                    // Cycle through LG CSS object-fit modes
-                    var modes = this.aspect_ratio_modes.lg;
-                    this.current_aspect_ratio_index = (this.current_aspect_ratio_index + 1) % modes.length;
-                    var selectedMode = modes[this.current_aspect_ratio_index];
-                    
-                    // Apply CSS object-fit to video element
-                    $(this.videoObj).css('object-fit', selectedMode);
-                    
-                }catch (e) {
-                    console.log('LG aspect ratio change failed:', e);
-                }
+
             },
             setDisplayArea:function(){
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();

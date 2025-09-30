@@ -538,7 +538,11 @@ var channel_page={
                 width:'58.3vw'
             });
             this.keys.focused_part="channel_selection";
-            $('#full-screen-information').hide();
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
+            $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
@@ -552,15 +556,19 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
             this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
-            $('#full-screen-information').slideDown(400);
+            $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
             this.full_screen_timer=setTimeout(function(){
-                $('#full-screen-information').slideUp(400);
+                $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
@@ -598,6 +606,17 @@ var channel_page={
             current_movie.num+' : '+current_movie.name
         );
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
+        
+        // Update new channel identity elements
+        $('#full-screen-channel-number').text(current_movie.num);
+        
+        // Add channel name to compact header
+        $('#full-screen-channel-name-compact').text(current_movie.name);
+        
+        // Extract resolution from channel name and show detailed format
+        var resolution = this.extractResolution(current_movie.name);
+        var detailedResolution = this.getDetailedResolution(resolution);
+        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels

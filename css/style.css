@@ -776,7 +776,14 @@
     color:#ccc;
 }
 
-/* Video resolution positioning moved to channel_page.css for proper player bar containment */
+.video-resolution {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 30px;
+    letter-spacing: 3px;
+}
 .video-loader{
     position:absolute;
     left:0;
