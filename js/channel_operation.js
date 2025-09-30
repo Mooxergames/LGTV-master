@@ -532,19 +532,7 @@ var channel_page={
     },
     zoomInOut:function(){
         if(!this.full_screen_video){
-            $('#live_channels_home .player-container').css({
-                position:'relative',
-                height:'58.3vh',
-                width:'58.3vw'
-            });
-            this.keys.focused_part="channel_selection";
-            $('#full-screen-information').removeClass('visible');
-            $('#full-screen-channel-name').hide();
-            $('#live_channels_home').find('.channel-information-container').show();
-            $('#live-channel-button-container').show();
-            $('#live_channels_home').find('.video-skin').show();
-        }
-        else{
+            // Going TO fullscreen
             $('#live_channels_home .player-container').css({
                 position:'fixed',
                 left:0,
@@ -564,10 +552,31 @@ var channel_page={
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
+            // Call setDisplayArea for fullscreen
+            setTimeout(function () {
+                try{
+                    media_player.setDisplayArea();
+                }catch (e) {
+                }
+            },100);
         }
-        // Only call setDisplayArea() when entering fullscreen mode
-        // For preview mode, setDisplayArea() is called immediately in showLiveChannelMovie()
-        if(this.full_screen_video){
+        else{
+            // Going TO preview
+            $('#live_channels_home .player-container').css({
+                position:'relative',
+                left:0,
+                top:0,
+                height:'58.3vh',
+                width:'58.3vw'
+            });
+            this.keys.focused_part="channel_selection";
+            $('#full-screen-information').removeClass('visible');
+            $('#full-screen-channel-name').hide();
+            $('#live_channels_home').find('.channel-information-container').show();
+            $('#live-channel-button-container').show();
+            $('#live_channels_home').find('.video-skin').show();
+            this.full_screen_video=false;
+            // Call setDisplayArea for preview
             setTimeout(function () {
                 try{
                     media_player.setDisplayArea();
