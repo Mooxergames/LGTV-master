@@ -49,6 +49,7 @@ function initPlayer() {
                 }
             },
             check4KSupport: function() {
+                console.log("Checking 4K support...");
                 try {
                     if(typeof webapis !== 'undefined' && webapis.productinfo) {
                         if(webapis.productinfo.isUdPanelSupported()) {
@@ -56,9 +57,11 @@ function initPlayer() {
                         } else {
                             console.log("✗ 4K UHD is not supported");
                         }
+                    } else {
+                        console.log("⚠ Not on Samsung TV - 4K check skipped");
                     }
                 } catch(e) {
-                    // Silent fail if API not available
+                    console.log("⚠ 4K check failed:", e.message);
                 }
             },
             playAsync:function(url){
