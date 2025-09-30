@@ -51,14 +51,19 @@ function initPlayer() {
             check4KSupport: function() {
                 console.log("Checking 4K support...");
                 try {
-                    if(typeof webapis !== 'undefined' && webapis.productinfo) {
-                        if(webapis.productinfo.isUdPanelSupported()) {
-                            console.log("✓ 4K UHD is supported");
-                        } else {
-                            console.log("✗ 4K UHD is not supported");
+                    if(typeof tizen !== 'undefined' && tizen.systeminfo) {
+                        if(tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.all")) {
+                            var screenSizes = tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.all");
+                            console.log("Screen capabilities:", screenSizes);
+                            
+                            if(tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.normal.3840.2160")) {
+                                console.log("✓ 4K UHD (3840x2160) is supported");
+                            } else {
+                                console.log("✗ 4K UHD is not supported");
+                            }
                         }
                     } else {
-                        console.log("⚠ Not on Samsung TV - 4K check skipped");
+                        console.log("⚠ Not on Tizen platform - 4K check skipped");
                     }
                 } catch(e) {
                     console.log("⚠ 4K check failed:", e.message);
