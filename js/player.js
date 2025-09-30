@@ -52,16 +52,18 @@ function initPlayer() {
                 console.log("Checking 4K support...");
                 try {
                     if(typeof tizen !== 'undefined' && tizen.systeminfo) {
-                        if(tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.all")) {
-                            var screenSizes = tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.all");
-                            console.log("Screen capabilities:", screenSizes);
+                        tizen.systeminfo.getPropertyValue('DISPLAY', function(display) {
+                            var is4K = (display.resolutionWidth >= 3840 && display.resolutionHeight >= 2160);
+                            console.log("Screen resolution: " + display.resolutionWidth + "x" + display.resolutionHeight);
                             
-                            if(tizen.systeminfo.getCapability("http://tizen.org/feature/screen.size.normal.3840.2160")) {
-                                console.log("✓ 4K UHD (3840x2160) is supported");
+                            if(is4K) {
+                                console.log("✓ 4K UHD is supported");
                             } else {
-                                console.log("✗ 4K UHD is not supported");
+                                console.log("✗ 4K UHD is not supported (resolution below 3840x2160)");
                             }
-                        }
+                        }, function(error) {
+                            console.log("⚠ Could not get display info:", error.message);
+                        });
                     } else {
                         console.log("⚠ Not on Tizen platform - 4K check skipped");
                     }
