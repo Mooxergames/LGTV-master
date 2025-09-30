@@ -238,13 +238,14 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
-                var top_position=$(this.videoObj).offset().top;
-                var left_position=$(this.videoObj).offset().left;
-                var width=parseInt($(this.videoObj).width())
-                var height=parseInt($(this.videoObj).height());
-                console.log(top_position,left_position,width,height);
-                // console.log(this.videoObj);
-                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
+                var dpr = window.devicePixelRatio || 1;
+                var rect = this.videoObj.getBoundingClientRect();
+                var left = Math.round(rect.left * dpr);
+                var top = Math.round(rect.top * dpr);
+                var width = Math.round(rect.width * dpr);
+                var height = Math.round(rect.height * dpr);
+                console.log("DisplayRect DPR=" + dpr + " -> " + left + " " + top + " " + width + " " + height);
+                webapis.avplay.setDisplayRect(left, top, width, height);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
