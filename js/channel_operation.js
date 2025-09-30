@@ -545,14 +545,6 @@ var channel_page={
                 width:'58.3vw'
             });
             this.keys.focused_part="channel_selection";
-            // Set display area for preview mode after CSS layout settles
-            setTimeout(function() {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                    console.log('[PREVIEW DEBUG] setDisplayArea failed in preview mode:', e);
-                }
-            }, 150);
             $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
@@ -567,7 +559,6 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
-            // Fullscreen mode - setDisplayArea() will be called by timer below
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
@@ -580,16 +571,6 @@ var channel_page={
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             this.keys.focused_part="full_screen";
-        }
-        // Only call setDisplayArea() when entering fullscreen mode
-        // For preview mode, setDisplayArea() is called immediately in showLiveChannelMovie()
-        if(this.full_screen_video){
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                }
-            },100);
         }
     },
     showLiveChannelMovie:function(movie_id){
@@ -604,11 +585,7 @@ var channel_page={
         }
         try{
             media_player.init("channel-page-video","channel-page");
-            // For preview mode, call setDisplayArea() immediately
-            // For fullscreen mode, setDisplayArea() will be called after CSS positioning changes in zoomInOut()
-            if(!this.full_screen_video){
-                media_player.setDisplayArea();
-            }
+            media_player.setDisplayArea();
         }catch (e) {
             console.log(e);
         }
