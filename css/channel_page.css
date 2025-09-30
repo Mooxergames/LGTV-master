@@ -152,6 +152,43 @@
     margin-right:20px;
 }
 
+/* Fullscreen back button */
+.fullscreen-back-btn {
+    position: fixed;
+    top: 2vh;
+    left: 2vw;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 101;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.fullscreen-back-btn:hover,
+.fullscreen-back-btn:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.05);
+}
+
+.fullscreen-back-btn .back-arrow {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Show back button only in fullscreen */
+.fullscreen-back-btn.visible {
+    display: flex;
+}
+
 #full-screen-information{
     /* Robust background with TV browser compatibility */
     background: rgba(0, 0, 0, 0.75);
