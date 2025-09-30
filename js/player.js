@@ -107,7 +107,6 @@ function initPlayer() {
                     webapis.avplay.open(url);
                     this.configure4KStreaming(resolution);
                     this.setupEventListeners();
-                    this.setDisplayArea();
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
@@ -118,6 +117,7 @@ function initPlayer() {
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
+                            that.setDisplayArea();
                             webapis.avplay.play();
                             try{
                                 that.full_screen_state=1;
