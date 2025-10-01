@@ -1,0 +1,30 @@
+Current movie object: {num: 663, name: 'TR: TRT 1 QHD', stream_type: 'live', stream_id: 170686, stream_icon: 'http://45.129.183.111/turk84/trt18k.png', …}
+player.js:1 Can play
+channel_operation.js:1 []
+channel_operation.js:1 === CHANNEL PAGE INIT DEBUG ===
+channel_operation.js:1 Category ID: 675
+channel_operation.js:1 Category Name: TR: 4K KANALLAR
+channel_operation.js:1 Movies array length: 15
+channel_operation.js:1 First 3 movies: (3) [{…}, {…}, {…}]
+channel_operation.js:1 Current movie set to: {num: 135, name: '☆☆  TR: 4K KANALLAR ☆☆ ', stream_type: 'live', stream_id: 64571, stream_icon: '', …}
+channel_operation.js:1 === SHOW LIVE CHANNEL MOVIE DEBUG ===
+channel_operation.js:1 Movie ID (stream_id): 64571
+channel_operation.js:1 Generated URL: http://galaiptv.shop:4512/live/yenideneme1/mWT6HVdjMZ/64571.ts
+channel_operation.js:1 URL type check - contains '/live/': true
+channel_operation.js:1 URL type check - contains '/movie/': false
+channel_operation.js:1 Calling media_player.playAsync with URL: http://galaiptv.shop:4512/live/yenideneme1/mWT6HVdjMZ/64571.ts
+player.js:1 http://galaiptv.shop:4512/live/yenideneme1/mWT6HVdjMZ/64571.ts
+channel_operation.js:1 Current movie object: {num: 135, name: '☆☆  TR: 4K KANALLAR ☆☆ ', stream_type: 'live', stream_id: 64571, stream_icon: '', …}
+player.js:1 http://galaiptv.shop:4512/movie/yenideneme1/mWT6HVdjMZ/346057.mkv
+player.js:1 Uncaught (in promise) DOMException: The play() request was interrupted by a call to pause(). https://goo.gl/LdLk22
+playAsync @ player.js:1
+(anonymous) @ home_operation.js:1
+setTimeout (async)
+reEnter @ home_operation.js:1
+goBack @ channel_operation.js:1
+HandleKey @ channel_operation.js:1
+(anonymous) @ main.js:1
+2player.js:1 Failed to fetch data, but trying.
+index.html:1 The resource https://flixapp.net/images/activation-qr-code.svg was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+2player.js:1 Can play
+index.html:1 The resource https://flixapp.net/images/activation-qr-code.svg was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.

@@ -248,6 +248,7 @@ var home_page={
             if(this.preview_url){
                 media_player.init("home-page-video-preview",'home-page');
                 setTimeout(function () {
+                    if(current_route !== "home-page") return;
                     try{
                         media_player.setDisplayArea();
                     }catch (e) {

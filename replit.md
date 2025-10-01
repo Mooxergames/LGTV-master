@@ -8,6 +8,7 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **Fixed home page preview interfering with Live TV** - Added route guard (current_route === 'home-page' check) to the delayed playAsync call in home_operation.js reEnter() function. This prevents the home page preview (VOD movie) from playing when user quickly navigates to Live TV, resolving the critical bug where VOD movies would play instead of live channels when switching fast between pages.
 - **Restored Samsung live TV player to original working state** - Reverted player.js, channel_operation.js, and home_operation.js to commit 5b4f1f7 (stable version before aspect ratio and fullscreen modifications). The original simple implementation calls setDisplayArea() immediately after webapis.avplay.open() without delays or conditional logic, ensuring smooth preview/fullscreen transitions and proper channel switching on Samsung Tizen devices.
 - **Removed debug back buttons from detail pages** - Completely removed the temporary debug back buttons from both movies (VOD) and series detail pages for a cleaner user interface. All standard navigation functionality remains intact through existing remote control navigation.
 - **Improved subtitle "bottom" position placement** - Adjusted the subtitle position "bottom" preset from 5vh to 2vh, moving subtitles closer to the actual bottom of the screen for better readability and positioning. This change maintains all down button navigation functionality while providing improved subtitle placement at the lowest screen position.

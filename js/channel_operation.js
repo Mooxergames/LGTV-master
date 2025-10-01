@@ -40,10 +40,6 @@ var channel_page={
         this.is_drawing=false;
         $("#channel-page").show();
         var category=current_category;
-        
-        console.log("=== CHANNEL PAGE INIT DEBUG ===");
-        console.log("Category ID:", category.category_id);
-        console.log("Category Name:", category.category_name);
 
         $('.bottom-label-item').hide();
         if(category.category_id==='recent' || category.category_id==='favourite')
@@ -55,12 +51,9 @@ var channel_page={
         else
             this.movies=getSortedMovies(category.movies,settings.live_sort);
 
-        console.log("Movies array length:", this.movies.length);
-        console.log("First 3 movies:", this.movies.slice(0, 3));
 
         this.removed_favourite_ids=[];
         current_movie=this.movies[0];
-        console.log("Current movie set to:", current_movie);
         var stream_channel_index=0;
         if(channel_id!=0){
             current_movie=getCurrentMovieFromId(channel_id,this.movies,'stream_id');
@@ -588,19 +581,11 @@ var channel_page={
         },0)
     },
     showLiveChannelMovie:function(movie_id){
-        console.log("=== SHOW LIVE CHANNEL MOVIE DEBUG ===");
-        console.log("Movie ID (stream_id):", movie_id);
-        
         var url
         if(settings.playlist_type==="xtreme")
             url=getMovieUrl(movie_id,'live','ts');
         else if(settings.playlist_type==="type1")
             url=LiveModel.getMovieFromId(movie_id)['url'];
-        
-        console.log("Generated URL:", url);
-        console.log("URL type check - contains '/live/':", url.includes('/live/'));
-        console.log("URL type check - contains '/movie/':", url.includes('/movie/'));
-        
         try{
             media_player.close();
         }catch (e) {
@@ -612,13 +597,11 @@ var channel_page={
             console.log(e);
         }
         try{
-            console.log("Calling media_player.playAsync with URL:", url);
             media_player.playAsync(url);
         }catch (e) {
             console.log(e);
         }
         var current_movie=getCurrentMovieFromId(movie_id, this.movies,'stream_id');
-        console.log("Current movie object:", current_movie);
         $('#full-screen-channel-name').html(
             current_movie.num+' : '+current_movie.name
         );
