@@ -60,7 +60,7 @@ var login_page={
                 </div>\
             </div>\
             <div class="home-slick-image-container">'+
-                    '   <img src="'+advert.url+'">\
+                    '   <img src="'+advert.url+'" onerror="this.onerror=null; this.src=\'images/advertise.png\'">\
                                         </div>\
                                     </div>\
                                 </div>';
