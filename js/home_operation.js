@@ -126,7 +126,9 @@ var home_page={
         if(first_play_video!==''){
             this.preview_url=first_play_video
             setTimeout(function () {
-                media_player.playAsync(first_play_video);
+                if(current_route === 'home-page') {
+                    media_player.playAsync(first_play_video);
+                }
             },0)
         }
         else{
@@ -235,6 +237,14 @@ var home_page={
     },
     Exit:function(){
         $('#home-page').css({height:0});
+        // Stop slick autoplay to prevent interference
+        try{
+            $('#home-page-slider-container').slick('slickPause');
+        }catch(e){}
+        // Reset preview state
+        this.current_preview_id = -1;
+        this.current_preview_type = '';
+        this.preview_url = '';
         try{
             media_player.close();
         }catch (e) {
@@ -248,13 +258,15 @@ var home_page={
             if(this.preview_url){
                 media_player.init("home-page-video-preview",'home-page');
                 setTimeout(function () {
-                    try{
-                        media_player.setDisplayArea();
-                    }catch (e) {
-                    }
-                    try{
-                        media_player.playAsync(that.preview_url);
-                    }catch (e) {
+                    if(current_route === 'home-page') {
+                        try{
+                            media_player.setDisplayArea();
+                        }catch (e) {
+                        }
+                        try{
+                            media_player.playAsync(that.preview_url);
+                        }catch (e) {
+                        }
                     }
                 },1000)
             }
@@ -1090,12 +1102,14 @@ var home_page={
             if(this.preview_url){
                 var that=this;
                 setTimeout(function () {
-                    media_player.init("home-page-video-preview",'home-page');
-                    try{
-                        media_player.setDisplayArea();
-                    }catch (e) {
+                    if(current_route === 'home-page') {
+                        media_player.init("home-page-video-preview",'home-page');
+                        try{
+                            media_player.setDisplayArea();
+                        }catch (e) {
+                        }
+                        media_player.playAsync(that.preview_url);
                     }
-                    media_player.playAsync(that.preview_url);
                 },500)
             }
         }
@@ -1665,15 +1679,17 @@ var home_page={
             }catch(e){
                 console.log(e);
             }
-            try{
-                media_player.init("home-page-video-preview",'home-page');
-                media_player.setDisplayArea();
-            }catch (e) {
-            }
-            try{
-                media_player.playAsync(url);
-            }catch (e) {
+            if(current_route === 'home-page') {
+                try{
+                    media_player.init("home-page-video-preview",'home-page');
+                    media_player.setDisplayArea();
+                }catch (e) {
+                }
+                try{
+                    media_player.playAsync(url);
+                }catch (e) {
 
+                }
             }
         }
     },
