@@ -836,7 +836,7 @@ var home_page={
         var current_sort_key=current_movie_type==='movies' ? 'vod_sort' : 'series_sort';
         $('#sort-modal-container').hide();
         var category=current_movie_categories[keys.submenu_selection];
-        if(settings[current_sort_key]!=key && category.category_id!='all'){
+        if(settings[current_sort_key]!=key){
             settings.saveSettings(current_sort_key,key,'');
             this.movies=getSortedMovies(current_category.movies,key)
             $('#movie-grids-container').html('');
