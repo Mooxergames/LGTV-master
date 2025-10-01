@@ -520,7 +520,13 @@ var channel_page={
         }
         try{
             media_player.init("channel-page-video","channel-page");
-            media_player.setDisplayArea();
+            setTimeout(function(){
+                try{
+                    media_player.setDisplayArea();
+                }catch(e){
+                    console.log(e);
+                }
+            }, 50);
         }catch (e) {
             console.log(e);
         }
