@@ -42,42 +42,32 @@ function initPlayer() {
                 this.reconnect_count = 0;
             },
             playAsync:function(url){
-                console.log('[PLAYER DEBUG] playAsync called with URL:', url);
-                console.log('[PLAYER DEBUG] Current state:', this.state, 'videoObj exists:', !!this.videoObj);
+                console.log(url);
                 this.url=url;
                 $('#'+this.parent_id).find('.video-error').hide();
 
                 $('.video-loader').show();
                 if (this.state > this.STATES.STOPPED) {
-                    console.log('[PLAYER DEBUG] playAsync blocked - state too high:', this.state);
                     return;
                 }
                 if (!this.videoObj) {
-                    console.log('[PLAYER DEBUG] playAsync blocked - no videoObj');
                     return 0;
                 }
                 var that=this;
                 try{
-                    console.log('[PLAYER DEBUG] Opening Samsung webapis.avplay with URL');
                     webapis.avplay.open(url);
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.open() success');
                     this.setupEventListeners();
-                    console.log('[PLAYER DEBUG] Event listeners setup complete');
-                    // setDisplayArea() will be called after buffering completes to avoid Samsung InvalidStateError
+                    this.setDisplayArea();
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
-                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.prepareAsync()');
                     webapis.avplay.prepareAsync(
                         function(){
-                            console.log('[PLAYER DEBUG] prepareAsync SUCCESS callback - Samsung player is now PREPARED');
                             that.reconnect_count = 0;
                             $('#' + that.parent_id).find('.video-reconnect-message').hide();
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
-                            console.log('[PLAYER DEBUG] Player state set to PLAYING:', that.state);
-                            console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.play()');
                             webapis.avplay.play();
                             try{
                                 that.full_screen_state=1;
@@ -116,8 +106,6 @@ function initPlayer() {
                             }
                         },
                         function(e){
-                            console.log('[PLAYER DEBUG] prepareAsync FAILED callback - Samsung player preparation failed');
-                            console.log('[PLAYER DEBUG] Samsung webapis error:', e);
                             console.log('video loading failed',e);
                             $('.video-loader').hide();
                             $('#'+that.parent_id).find('.video-error').show();
@@ -126,9 +114,6 @@ function initPlayer() {
                         }
                     );
                 }catch(e){
-                    console.log('[PLAYER DEBUG] playAsync() caught exception during Samsung webapis setup');
-                    console.log('[PLAYER DEBUG] Samsung webapis exception:', e);
-                    console.log('[PLAYER DEBUG] Exception code:', e.code, 'name:', e.name, 'message:', e.message);
                     console.log('video loading failed',e);
                     $('.video-loader').hide();
                     $('#'+that.parent_id).find('.video-error').show();
@@ -158,45 +143,29 @@ function initPlayer() {
                 }
             },
             stop:function() {
-                console.log('[PLAYER DEBUG] stop() called - current state:', this.state);
                 this.state = this.STATES.STOPPED;
                 try{
-                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.stop()');
                     webapis.avplay.stop();
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.stop() SUCCESS');
                 }catch (e) {
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.stop() FAILED:', e);
                 }
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
-                // Clear any pending setDisplayArea timers to prevent late calls
-                console.log('[PLAYER DEBUG] Clearing display_area_timer to prevent late setDisplayArea calls');
-                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
-                console.log('[PLAYER DEBUG] stop() complete - state now STOPPED');
             },
             close:function(){
-                console.log('[PLAYER DEBUG] close() called - current state:', this.state);
                 this.state = this.STATES.STOPPED;
                 try{
-                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.close()');
                     webapis.avplay.close();
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.close() SUCCESS');
                 }catch (e) {
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.close() FAILED:', e);
                 }
                 $(this.parent_id).find('.video-error').hide();
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
-                // Clear any pending setDisplayArea timers to prevent late calls
-                console.log('[PLAYER DEBUG] Clearing display_area_timer to prevent late setDisplayArea calls');
-                clearTimeout(this.display_area_timer);
                 $('#' + this.parent_id).find('.video-reconnect-message').hide();
                 SrtOperation.deStruct();
                 this.subtitles=[];
-                console.log('[PLAYER DEBUG] close() complete - state now STOPPED');
             },
             tryReconnect: function () {
                 if (current_route !== 'channel-page' && !(current_route=='home-page' && home_page.current_preview_type==='live'))
@@ -219,29 +188,13 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
-                console.log('[PLAYER DEBUG] setDisplayArea() called from:', (new Error().stack.split('\n')[2] || 'unknown'));
-                console.log('[PLAYER DEBUG] setDisplayArea() called - checking videoObj and Samsung player state');
-                console.log('[PLAYER DEBUG] Current player state:', this.state);
-                
                 var top_position=$(this.videoObj).offset().top;
                 var left_position=$(this.videoObj).offset().left;
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
-                
-                console.log('[PLAYER DEBUG] Calculated display coordinates:');
-                console.log('[PLAYER DEBUG] Position:', left_position, top_position);
-                console.log('[PLAYER DEBUG] Dimensions:', width + 'x' + height);
-                console.log('[PLAYER DEBUG] Full rect:', left_position, top_position, width, height);
-                
-                try {
-                    console.log('[PLAYER DEBUG] Calling Samsung webapis.avplay.setDisplayRect()');
-                    webapis.avplay.setDisplayRect(left_position,top_position,width,height);
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.setDisplayRect() SUCCESS');
-                } catch (e) {
-                    console.log('[PLAYER DEBUG] Samsung webapis.avplay.setDisplayRect() FAILED:', e);
-                    console.log('[PLAYER DEBUG] Error code:', e.code, 'name:', e.name, 'message:', e.message);
-                    throw e;
-                }
+                console.log(top_position,left_position,width,height);
+                // console.log(this.videoObj);
+                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
@@ -302,12 +255,9 @@ function initPlayer() {
                         // console.log("Buffering progress: "+percent);
                     },
                     onbufferingcomplete: function() {
-                        console.log('[PLAYER DEBUG] onbufferingcomplete fired - Samsung player buffering complete');
                         $('#'+that.parent_id).find('.video-loader').hide();
-                        // Reapply display area after buffering for proper sizing - store timer for cleanup
-                        console.log('[PLAYER DEBUG] Setting 100ms timer for delayed setDisplayArea() call');
-                        that.display_area_timer = setTimeout(function() {
-                            console.log('[PLAYER DEBUG] 100ms timer expired - calling setDisplayArea() now');
+                        // Reapply display area after buffering for proper sizing
+                        setTimeout(function() {
                             that.setDisplayArea();
                         }, 100);
                         // console.log('Buffering Complete, Can play now!');
@@ -742,115 +692,6 @@ function initPlayer() {
                 } catch(e) {
                     console.error('LG subtitle/audio track error:', e);
                 }
-            },
-            
-            // Samsung 4K/8K UHD capability detection according to Samsung documentation
-            uhd_support: {
-                supports_4k: false,
-                supports_8k: false,
-                checked: false
-            },
-            
-            checkUHDSupport: function() {
-                if(this.uhd_support.checked) return;
-                
-                try {
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] SAMSUNG TV 4K DETECTION TEST');
-                    console.log('========================================');
-                    
-                    // Screen info
-                    console.log('[UHD DEBUG] Screen Resolution:', (screen.width || 0) + 'x' + (screen.height || 0));
-                    console.log('[UHD DEBUG] Window Size:', window.innerWidth + 'x' + window.innerHeight);
-                    console.log('[UHD DEBUG] Device Pixel Ratio:', window.devicePixelRatio);
-                    
-                    // Check if Samsung webapis exists
-                    if(typeof webapis === 'undefined') {
-                        console.log('[UHD DEBUG] ✗ webapis NOT available - not on Samsung TV');
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                        return;
-                    }
-                    
-                    console.log('[UHD DEBUG] ✓ webapis is available');
-                    
-                    // Check if productinfo exists
-                    if(!webapis.productinfo) {
-                        console.log('[UHD DEBUG] ✗ webapis.productinfo NOT available');
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                        return;
-                    }
-                    
-                    console.log('[UHD DEBUG] ✓ webapis.productinfo is available');
-                    console.log('[UHD DEBUG] Available ProductInfo methods:');
-                    for(var key in webapis.productinfo) {
-                        console.log('[UHD DEBUG]   - ' + key + ' (type: ' + typeof webapis.productinfo[key] + ')');
-                    }
-                    
-                    // Official Samsung 4K detection using isUdPanelSupported()
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] Testing: webapis.productinfo.isUdPanelSupported()');
-                    console.log('[UHD DEBUG] (true = 4K or higher, false = up to FHD)');
-                    console.log('========================================');
-                    
-                    if (webapis.productinfo.isUdPanelSupported()) {
-                        console.log("✓✓✓ 4K UHD is supported ✓✓✓");
-                        this.uhd_support.supports_4k = true;
-                    } else {
-                        console.log("✗✗✗ 4K UHD is not supported ✗✗✗");
-                        this.uhd_support.supports_4k = false;
-                    }
-                    
-                    // Check 8K support
-                    if(typeof webapis.productinfo.is8KPanelSupported === 'function') {
-                        console.log('[UHD DEBUG] Testing: webapis.productinfo.is8KPanelSupported()');
-                        if (webapis.productinfo.is8KPanelSupported()) {
-                            console.log("✓✓✓ 8K UHD is supported ✓✓✓");
-                            this.uhd_support.supports_8k = true;
-                        } else {
-                            console.log("✗ 8K UHD is not supported");
-                            this.uhd_support.supports_8k = false;
-                        }
-                    } else {
-                        console.log('[UHD DEBUG] is8KPanelSupported() not available');
-                        this.uhd_support.supports_8k = false;
-                    }
-                    
-                    this.uhd_support.checked = true;
-                    
-                    // Final summary
-                    console.log('========================================');
-                    console.log('[UHD DEBUG] FINAL RESULTS:');
-                    console.log('[UHD DEBUG] 4K (3840x2160):', this.uhd_support.supports_4k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
-                    console.log('[UHD DEBUG] 8K (7680x4320):', this.uhd_support.supports_8k ? 'SUPPORTED ✓' : 'NOT SUPPORTED ✗');
-                    console.log('========================================');
-                    
-                } catch(e) {
-                    console.log('[UHD DEBUG] ✗ ERROR during UHD detection:', e);
-                    console.log('[UHD DEBUG] Error details:', e.message, e.stack);
-                    this.uhd_support.supports_4k = false;
-                    this.uhd_support.supports_8k = false;
-                    this.uhd_support.checked = true;
-                }
-            },
-            
-            // Get UHD capabilities for external use
-            getUHDSupport: function() {
-                if(!this.uhd_support.checked) {
-                    try {
-                        this.checkUHDSupport();
-                    } catch(e) {
-                        console.log('[UHD DEBUG] Error calling checkUHDSupport:', e);
-                        // Safe fallback
-                        this.uhd_support.supports_4k = false;
-                        this.uhd_support.supports_8k = false;
-                        this.uhd_support.checked = true;
-                    }
-                }
-                return this.uhd_support;
             }
         }
     }

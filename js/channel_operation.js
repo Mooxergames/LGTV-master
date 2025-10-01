@@ -100,13 +100,6 @@ var channel_page={
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
             that.keys.focused_part="full_screen";
-            // Ensure setDisplayArea() is called after CSS changes for initial fullscreen
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                }
-            },100);
         }
         else{
             that.full_screen_video=false;
@@ -538,8 +531,24 @@ var channel_page={
         }
     },
     zoomInOut:function(){
-        if(this.full_screen_video){
-            // Flag is TRUE = apply FULLSCREEN CSS
+        if(!this.full_screen_video){
+            $('#live_channels_home .player-container').css({
+                position:'relative',
+                height:'58.3vh',
+                width:'58.3vw'
+            });
+            this.keys.focused_part="channel_selection";
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
+            $('#full-screen-information').removeClass('visible');
+            $('#full-screen-channel-name').hide();
+            $('#live_channels_home').find('.channel-information-container').show();
+            $('#live-channel-button-container').show();
+            $('#live_channels_home').find('.video-skin').show();
+        }
+        else{
             $('#live_channels_home .player-container').css({
                 position:'fixed',
                 left:0,
@@ -547,9 +556,14 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            // try{
+            //     media_player.setDisplayArea();
+            // }catch (e) {
+            // }
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
+            this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
@@ -559,29 +573,12 @@ var channel_page={
             },5000)
             this.keys.focused_part="full_screen";
         }
-        else{
-            // Flag is FALSE = apply PREVIEW CSS
-            $('#live_channels_home .player-container').css({
-                position:'relative',
-                left:0,
-                top:0,
-                height:'58.3vh',
-                width:'58.3vw'
-            });
-            this.keys.focused_part="channel_selection";
-            $('#full-screen-information').removeClass('visible');
-            $('#full-screen-channel-name').hide();
-            $('#live_channels_home').find('.channel-information-container').show();
-            $('#live-channel-button-container').show();
-            $('#live_channels_home').find('.video-skin').show();
-        }
-        // Always call setDisplayArea after CSS changes
         setTimeout(function () {
             try{
                 media_player.setDisplayArea();
             }catch (e) {
             }
-        },100);
+        },0)
     },
     showLiveChannelMovie:function(movie_id){
         var url
@@ -616,23 +613,10 @@ var channel_page={
         // Add channel name to compact header
         $('#full-screen-channel-name-compact').text(current_movie.name);
         
-        // Extract resolution from channel name and show detailed format with UHD capability check
+        // Extract resolution from channel name and show detailed format
         var resolution = this.extractResolution(current_movie.name);
         var detailedResolution = this.getDetailedResolution(resolution);
-        
-        // Check if TV supports the detected resolution (Samsung only)
-        var uhd_capabilities = {supports_4k: false, supports_8k: false}; // Default fallback
-        try {
-            if(platform === 'samsung' && typeof media_player !== 'undefined' && 
-               typeof media_player.getUHDSupport === 'function') {
-                uhd_capabilities = media_player.getUHDSupport();
-            }
-        } catch(e) {
-            console.log('[UHD DEBUG] Error getting UHD capabilities:', e);
-        }
-        var finalResolution = this.validateResolutionSupport(resolution, detailedResolution, uhd_capabilities);
-        
-        $('#full-screen-resolution').text(finalResolution);
+        $('#full-screen-resolution').text(detailedResolution);
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -673,39 +657,6 @@ var channel_page={
                 return '720x480 SD';
             default:
                 return '1280x720 HD';
-        }
-    },
-    validateResolutionSupport:function(resolution, detailedResolution, uhd_capabilities){
-        // Validate if Samsung TV supports the detected resolution and provide fallbacks
-        console.log('[UHD DEBUG] Validating resolution support for:', resolution);
-        console.log('[UHD DEBUG] TV capabilities - 4K:', uhd_capabilities.supports_4k, '8K:', uhd_capabilities.supports_8k);
-        
-        switch(resolution) {
-            case '8K':
-                if(uhd_capabilities.supports_8k) {
-                    console.log('[UHD DEBUG] 8K content supported - displaying native 8K');
-                    return detailedResolution + ' ✓';
-                } else if(uhd_capabilities.supports_4k) {
-                    console.log('[UHD DEBUG] 8K content not supported - will downscale to 4K');
-                    return detailedResolution + ' → 4K';
-                } else {
-                    console.log('[UHD DEBUG] 8K content not supported - will downscale to FHD');
-                    return detailedResolution + ' → FHD';
-                }
-                
-            case '4K':
-                if(uhd_capabilities.supports_4k) {
-                    console.log('[UHD DEBUG] 4K content supported - displaying native 4K');
-                    return detailedResolution + ' ✓';
-                } else {
-                    console.log('[UHD DEBUG] 4K content not supported - will downscale to FHD');
-                    return detailedResolution + ' → FHD';
-                }
-                
-            default:
-                // FHD, HD, SD are supported by all Samsung TVs
-                console.log('[UHD DEBUG] Standard resolution - no validation needed');
-                return detailedResolution;
         }
     },
     showNextChannel:function(increment){
