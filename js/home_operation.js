@@ -840,25 +840,15 @@ var home_page={
         var keys=this.keys;
         var current_sort_key=current_movie_type==='movies' ? 'vod_sort' : 'series_sort';
         $('#sort-modal-container').hide();
-        var category=current_movie_categories[keys.submenu_selection];
         if(settings[current_sort_key]!=key){
             settings.saveSettings(current_sort_key,key,'');
             
-            // Rebuild movie list for "all" category from aggregated sources
-            var movies_to_sort = current_category.movies;
-            if(category.category_id==='all'){
-                movies_to_sort = [];
-                current_movie_categories.map(function (item){
-                    if(!checkForAdult(item,'category',[]) && !item.is_hide && item.category_id!='recent' && item.category_id!='favourite' && item.category_id!='resume')
-                        movies_to_sort=movies_to_sort.concat(item.movies);
-                })
-            }
-            
-            this.movies=getSortedMovies(movies_to_sort,key)
+            // Sort the already loaded movies array (don't rebuild from categories)
+            this.movies=getSortedMovies(this.movies,key)
             $('#movie-grids-container').html('');
             this.current_render_count=0;
             this.renderCategoryContent();
-            if(current_category.movies.length>0){
+            if(this.movies.length>0){
                 keys.focused_part="grid_selection";
                 keys.grid_selection=0;
                 $('#sort-button-container').removeClass('active');
