@@ -278,17 +278,22 @@ var home_page={
             extension=movie.container_extension;
         }
         var channel_class=movie_type=='live' ? ' channel' : '';
+        
+        // Show NEW badge on first 10 featured movies (they're already sorted by "added")
+        var show_new_badge = (movie_type === 'movie' && grid_index < 10);
+        
         var htmlContent=
             '<div class="movie-item-container">\
-                <div class="movie-item-wrapper '+channel_class+'"\
+                <div class="movie-item-wrapper '+channel_class+' position-relative"\
                     data-movie_type="'+movie_type+'"\
                     data-stream_id="'+movie.stream_id+'" data-extension="'+extension+'"\
                     data-slider_index="'+slider_index+'"\
                     data-slider_item_index="'+grid_index+'"\
                     onmouseenter="home_page.changeMovieGridItem(this)"\
                     onclick="home_page.showPreviewVideo(this)"\
-                >\
-                    <div class="movie-item-thumbernail">\
+                >'+
+                (show_new_badge ? '<div class="new-badge">NEW</div>' : '')+
+                    '<div class="movie-item-thumbernail">\
                         <div class="movie-item-thumbernail-img-wrapper">\
                             <img class="movie-item-thumbernail-img" src="'+movie.stream_icon+'" onerror="this.src=\''+fall_back_image+'\'"> \
                         </div> \
@@ -838,7 +843,18 @@ var home_page={
         var category=current_movie_categories[keys.submenu_selection];
         if(settings[current_sort_key]!=key){
             settings.saveSettings(current_sort_key,key,'');
-            this.movies=getSortedMovies(current_category.movies,key)
+            
+            // Rebuild movie list for "all" category from aggregated sources
+            var movies_to_sort = current_category.movies;
+            if(category.category_id==='all'){
+                movies_to_sort = [];
+                current_movie_categories.map(function (item){
+                    if(!checkForAdult(item,'category',[]) && !item.is_hide && item.category_id!='recent' && item.category_id!='favourite' && item.category_id!='resume')
+                        movies_to_sort=movies_to_sort.concat(item.movies);
+                })
+            }
+            
+            this.movies=getSortedMovies(movies_to_sort,key)
             $('#movie-grids-container').html('');
             this.current_render_count=0;
             this.renderCategoryContent();
@@ -850,11 +866,6 @@ var home_page={
             $('#sort-button').text($(this.sort_selection_doms[keys.sort_selection]).text());
             $('#movie-grids-container').scrollTop(0);
         }else{
-            // keys.focused_part="grid_selection";
-            // keys.grid_selection=0;
-            // $('#sort-button-container').removeClass('active');
-            // $('#movie-grids-container .movie-item-wrapper').removeClass('active');
-            // $($('#movie-grids-container .movie-item-wrapper')[0]).addClass('active');
             this.hoverMovieGridItem(this.movie_grid_doms[0]);
         }
     },
