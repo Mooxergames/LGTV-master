@@ -53,6 +53,9 @@ var EnhancedSubtitleWorkflow = {
         
         console.log('Combined subtitles available:', combinedSubtitles.length);
         
+        // Apply global subtitle settings for this new content
+        this.applyGlobalSubtitleSettings();
+        
         if(successCallback) {
             successCallback(combinedSubtitles);
         }
@@ -81,6 +84,9 @@ var EnhancedSubtitleWorkflow = {
             if(typeof media_player !== 'undefined') {
                 media_player.subtitles = fallbackSubtitles;
             }
+            
+            // Apply global subtitle settings for this new content
+            this.applyGlobalSubtitleSettings();
             
             if(successCallback) {
                 successCallback(fallbackSubtitles);
@@ -202,7 +208,6 @@ var EnhancedSubtitleWorkflow = {
             return;
         }
         
-        console.log('Loading API subtitle:', subtitleUrl);
         
         if(loadingCallback) loadingCallback();
         
@@ -292,5 +297,23 @@ var EnhancedSubtitleWorkflow = {
         }
         
         console.log('All subtitles disabled');
+    },
+    
+    /**
+     * Apply global subtitle settings saved in localStorage
+     * This ensures all movies/series use the same subtitle preferences
+     */
+    applyGlobalSubtitleSettings: function() {
+        // Apply global settings via SrtOperation if available
+        if(typeof srt_operation !== 'undefined') {
+            srt_operation.applyUserStyles();
+        }
+        
+        // Also apply via vod_series_player if available
+        if(typeof vod_series_player !== 'undefined' && vod_series_player.applySubtitlePosition) {
+            vod_series_player.applySubtitlePosition();
+        }
+        
+        console.log('Global subtitle settings applied for new content');
     }
 };

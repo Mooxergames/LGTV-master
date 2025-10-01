@@ -177,7 +177,6 @@ var youtube_page={
     onPlayerStateChange:function (event) {
         var data=event.data;
         if(data===YT.PlayerState.ENDED){
-            console.log('here ended and showing next movie');
             youtube_page.showNextMovie(1);
         }
 
@@ -238,7 +237,6 @@ var youtube_page={
                 this.showMovie();
                 break;
             case 'full_screen':
-                console.log("here");
                 this.playOrPause();
                 break;
         }

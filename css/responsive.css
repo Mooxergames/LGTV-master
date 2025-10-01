@@ -124,14 +124,14 @@
 
     #full-screen-program-name,
     #catchup-full-screen-program-name,#guide-video-program-name{
-        font-size:35px;
+        font-size:24px;
     }
 
     #full-screen-program-description,
     #catchup-full-screen-program-description,
     #guide-video-program-description
     {
-        font-size:25px;
+        font-size:14px;
     }
 
     #full-screen-channel-name,
@@ -194,12 +194,6 @@
         right: 10px;
         top: 5px;
         font-size: 20px;
-    }
-    .new-badge {
-        left: 5px;
-        top: 5px;
-        font-size: 10px;
-        padding: 3px 6px;
     }
     #vod-summary-description, #series-summary-description {
         margin-top: 20px;

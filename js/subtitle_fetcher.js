@@ -64,7 +64,6 @@ var SubtitleFetcher = {
         else {
             var episodeName = movieData.title || movieData.name || movieData.episode_name || '';
             
-            console.log('🎯 Processing episode with ExoApp API format');
             var parsedEpisode = this.parseEpisodeName(episodeName);
             
             if (parsedEpisode.season_number && parsedEpisode.episode_number) {
@@ -137,7 +136,6 @@ var SubtitleFetcher = {
         
         // STAGE 1: Episode TMDB + Season/Episode (Most specific - ExoApp format)
         if(episodeTmdbFallback && subtitleRequestData.season_number && subtitleRequestData.episode_number) {
-            console.log('🎯 Stage 1: Episode TMDB with season/episode numbers');
             var episodeRequestData = Object.assign({}, subtitleRequestData, {
                 tmdb_id: String(episodeTmdbFallback)
             });
@@ -149,7 +147,6 @@ var SubtitleFetcher = {
                 }
             }, function(error) {
                 // STAGE 2: Name-based fallback "Series S01 E01" (reliable for wrong TMDB)
-                console.log('🎯 Stage 2: Name-based series fallback');
                 var parsedEpisode = that.parseEpisodeName(episodeName);
                 
                 if(parsedEpisode.series_name && parsedEpisode.season_number && parsedEpisode.episode_number) {
@@ -161,7 +158,6 @@ var SubtitleFetcher = {
                         movie_name: nameBasedTitle
                     };
                     
-                    console.log('🎯 Using name-based format:', nameBasedTitle);
                     
                     that.makeSubtitleRequest(nameBasedRequest, function(subtitles) {
                         console.log('✅ Name-based series matching successful');
@@ -170,7 +166,6 @@ var SubtitleFetcher = {
                         }
                     }, function(error2) {
                         // STAGE 3: Season/episode structure only (no TMDB, no name)
-                        console.log('🎯 Stage 3: Season/episode structure only');
                         that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
                             console.log('✅ Season/episode structure matching successful');
                             if(successCallback) {
@@ -179,7 +174,6 @@ var SubtitleFetcher = {
                         }, function(error3) {
                             // STAGE 4: Series TMDB as last resort
                             if(seriesTmdbFallback) {
-                                console.log('🎯 Stage 4: Series TMDB last resort');
                                 var seriesRequestData = Object.assign({}, subtitleRequestData, {
                                     tmdb_id: String(seriesTmdbFallback)
                                 });
@@ -194,7 +188,6 @@ var SubtitleFetcher = {
                     });
                 } else {
                     // Can't parse name - skip to season/episode structure
-                    console.log('🎯 Stage 2B: Season/episode structure (no name parsing)');
                     that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
                         console.log('✅ Season/episode structure matching successful');
                         if(successCallback) {
@@ -202,7 +195,6 @@ var SubtitleFetcher = {
                         }
                     }, function(error2) {
                         if(episodeTmdbFallback) {
-                            console.log('🎯 Stage 3B: Episode TMDB fallback');
                             var episodeRequestData = Object.assign({}, subtitleRequestData, {
                                 tmdb_id: String(episodeTmdbFallback)
                             });
@@ -219,7 +211,6 @@ var SubtitleFetcher = {
         } 
         // STAGE 1B: No episode TMDB - prioritize name-based matching  
         else if(subtitleRequestData.season_number && subtitleRequestData.episode_number) {
-            console.log('🎯 Stage 1B: Name-based matching (no episode TMDB)');
             
             var parsedEpisode = this.parseEpisodeName(episodeName);
             
@@ -232,7 +223,6 @@ var SubtitleFetcher = {
                     movie_name: nameBasedTitle
                 };
                 
-                console.log('🎯 Using name-based format:', nameBasedTitle);
                 
                 this.makeSubtitleRequest(nameBasedRequest, function(subtitles) {
                     console.log('✅ Name-based series matching successful');
@@ -241,7 +231,6 @@ var SubtitleFetcher = {
                     }
                 }, function(error) {
                     // STAGE 2B: Season/episode structure fallback
-                    console.log('🎯 Stage 2B: Season/episode structure fallback');
                     that.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
                         console.log('✅ Season/episode structure matching successful');
                         if(successCallback) {
@@ -250,7 +239,6 @@ var SubtitleFetcher = {
                     }, function(error2) {
                         // STAGE 3B: Series TMDB last resort
                         if(seriesTmdbFallback) {
-                            console.log('🎯 Stage 3B: Series TMDB last resort');
                             var seriesRequestData = Object.assign({}, subtitleRequestData, {
                                 tmdb_id: String(seriesTmdbFallback)
                             });
@@ -265,7 +253,6 @@ var SubtitleFetcher = {
                 });
             } else {
                 // Can't parse name - fall back to season/episode structure
-                console.log('🎯 Stage 1B-Alt: Season/episode structure (no name parsing)');
                 this.makeSubtitleRequest(subtitleRequestData, function(subtitles) {
                     console.log('✅ Season/episode structure matching successful');
                     if(successCallback) {
@@ -273,7 +260,6 @@ var SubtitleFetcher = {
                     }
                 }, function(error) {
                     if(seriesTmdbFallback) {
-                        console.log('🎯 Stage 2B-Alt: Series TMDB fallback');
                         var seriesRequestData = Object.assign({}, subtitleRequestData, {
                             tmdb_id: String(seriesTmdbFallback)
                         });
@@ -289,7 +275,6 @@ var SubtitleFetcher = {
         }
         // STAGE 1C: Movie format fallback (when episode parsing failed)
         else {
-            console.log('🎯 Stage 1C: Movie format fallback');
             
             // Try with any available TMDB ID first
             if(episodeTmdbFallback || seriesTmdbFallback) {
