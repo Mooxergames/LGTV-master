@@ -561,17 +561,15 @@ var channel_page={
                 this.hoverMenuItem(current_channel_index);
                 keys.focused_part="full_screen";
                 this.hover_channel_id=stream_id;
-                this.next_channel_timer=setTimeout(function () {
-                    that.showLiveChannelMovie(stream_id);
-                    clearTimeout(that.full_screen_timer);
-                    $('#full-screen-information').slideDown(400);
-                    $('#full-screen-channel-name').slideDown(400);
-                    that.full_screen_timer=setTimeout(function(){
-                        $('#full-screen-information').slideUp(400);
-                        $('#full-screen-channel-name').slideUp(400);
-                    },5000)
-                    that.changeActiveChannel();
-                },400)
+                that.showLiveChannelMovie(stream_id);
+                clearTimeout(that.full_screen_timer);
+                $('#full-screen-information').slideDown(400);
+                $('#full-screen-channel-name').slideDown(400);
+                that.full_screen_timer=setTimeout(function(){
+                    $('#full-screen-information').slideUp(400);
+                    $('#full-screen-channel-name').slideUp(400);
+                },5000)
+                that.changeActiveChannel();
             }
         }else
             this.handleMenusUpDown(10*increment);
