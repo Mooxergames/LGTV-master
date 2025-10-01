@@ -603,6 +603,9 @@ function initPlayer() {
             stop:function() {
                 try{
                     this.videoObj.pause();
+                    // Properly clean up video element to prevent resume attempts
+                    this.videoObj.removeAttribute('src');
+                    this.videoObj.load();
                 }catch (e) {
                 }
                 SrtOperation.deStruct();
@@ -611,6 +614,9 @@ function initPlayer() {
             close:function(){
                 try{
                     this.videoObj.pause();
+                    // Properly clean up video element to prevent resume attempts
+                    this.videoObj.removeAttribute('src');
+                    this.videoObj.load();
                 }catch (e) {
                 }
                 SrtOperation.deStruct();
