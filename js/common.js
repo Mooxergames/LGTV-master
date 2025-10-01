@@ -258,6 +258,12 @@ function changeBackgroundImage(){
             $('#login-container').css({'background-image':'url('+bg_img+')'});
             $('#app').css({'background-image':'url('+bg_img+')'});
         }
+        else{
+            // API not working - use local fallback background
+            var fallback_bg='images/background1.png';
+            $('#login-container').css({'background-image':'url('+fallback_bg+')'});
+            $('#app').css({'background-image':'url('+fallback_bg+')'});
+        }
     }
 }
 
