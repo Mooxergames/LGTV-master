@@ -246,21 +246,35 @@ function goHomePageWithMovieType(movie_type) {  // when clicking red button in s
 }
 
 function changeBackgroundImage(){
+    var fallback_bg='images/background1.png';
     var bg_img_index=settings.bg_img_index;
+    
+    // Function to apply fallback if image fails to load
+    function applyFallbackIfNeeded(imageUrl) {
+        var testImage = new Image();
+        testImage.onerror = function() {
+            // Image failed to load, use fallback
+            $('#login-container').css({'background-image':'url('+fallback_bg+')'});
+            $('#app').css({'background-image':'url('+fallback_bg+')'});
+        };
+        testImage.src = imageUrl;
+    }
+    
     if(typeof themes[bg_img_index]!="undefined"){
         var bg_img=themes[bg_img_index].url;
         $('#login-container').css({'background-image':'url('+bg_img+')'});
         $('#app').css({'background-image':'url('+bg_img+')'});
+        applyFallbackIfNeeded(bg_img);
     }
     else{  // if background image not setted, or not exist
         if(typeof themes[0]!="undefined"){
             var bg_img=themes[0].url;
             $('#login-container').css({'background-image':'url('+bg_img+')'});
             $('#app').css({'background-image':'url('+bg_img+')'});
+            applyFallbackIfNeeded(bg_img);
         }
         else{
             // API not working - use local fallback background
-            var fallback_bg='images/background1.png';
             $('#login-container').css({'background-image':'url('+fallback_bg+')'});
             $('#app').css({'background-image':'url('+fallback_bg+')'});
         }
