@@ -574,7 +574,7 @@ var channel_page={
                 media_player.setDisplayArea();
             }catch (e) {
             }
-        },100);
+        },50);
     },
     showLiveChannelMovie:function(movie_id){
         var url
