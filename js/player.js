@@ -72,8 +72,10 @@ function initPlayer() {
                             that.state = that.STATES.PLAYING;
                             webapis.avplay.play();
                             try{
-                                that.full_screen_state=1;
-                                webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                                if(current_route==='vod-series-player-video'){
+                                    that.full_screen_state=1;
+                                    webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                                }
                             }catch (e) {
                             }
                             $('#'+that.parent_id).find('.video-total-time').text(that.formatTime(webapis.avplay.getDuration()/1000));
@@ -390,7 +392,7 @@ function initPlayer() {
                 this.next_video_showing=false;
                 clearTimeout(this.next_video_timer);
                 this.id=id;
-                this.videoObj=null;	// tag video
+                this.videoObj=null;     // tag video
                 this.parent_id=parent_id;
                 this.current_time=0;
                 this.state = this.STATES.STOPPED;
