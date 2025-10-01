@@ -313,6 +313,11 @@ var home_page={
             current_model=SeriesModel;
         }
         var current_render_count=this.current_render_count;
+        
+        // Show NEW badge on first 10 items when sorted by "added"
+        var current_sort_key = current_movie_type==='movies' ? settings.vod_sort : settings.series_sort;
+        var show_new_badge = (current_sort_key === 'added' && (current_render_count + index) < 10);
+        
         var htmlContent=
             '<div class="movie-item-container">\
                 <div class="movie-item-wrapper position-relative"\
@@ -321,6 +326,7 @@ var home_page={
                     onclick="home_page.clickMovieGridItem(this)"\
                 >'+
                 (current_model.favourite_ids.includes(movie[id_key]) ? '<div class="favourite-badge"><i class="fa fa-star"></i></div>' : '')+
+                (show_new_badge ? '<div class="new-badge">NEW</div>' : '')+
                     '<img class="movie-grid-item-image movie-grid-item-image-'+current_render_count+'" src="'+img+'" onerror="this.src=\''+fall_back_image+'\'">\
                     <div class="movie-grid-item-title-wrapper position-relative">\
                         <p class="movie-thumbernail-title position-absolute">'+movie.name+'</p>\
