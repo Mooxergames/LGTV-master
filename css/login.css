@@ -477,12 +477,6 @@
     position: fixed;
     right: 40px;
     bottom: 30px;
-    text-align: right;
-}
-.mac-address-display {
-    font-size: 18px;
-    margin-top: 5px;
-    color: #999;
 }
 .version span {
     display: inline-block;

@@ -5,38 +5,31 @@ var SrtOperation={
     srt:[],
     stopped:false,
     subtitle_shown:false,
-    init: function (subtitle, current_time) {
-        // Enhanced initialization from exo app
-        // Clear existing subtitles
-        $('#' + media_player.parent_id).find('.subtitle-container').html('');
-        this.subtitle_shown = false;
-        
-        // Parse SRT content
-        var srt = [];
-        if(subtitle && subtitle.content) {
-            try {
+    init: function (subtitle, current_time) {  // will set initial time and initial index from parsed subtitle text array
+        // we will save always the index and time for current time subtitle text
+        $('#'+media_player.parent_id).find('.subtitle-container').html('');
+        this.subtitle_shown=false;
+        var srt=[];
+        if(subtitle.content) {
+            try{
                 SrtParser.init();
-                srt = SrtParser.fromSrt(subtitle.content);
-            } catch(e) {
-                console.error('SRT parsing error:', e);
+                srt=SrtParser.fromSrt(subtitle.content)
+            }catch (e) {
             }
         }
-        
-        this.srt = srt;
-        if(srt.length > 0) {
-            this.stopped = false;
-            // Find starting subtitle index using binary search - exact timing
-            this.current_srt_index = this.findIndex(current_time, 0, srt.length - 1);
-            if(this.current_srt_index < 0) this.current_srt_index = 0;
-            console.log("SRT initialized - found index:", this.current_srt_index, "for time:", current_time);
-        } else {
-            this.stopped = true;
-            console.log("No subtitles available or parsing failed");
+        this.srt=srt;
+        if(srt.length>0)
+            this.stopped=false;
+        else{
+            this.stopped=true;
+            return;
         }
-        this.next_srt_time = 0;
-        
-        // Apply global subtitle settings immediately after initialization
-        this.applyUserStyles();
+
+        this.current_srt_index=this.findIndex(current_time,0,srt.length-1);
+        console.log("here found srt index",this.current_srt_index,current_time, srt);
+        if(this.current_srt_index<0)
+            this.current_srt_index=0;
+        this.next_srt_time=0;
     },
     findIndex: function (time,start, end) {  // we will use binary search algorithm here
         if(time==0)
@@ -50,7 +43,7 @@ var SrtOperation={
         let mid=Math.floor((start + end)/2);
 
         // Compare mid with given key x
-        if (arr[mid].startSeconds<=time && time<arr[mid].endSeconds)
+        if (arr[mid].startSeconds<=time && time<arr[mid].endTime)
             return mid;
 
 
@@ -63,182 +56,55 @@ var SrtOperation={
             // search in the right half of mid
             return this.findIndex(time, mid+1, end);
     },
-    timeChange: function(current_time) {
-        // Exact timing logic from exoapp - no compensation offsets
-        if(this.stopped || !this.srt || this.srt.length === 0) {
+    timeChange:function (current_time) {
+        if(this.stopped)
             return;
+        var srt_index=this.current_srt_index;
+        var srt_item=this.srt[srt_index];
+        if(current_time>=srt_item.startSeconds && current_time<srt_item.endSeconds){
+            if(!this.subtitle_shown)
+                $('#'+media_player.parent_id).find('.subtitle-container').html(srt_item.text)
         }
-        
-        var srtIndex = this.current_srt_index;
-        if(srtIndex >= this.srt.length || srtIndex < 0) {
-            srtIndex = this.findIndex(current_time, 0, this.srt.length - 1);
-            this.current_srt_index = Math.max(0, srtIndex);
-            return;
-        }
-        
-        var srtItem = this.srt[srtIndex];
-        
-        // Check if current subtitle should be displayed - exact timing
-        if(current_time >= srtItem.startSeconds && current_time < srtItem.endSeconds) {
-            if(!this.subtitle_shown) {
-                this.showSubtitle(srtItem.text);
-                this.subtitle_shown = true;
+        else if(current_time>srt_item.endSeconds) {
+            var next_srt_item=this.srt[srt_index+1];
+            try{
+                if(current_time<next_srt_item.startSeconds){
+                    if(this.subtitle_shown){
+                        $('#'+media_player.parent_id).find('.subtitle-container').html('');
+                        this.subtitle_shown=false;
+                    }
+                }else if(next_srt_item.endSeconds>current_time){
+                    $('#'+media_player.parent_id).find('.subtitle-container').html(next_srt_item.text);
+                    this.subtitle_shown=true;
+                    this.current_srt_index+=1;
+                }else   // in this case, have to find the next index;
+                {
+                    console.log("here finding new srt index");
+                    this.current_srt_index=this.findIndex(current_time,0,this.srt.length-1);
+                    if(this.current_srt_index<0)
+                        this.current_srt_index=0;
+                }
+            }catch (e) {
+                console.log("subtitle timer issue",e);
             }
-        } else {
-            // Hide subtitle when out of time range
-            if(this.subtitle_shown) {
-                this.hideSubtitle();
-                this.subtitle_shown = false;
-            }
-            
-            // Find next subtitle
-            var newIndex = this.findIndex(current_time, 0, this.srt.length - 1);
-            if(newIndex >= 0 && newIndex !== this.current_srt_index) {
-                this.current_srt_index = newIndex;
+        }
+        else if(current_time<srt_item.startSeconds) {
+            try{
+                this.current_srt_index=this.findIndex(current_time,0,this.srt.length-1);
+                if(this.current_srt_index<0)
+                    this.current_srt_index=0;
+            }catch (e) {
             }
         }
     },
-    showSubtitle: function(text) {
-        // Enhanced subtitle display with better formatting
-        var subtitleHtml = '<div class="subtitle-text">' + text.replace(/\n/g, '<br>') + '</div>';
-        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
-        subtitleContainer.html(subtitleHtml);
-        subtitleContainer.show(); // Ensure container is visible when showing subtitles
-        
-        // Apply user settings AFTER inserting the HTML so styles apply to new elements
-        this.applyUserStyles();
-    },
-    
-    applyUserStyles: function() {
-        // Apply user subtitle settings from localStorage (saved by subtitle settings modal)
-        var position = parseInt(localStorage.getItem('subtitle_position') || '10');
-        var size = parseInt(localStorage.getItem('subtitle_size') || '18');
-        var bgType = localStorage.getItem('subtitle_background') || 'black';
-        
-        // Get background style based on saved setting
-        var backgroundStyle = this.getBackgroundStyleFromType(bgType);
-        
-        // Apply styles directly to subtitle container
-        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
-        subtitleContainer.css({
-            'bottom': position + 'vh',
-            'top': 'auto',
-            'font-size': size + 'px',
-            'background': backgroundStyle.background,
-            'color': backgroundStyle.color,
-            'text-shadow': backgroundStyle.textShadow,
-            'padding': backgroundStyle.padding,
-            'border-radius': backgroundStyle.borderRadius
-        });
-        
-        // Also apply to subtitle text elements
-        subtitleContainer.find('.subtitle-text').css({
-            'font-size': size + 'px',
-            'background': backgroundStyle.background,
-            'color': backgroundStyle.color,
-            'text-shadow': backgroundStyle.textShadow,
-            'padding': backgroundStyle.padding,
-            'border-radius': backgroundStyle.borderRadius
-        });
-    },
-    
-    getBackgroundStyleFromType: function(bgType) {
-        switch(bgType) {
-            case 'transparent':
-                return {
-                    background: 'transparent',
-                    color: '#fff',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                    padding: '2px 6px',
-                    borderRadius: '0px'
-                };
-            case 'black':
-                return {
-                    background: 'rgba(0,0,0,0.8)',
-                    color: '#fff',
-                    textShadow: 'none',
-                    padding: '4px 8px',
-                    borderRadius: '4px'
-                };
-            case 'gray':
-                return {
-                    background: 'rgba(128,128,128,0.8)',
-                    color: '#fff',
-                    textShadow: 'none',
-                    padding: '4px 8px',
-                    borderRadius: '4px'
-                };
-            case 'dark':
-                return {
-                    background: 'rgba(22,25,30,0.9)',
-                    color: '#fff',
-                    textShadow: 'none',
-                    padding: '4px 8px',
-                    borderRadius: '6px'
-                };
-            default:
-                return this.getBackgroundStyleFromType('black');
-        }
-    },
-
-    getSizeValue: function(size) {
-        var sizes = {
-            'small': '18px',
-            'medium': '24px', 
-            'large': '32px',
-            'extra-large': '40px'
-        };
-        return sizes[size] || '24px';
-    },
-    
-    getBackgroundValue: function(color) {
-        var backgrounds = {
-            'transparent': 'transparent',
-            'black': 'rgba(0, 0, 0, 0.8)',
-            'red': 'rgba(255, 0, 0, 0.8)',
-            'white': 'rgba(255, 255, 255, 0.8)',
-            'blue': 'rgba(0, 0, 255, 0.8)'
-        };
-        return backgrounds[color] || 'rgba(0, 0, 0, 0.8)';
-    },
-    
-    getTextColorValue: function(color) {
-        var colors = {
-            'white': '#ffffff',
-            'black': '#000000',
-            'yellow': '#ffff00',
-            'red': '#ff0000',
-            'green': '#00ff00'
-        };
-        return colors[color] || '#ffffff';
-    },
-    
-    getOutlineValue: function(textColor) {
-        // Provide contrast outline based on text color
-        if(textColor === 'white' || textColor === 'yellow') {
-            return '1px 1px 2px rgba(0, 0, 0, 0.8)';
-        } else {
-            return '1px 1px 2px rgba(255, 255, 255, 0.8)';
-        }
-    },
-    
-    hideSubtitle: function() {
-        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
-        subtitleContainer.html('');
-        // Keep container visible but empty - don't hide it as it may be needed again
-    },
-    
     stopOperation: function () {
-        this.stopped = true;
-        this.hideSubtitle();
-        this.subtitle_shown = false;
+        this.stopped=true;
+        $('#'+media_player.parent_id).find('.subtitle-container').html('');
+        this.subtitle_shown=false
     },
-    
-    deStruct: function () {
-        this.srt = [];
-        this.stopped = true;
-        this.hideSubtitle();
-        this.current_srt_index = 0;
-        this.subtitle_shown = false;
+    deStruct:function () {
+        this.srt=[];
+        this.stopped=true;
+        $('#'+media_player.parent_id).find('.subtitle-container').html('');
     }
 }

@@ -34,13 +34,12 @@ var settings={
         if(temp!=null && temp!=='null')
             this.epg_time_difference=parseFloat(temp);
 
-        var keys=['vod_sort','series_sort','live_sort','show_featured_movies','subtitle_size','subtitle_bg_color','subtitle_text_color'];
+        var keys=['vod_sort','series_sort','live_sort','show_featured_movies'];
         keys.map(function (key) {
             temp=localStorage.getItem(storage_id+key);
             if(temp!=null && temp!=='null')
                 that[key]=temp;
         })
-        
 
         temp=localStorage.getItem(storage_id+'language');
         if(temp!=null && temp!=='null')
@@ -88,9 +87,5 @@ var settings={
         this.language='en';
         this.show_featured_movies='on';
         this.epg_time_difference=0;
-        // Subtitle settings with defaults
-        this.subtitle_size='medium';
-        this.subtitle_bg_color='black';
-        this.subtitle_text_color='white';
     }
 }

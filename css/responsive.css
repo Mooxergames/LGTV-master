@@ -124,14 +124,14 @@
 
     #full-screen-program-name,
     #catchup-full-screen-program-name,#guide-video-program-name{
-        font-size:24px;
+        font-size:35px;
     }
 
     #full-screen-program-description,
     #catchup-full-screen-program-description,
     #guide-video-program-description
     {
-        font-size:14px;
+        font-size:25px;
     }
 
     #full-screen-channel-name,

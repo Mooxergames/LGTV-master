@@ -156,23 +156,6 @@ var login_page={
                     that.startApp(JSON.parse(local_data));
                 else{
                     that.hideLoadImage();
-                    // Update MAC address in network issue modal
-                    if(typeof mac_address !== 'undefined' && mac_address) {
-                        $('#network-issue-mac-address').text(mac_address);
-                    }
-                    
-                    // Hide or show Choose Playlist button based on playlist count
-                    var playlistCount = playlist_urls ? playlist_urls.length : 0;
-                    var choosePlaylistBtn = $('.network-issue-btn').filter(function() {
-                        return $(this).attr('onclick') === 'login_page.showPlaylistSelectionModal()';
-                    });
-                    
-                    if (playlistCount > 1) {
-                        choosePlaylistBtn.show();
-                    } else {
-                        choosePlaylistBtn.hide();
-                    }
-                    
                     $('#network-issue-container').show();
                     if(keys.focused_part!=='turn_off_modal')
                         that.hoverNetworkIssueBtn(0);
@@ -283,7 +266,7 @@ var login_page={
 
     getSamsungHardcodedMac: function() {
         console.log('Samsung: Using hardcoded MAC address');
-        mac_address = '52:54:00:12:34:59'; // Hardcoded fallback
+        mac_address = '52:54:00:12:34:58'; // Hardcoded fallback
         this.fetchPlaylistInformation();
     },
 
@@ -469,6 +452,9 @@ var login_page={
 
         playlist_succeed=false;
         $('#turn-off-modal').modal('hide');
+        // Update MAC address in playlist error dialog with fallback
+        $('#playlist-error-mac').text(mac_address || 'N/A');
+        $('#playlist-modal').modal('show');
         $('#playlist-error').show();
         // this.hideLoadImage();
         this.goToHomePage();
@@ -625,16 +611,15 @@ var login_page={
         var that = this;
         var keys = this.keys;
 
-        // Update MAC address in network issue modal
-        if(typeof mac_address !== 'undefined' && mac_address) {
-            $('#network-issue-mac-address').text(mac_address);
-        }
-
         // Update network issue text with MAC address
         $('#network-issue-text').html(
             'We couldn\'t load your playlist. This may be due to one of the following reasons:<br>' +
             '🔌 Network issue – Please check your internet connection.<br>' +
             '🌐 Playlist server is temporarily unavailable – Ensure your playlist is correct or contact your provider.<br><br>' +
+            '<div class="device-info-section">' +
+            '<strong>Device Information:</strong><br>' +
+            'MAC Address: <span class="mac-address-display">' + mac_address + '</span>' +
+            '</div>' +
             'You can continue using the app with limited functionality, or tap "Retry" to try loading your playlist again.'
         );
 
