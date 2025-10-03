@@ -61,9 +61,35 @@ var vod_summary_page={
             $.getJSON(api_host_url+'/player_api.php?username='+user_name+'&password='+password+'&action=get_vod_info&vod_id='+current_movie.stream_id)
                 .then(
                     function(response){
+                        console.log('=== XTREME API get_vod_info RESPONSE ANALYSIS ===');
+                        console.log('Full API response:', response);
+                        console.log('Info object:', response.info);
+                        console.log('TMDB ID check:', response.info.tmdb_id);
+                        
                         showLoader(false);
                         that.is_loading=false;
                         var info=response.info;
+                        
+                        // Store complete info object
+                        current_movie.info = info;
+                        
+                        // CRITICAL: Extract TMDB ID from API response
+                        if(info.tmdb_id) {
+                            current_movie.tmdb_id = info.tmdb_id;
+                            console.log('✅ TMDB ID extracted and stored:', current_movie.tmdb_id);
+                        } else {
+                            console.log('⚠️ NO TMDB ID in API response - subtitle matching will be less accurate');
+                        }
+                        
+                        // Store other enhanced metadata for subtitle fetching
+                        if(info.year) {
+                            current_movie.year = info.year;
+                        }
+                        if(info.releasedate) {
+                            current_movie.release_date = info.releasedate;
+                        }
+                        
+                        // Update UI elements
                         $('#vod-summary-release-date').text(info.releasedate);
                         $('#vod-summary-release-genre').text(info.genre);
                         $('#vod-summary-release-length').text(info.duration);
@@ -93,6 +119,9 @@ var vod_summary_page={
                             $('#vod-watch-trailer-button').hide();
                         }
                         current_movie.youtube_trailer=response.info.youtube_trailer;
+                        
+                        console.log('=== MOVIE DATA STORAGE COMPLETE ===');
+                        console.log('Current movie enhanced data - Name:', current_movie.name, 'TMDB:', current_movie.tmdb_id, 'Year:', current_movie.year);
                     }
                 )
                 .fail(

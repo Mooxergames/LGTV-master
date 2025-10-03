@@ -34,6 +34,9 @@ var SrtOperation={
             console.log("No subtitles available or parsing failed");
         }
         this.next_srt_time = 0;
+        
+        // Apply global subtitle settings immediately after initialization
+        this.applyUserStyles();
     },
     findIndex: function (time,start, end) {  // we will use binary search algorithm here
         if(time==0)
@@ -101,6 +104,122 @@ var SrtOperation={
         var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
         subtitleContainer.html(subtitleHtml);
         subtitleContainer.show(); // Ensure container is visible when showing subtitles
+        
+        // Apply user settings AFTER inserting the HTML so styles apply to new elements
+        this.applyUserStyles();
+    },
+    
+    applyUserStyles: function() {
+        // Apply user subtitle settings from localStorage (saved by subtitle settings modal)
+        var position = parseInt(localStorage.getItem('subtitle_position') || '10');
+        var size = parseInt(localStorage.getItem('subtitle_size') || '18');
+        var bgType = localStorage.getItem('subtitle_background') || 'black';
+        
+        // Get background style based on saved setting
+        var backgroundStyle = this.getBackgroundStyleFromType(bgType);
+        
+        // Apply styles directly to subtitle container
+        var subtitleContainer = $('#' + media_player.parent_id).find('.subtitle-container');
+        subtitleContainer.css({
+            'bottom': position + 'vh',
+            'top': 'auto',
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius
+        });
+        
+        // Also apply to subtitle text elements
+        subtitleContainer.find('.subtitle-text').css({
+            'font-size': size + 'px',
+            'background': backgroundStyle.background,
+            'color': backgroundStyle.color,
+            'text-shadow': backgroundStyle.textShadow,
+            'padding': backgroundStyle.padding,
+            'border-radius': backgroundStyle.borderRadius
+        });
+    },
+    
+    getBackgroundStyleFromType: function(bgType) {
+        switch(bgType) {
+            case 'transparent':
+                return {
+                    background: 'transparent',
+                    color: '#fff',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    padding: '2px 6px',
+                    borderRadius: '0px'
+                };
+            case 'black':
+                return {
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px'
+                };
+            case 'gray':
+                return {
+                    background: 'rgba(128,128,128,0.8)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px'
+                };
+            case 'dark':
+                return {
+                    background: 'rgba(22,25,30,0.9)',
+                    color: '#fff',
+                    textShadow: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '6px'
+                };
+            default:
+                return this.getBackgroundStyleFromType('black');
+        }
+    },
+
+    getSizeValue: function(size) {
+        var sizes = {
+            'small': '18px',
+            'medium': '24px', 
+            'large': '32px',
+            'extra-large': '40px'
+        };
+        return sizes[size] || '24px';
+    },
+    
+    getBackgroundValue: function(color) {
+        var backgrounds = {
+            'transparent': 'transparent',
+            'black': 'rgba(0, 0, 0, 0.8)',
+            'red': 'rgba(255, 0, 0, 0.8)',
+            'white': 'rgba(255, 255, 255, 0.8)',
+            'blue': 'rgba(0, 0, 255, 0.8)'
+        };
+        return backgrounds[color] || 'rgba(0, 0, 0, 0.8)';
+    },
+    
+    getTextColorValue: function(color) {
+        var colors = {
+            'white': '#ffffff',
+            'black': '#000000',
+            'yellow': '#ffff00',
+            'red': '#ff0000',
+            'green': '#00ff00'
+        };
+        return colors[color] || '#ffffff';
+    },
+    
+    getOutlineValue: function(textColor) {
+        // Provide contrast outline based on text color
+        if(textColor === 'white' || textColor === 'yellow') {
+            return '1px 1px 2px rgba(0, 0, 0, 0.8)';
+        } else {
+            return '1px 1px 2px rgba(255, 255, 255, 0.8)';
+        }
     },
     
     hideSubtitle: function() {
