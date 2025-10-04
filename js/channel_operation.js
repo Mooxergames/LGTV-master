@@ -38,7 +38,20 @@ var channel_page={
     rearrange_origin_position:0,
     removed_favourite_ids:[],
     init:function (channel_id, full_screen) {
-        console.log('channel_operation.init: START - channel_id=', channel_id, 'full_screen=', full_screen, 'current full_screen_video=', this.full_screen_video, 'media_player.full_screen_state=', media_player.full_screen_state);
+        console.log('╔══════════════════════════════════════════════════════════════════╗');
+        console.log('║ CHANNEL_OPERATION.INIT() - ENTERING CATEGORY');
+        console.log('╠══════════════════════════════════════════════════════════════════╣');
+        console.log('  channel_id:', channel_id);
+        console.log('  full_screen param:', full_screen);
+        console.log('  CURRENT STATE:');
+        console.log('    - full_screen_video:', this.full_screen_video);
+        console.log('    - transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
+        console.log('    - media_player.full_screen_state:', media_player.full_screen_state);
+        console.log('    - keys.focused_part:', this.keys.focused_part);
+        console.log('    - current_channel_id:', this.current_channel_id);
+        console.log('  RESETTING STATE for new category...');
+        console.log('╚══════════════════════════════════════════════════════════════════╝');
+        
         this.is_drawing=false;
         $("#channel-page").show();
         var category=current_category;
@@ -639,13 +652,26 @@ var channel_page={
             console.log(e);
         }
         
-        console.log('showLiveChannelMovie: Setting channel info bar - Name:', current_movie.num + ' : ' + current_movie.name);
-        $('#full-screen-channel-name').html(
-            current_movie.num+' : '+current_movie.name
-        );
+        var channelNameText = current_movie.num + ' : ' + current_movie.name;
+        console.log('╔═══════════════════════════════════════════════════════════════╗');
+        console.log('║ Setting Channel Info Bar');
+        console.log('╠═══════════════════════════════════════════════════════════════╣');
+        console.log('  Channel Name Text:', channelNameText);
+        console.log('  Before setting HTML:');
+        var $elem = $('#full-screen-channel-name');
+        console.log('    Element exists:', $elem.length > 0);
+        console.log('    Current HTML:', $elem.html());
+        console.log('    Is visible:', $elem.is(':visible'));
+        console.log('    Display CSS:', $elem.css('display'));
+        
+        $elem.html(channelNameText);
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
-        console.log('showLiveChannelMovie: Channel info HTML set to element #full-screen-channel-name');
-        console.log('showLiveChannelMovie: Element visibility:', $('#full-screen-channel-name').is(':visible'));
+        
+        console.log('  After setting HTML:');
+        console.log('    New HTML:', $elem.html());
+        console.log('    Is visible:', $elem.is(':visible'));
+        console.log('    Display CSS:', $elem.css('display'));
+        console.log('╚═══════════════════════════════════════════════════════════════╝');
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
@@ -914,34 +940,41 @@ var channel_page={
         
         var keys=this.keys;
         if(keys.focused_part==="search_back_selection"){
+            console.log('handleMenuClick: Branch → search_back_selection');
             $(this.search_back_buttons[keys.search_back_selection]).trigger('click');
             return;
         }
         if(keys.focused_part==="channel_selection"){  // if channel item clicked
+            console.log('handleMenuClick: Branch → channel_selection');
+            console.log('  Triggering click on menu_items[' + keys.channel_selection + ']');
             $(this.menu_items[keys.channel_selection]).trigger('click');
             return;
         }
         if(keys.focused_part==="full_screen"){ // if full screen mode, if click ok button,                                                                // then show full screen information
+            console.log('handleMenuClick: Branch → full_screen');
             if(this.transitioning_to_fullscreen){
-                console.log('handleMenuClick: Ignoring OK press - transition in progress');
+                console.log('handleMenuClick: ⚠️ Ignoring OK press - transition in progress');
                 return;
             }
-            console.log('handleMenuClick: Exiting fullscreen');
+            console.log('handleMenuClick: ⬅ Exiting fullscreen - calling zoomInOut()');
             this.keys.focused_part="channel_selection";
             this.full_screen_video=false;
             this.zoomInOut();
             return;
         }
         if(keys.focused_part==="search_selection"){
+            console.log('handleMenuClick: Branch → search_selection');
             var current_search_element=$('.search-item-wrapper')[keys.search_selection];
             $(current_search_element).trigger('click');
             return;
         }
         if(keys.focused_part==="right_screen_part"){  // in
+            console.log('handleMenuClick: Branch → right_screen_part');
             $(this.channel_action_items[keys.right_screen_part]).trigger('click');
             return;
         }
         if(keys.focused_part==="operation_modal"){
+            console.log('handleMenuClick: Branch → operation_modal');
             var buttons=$('#channel-operation-modal').find('.modal-operation-menu-type-1');
             $(buttons[keys.operation_modal]).trigger('click');
             if(keys.operation_modal==0){   // if clicked fav icon, after removing modal, focus to channel
@@ -950,6 +983,7 @@ var channel_page={
             }
             return;
         }
+        console.log('handleMenuClick: ⚠️ NO BRANCH MATCHED - focused_part:', keys.focused_part);
     },
     handleMenusUpDown:function(increment) {
         var keys=this.keys;
@@ -1100,22 +1134,51 @@ var channel_page={
         }
     },
     HandleKey:function(e) {
+        var keyName = '';
+        switch(e.keyCode) {
+            case tvKey.RIGHT: keyName = 'RIGHT'; break;
+            case tvKey.LEFT: keyName = 'LEFT'; break;
+            case tvKey.DOWN: keyName = 'DOWN'; break;
+            case tvKey.UP: keyName = 'UP'; break;
+            case tvKey.ENTER: keyName = 'OK/ENTER'; break;
+            case tvKey.CH_UP: keyName = 'PAGE UP'; break;
+            case tvKey.CH_DOWN: keyName = 'PAGE DOWN'; break;
+            case tvKey.RETURN: keyName = 'BACK'; break;
+            default: keyName = 'KEY_' + e.keyCode;
+        }
+        
+        console.log('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓');
+        console.log('┃ KEY PRESS: ' + keyName);
+        console.log('┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫');
+        console.log('  State Snapshot:');
+        console.log('    focused_part: ' + this.keys.focused_part);
+        console.log('    full_screen_video: ' + this.full_screen_video);
+        console.log('    transitioning_to_fullscreen: ' + this.transitioning_to_fullscreen);
+        console.log('    media_player.full_screen_state: ' + media_player.full_screen_state);
+        console.log('    current_channel_id: ' + this.current_channel_id);
+        console.log('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛');
+        
         if(this.is_drawing)
             return;
         switch (e.keyCode) {
             case tvKey.RIGHT:
+                console.log('→ Calling handleMenuLeftRight(1)');
                 this.handleMenuLeftRight(1)
                 break;
             case tvKey.LEFT:
+                console.log('← Calling handleMenuLeftRight(-1)');
                 this.handleMenuLeftRight(-1)
                 break;
             case tvKey.DOWN:
+                console.log('↓ Calling handleMenusUpDown(1)');
                 this.handleMenusUpDown(1);
                 break;
             case tvKey.UP:
+                console.log('↑ Calling handleMenusUpDown(-1)');
                 this.handleMenusUpDown(-1);
                 break;
             case tvKey.ENTER:
+                console.log('⏎ Calling handleMenuClick()');
                 this.handleMenuClick();
                 break;
             case tvKey.CH_UP:
