@@ -40,6 +40,7 @@ var settings={
             if(temp!=null && temp!=='null')
                 that[key]=temp;
         })
+        
 
         temp=localStorage.getItem(storage_id+'language');
         if(temp!=null && temp!=='null')

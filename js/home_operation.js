@@ -67,12 +67,20 @@ var home_page={
     init:function(){
         this.slider_items=[];
         $('#app').show();
+        
+        // Display MAC address at the top of home page
+        if(typeof mac_address !== 'undefined' && mac_address) {
+            $('#bottom-right-mac-address').text(mac_address);
+        }
         var  htmlContents="";
         var live_favourite_movie=LiveModel.getRecentOrFavouriteMovies('favourite');
         live_favourite_movie.map(function(movie, index){
             htmlContents+=home_page.makeSliderMovieItemElement(movie,'live',0, index)
         })
         $('#favourite_tv_wrapper').html(htmlContents);
+
+        // Clean up invalid favorites
+        VodModel.pruneInvalidFavorites();
 
         var vod_featured_movies=[];
         if(settings.show_featured_movies==='on')

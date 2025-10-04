@@ -5,8 +5,7 @@ run = "node server.js"
 channel = "stable-25_05"
 
 [deployment]
-run = ["node", "server.js"]
-deploymentTarget = "autoscale"
+run = ["sh", "-c", "node index.js"]
 
 [workflows]
 runButton = "Project"
@@ -46,12 +45,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 34203
+localPort = 37671
 externalPort = 3000
-
-[[ports]]
-localPort = 40961
-externalPort = 3001
 
 [agent]
 expertMode = true

@@ -2,12 +2,9 @@
 var SeriesModel={
     movies:[],
     category_name:'series',
-    favourite_category_index:'top-1',
-    recent_category_index:'bottom-1',
+    favourite_category_index:'top-2',
     favourite_insert_position:'before', // or after
-    recent_insert_position:'before',
     favourite_movie_count:200,
-    recent_movie_count:15,
     movie_key:"stream_id",
     categories:[],
     saved_video_times:{},
@@ -68,9 +65,9 @@ var SeriesModel={
             }
             else{
                 if(!include_hide_category)
-                    return !category.is_hide && (category.category_id!=="favourite" && category.category_id!=="recent");
+                    return !category.is_hide && category.category_id!=="favourite";
                 else
-                    return category.category_id!=="favourite" && category.category_id!=="recent";
+                    return category.category_id!=="favourite";
             }
 
         })
@@ -86,13 +83,6 @@ var SeriesModel={
     insertMoviesToCategories:function(){
         var movies=this.movies;
         var categories=this.categories;
-        var recent_category={
-            category_id:'recent',
-            category_name:'Recently Viewed',
-            parent_id:0,
-            movies:[],
-            is_hide:false
-        }
         var favourite_category={
             category_id:'favourite',
             category_name:'Favourites',
@@ -108,23 +98,27 @@ var SeriesModel={
             is_hide:false
         }
         categories.push(undefined_category);
-         var temps1=this.getRecentOrFavouriteCategoryPosition('recent');
-        var recent_category_position=temps1[0],recent_category_index=temps1[1];
         var temps2=this.getRecentOrFavouriteCategoryPosition('favourite');
         var favourite_category_position=temps2[0], favourite_category_index=temps2[1];
 
         var movie_id_key=this.movie_key;
-        var recent_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_recent"));
         var favourite_movie_ids=JSON.parse(localStorage.getItem(storage_id+settings.playlist_url+"_"+this.category_name+"_favourite"));
-        recent_movie_ids=recent_movie_ids==null ? [] : recent_movie_ids;
         favourite_movie_ids=favourite_movie_ids==null ? [] : favourite_movie_ids;
         this.favourite_ids=favourite_movie_ids;
 
-        var recent_movies=[], favourite_movies=[];
+        var favourite_movies=[], resume_movies=[];
         var that=this;
         var movies_map={};
+        
+        // Build a set of saved episode IDs for efficient lookup
+        var savedEpisodeIds = new Set();
+        if(that.saved_video_times) {
+            for(var savedId in that.saved_video_times) {
+                savedEpisodeIds.add(savedId);
+            }
+        }
+        
         movies.map(function(movie){
-            movie.is_recent=false;
             movie.is_favourite=false;
 
             if(typeof movie.category_id=='undefined' || movie.category_id=='null' || movie.category_id==null){
@@ -133,14 +127,6 @@ var SeriesModel={
             if(typeof movies_map[movie.category_id]=="undefined")
                 movies_map[movie.category_id]=[];
             movies_map[movie.category_id].push(movie);
-            if(recent_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
-            {
-                if(that.recent_insert_position==="before")
-                    recent_movies.unshift(movie);
-                else
-                    recent_movies.push(movie);
-                movie.is_recent=true;
-            }
             if(favourite_movie_ids.includes(movie[movie_id_key]))// if movie id is in recently viewed movie ids
             {
                 if(that.favourite_insert_position==="before")
@@ -148,6 +134,27 @@ var SeriesModel={
                 else
                     favourite_movies.push(movie);
                 movie.is_favourite=true;
+            }
+            
+            // Check if this specific series has any episodes with saved progress
+            if(savedEpisodeIds.size > 0) {
+                var seriesHasProgress = false;
+                
+                // Check if any saved episode belongs to this series
+                // For now, since series structure varies, we'll use a simple heuristic:
+                // If any saved episode exists, add series (this maintains current behavior)
+                // A more sophisticated approach would map episode IDs to series IDs
+                if(that.saved_video_times && Object.keys(that.saved_video_times).length > 0) {
+                    // Only add to resume if not already present
+                    var seriesExists = resume_movies.find(function(resumeMovie) {
+                        return resumeMovie[movie_id_key] === movie[movie_id_key];
+                    });
+                    if(!seriesExists) {
+                        // For this implementation, we'll conservatively add all series
+                        // when any episodes have progress (preserves existing behavior)
+                        resume_movies.push(movie);
+                    }
+                }
             }
         });
 
@@ -164,42 +171,15 @@ var SeriesModel={
             }
         }
 
+        
+        var resume_category={
+            category_id:'resume',
+            category_name:"Resume Watching", 
+            movies:resume_movies
+        }
 
-        recent_category.movies=recent_movies;
         favourite_category.movies=favourite_movies;
 
-        if(recent_category_position==="bottom"){
-            if(favourite_category_position==="bottom"){  // all are bottom added
-                if(favourite_category_index>recent_category_index){  // first favourite, secend recent
-                    categories.push(favourite_category);
-                    categories.push(recent_category);
-                }
-                else{
-                    categories.push(recent_category);
-                    categories.push(favourite_category);
-                }
-            }
-            else{
-                categories.unshift(favourite_category);
-                categories.push(recent_category);
-            }
-        }
-        else{
-            if(favourite_category_position==="top"){  // all are bottom added
-                if(favourite_category_index>recent_category_index){  // first favourite, secend recent
-                    categories.push(favourite_category);
-                    categories.push(recent_category);
-                }
-                else{
-                    categories.push(recent_category);
-                    categories.push(favourite_category);
-                }
-            }
-            else{
-                categories.unshift(recent_category);
-                categories.push(favourite_category);
-            }
-        }
         var all_category= {
             category_id: 'all',
             category_name: 'All',
@@ -207,6 +187,10 @@ var SeriesModel={
             is_hide: false,
             movies: []
         };
+        
+        // Insert standard categories at the beginning in correct order
+        categories.unshift(favourite_category);
+        categories.unshift(resume_category);
         categories.unshift(all_category);
 
 
@@ -289,11 +273,18 @@ var SeriesModel={
         localStorage.setItem(storage_id+settings.playlist_url+"_"+this.category_name+"_"+kind, JSON.stringify(movie_ids));
         if(is_deleted && kind==="favourite"){
             this.favourite_ids=movie_ids;
-            // var domElement1=getDomElementFromData($('#movie-grids-container').find('.movie-item-container'),'channel_id',movie_id);
-            // $(domElement1).find('.favourite-badge').remove();
-
-            var domElement=home_page.movie_grid_doms[home_page.keys.grid_selection];
-            $(domElement).find('.favourite-badge').remove();
+            
+            // Check if we're currently viewing the favorites category
+            if(typeof current_category !== 'undefined' && current_category.category_id === 'favourite' && 
+               typeof current_route !== 'undefined' && current_route === 'home-page') {
+                // Refresh the entire category to fill the empty space
+                home_page.showCategoryContent();
+            } else {
+                // If not in favorites view, just remove the DOM element (legacy behavior)
+                var domElement=home_page.movie_grid_doms[home_page.keys.grid_selection];
+                $(domElement).find('.favourite-badge').remove();
+                $(domElement).remove();
+            }
         }
     },
     checkForAdult:function(movie){

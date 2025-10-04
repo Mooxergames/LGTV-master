@@ -26,9 +26,14 @@ var series_summary_page={
         var backdrop_image='';
         try{
             backdrop_image=current_series.backdrop_path[0];
-            if(backdrop_image)
-                $('.vod-series-background-img').attr('src',backdrop_image);
         }catch (e) {
+        }
+        
+        // Use backdrop if available, otherwise use poster as fallback
+        if(backdrop_image) {
+            $('.vod-series-background-img').attr('src',backdrop_image);
+        } else if(current_series.cover) {
+            $('.vod-series-background-img').attr('src',current_series.cover);
         }
         this.hoverButtons(1);
         if(current_series.is_favourite){
@@ -74,8 +79,16 @@ var series_summary_page={
         $('#series-summary-page').hide();
         switch (this.prev_route) {
             case "home-page":
-                // $('#home-page').css({height:'100vh'});
-                home_page.reEnter();
+                // Check if we need to refresh favorites category after removal
+                if(typeof current_category !== 'undefined' && current_category.category_id === 'favourite') {
+                    // Refresh the favorites category to fill empty spaces
+                    home_page.reEnter();
+                    setTimeout(function() {
+                        home_page.showCategoryContent();
+                    }, 100);
+                } else {
+                    home_page.reEnter();
+                }
                 break;
             case "search-page":
                 $('#search-page').show();

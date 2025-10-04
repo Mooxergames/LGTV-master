@@ -77,8 +77,13 @@ var vod_summary_page={
                             backdrop_image=info.backdrop_path[0];
                         }catch (e) {
                         }
-                        if(backdrop_image)
+                        
+                        // Use backdrop if available, otherwise use poster as fallback
+                        if(backdrop_image) {
                             $('.vod-series-background-img').attr('src',backdrop_image);
+                        } else if(current_movie.stream_icon) {
+                            $('.vod-series-background-img').attr('src',current_movie.stream_icon);
+                        }
 
                         if(typeof info.youtube_trailer!='undefined' && info.youtube_trailer!=null && info.youtube_trailer.trim()!==''){
                             that.min_btn_index=0;
@@ -102,8 +107,16 @@ var vod_summary_page={
         $('#vod-summary-page').hide();
         switch (this.prev_route) {
             case 'home-page':
-                // $('#home-page').css({height:'100vh'});
-                home_page.reEnter();
+                // Check if we need to refresh favorites category after removal
+                if(typeof current_category !== 'undefined' && current_category.category_id === 'favourite') {
+                    // Refresh the favorites category to fill empty spaces
+                    home_page.reEnter();
+                    setTimeout(function() {
+                        home_page.showCategoryContent();
+                    }, 100);
+                } else {
+                    home_page.reEnter();
+                }
                 break;
             case 'search-page':
                 $('#search-page').show();
@@ -123,8 +136,6 @@ var vod_summary_page={
     },
     showMovie:function(){
         $('#vod-summary-page').hide();
-        if(!checkForAdult(current_movie,'movie',VodModel.categories))
-            VodModel.addRecentOrFavouriteMovie(current_movie,'recent');  // Add To Recent Movies
         vod_series_player.makeEpisodeDoms('home-page');
         vod_series_player.init(current_movie,"movies",this.prev_route);
     },
