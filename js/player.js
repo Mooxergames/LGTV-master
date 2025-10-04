@@ -240,23 +240,24 @@ function initPlayer() {
             },
             setDisplayArea:function() {
                 console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
-                console.trace('Called from:');
+                
+                var capabilities = this.detectTVCapabilities();
+                var avplayBaseWidth = capabilities.resolution.width;
+                var avplayBaseHeight = capabilities.resolution.height;
+                
                 if (this.full_screen_state === 1) {
+                    console.log('FULLSCREEN: Using setDisplayRect(0, 0, 1920, 1080)');
                     try {
-                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                        console.log('Using FULL_SCREEN mode');
+                        webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
+                        console.log('Fullscreen setDisplayRect successful');
                     } catch (e) {
-                        console.error('setDisplayMethod error:', e);
+                        console.error('Fullscreen setDisplayRect error:', e);
                     }
                 } else {
                     var top_position=$(this.videoObj).offset().top;
                     var left_position=$(this.videoObj).offset().left;
                     var width=parseInt($(this.videoObj).width())
                     var height=parseInt($(this.videoObj).height());
-                    
-                    var capabilities = this.detectTVCapabilities();
-                    var avplayBaseWidth = capabilities.resolution.width;
-                    var avplayBaseHeight = capabilities.resolution.height;
                     
                     var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
                     var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
@@ -269,7 +270,6 @@ function initPlayer() {
                     console.log('Preview mode - Original coordinates:', left_position, top_position, width, height);
                     console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
                     console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                    console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
                     
                     try {
                         webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
