@@ -90,6 +90,7 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            media_player.full_screen_state=1;
             setTimeout(function () {
                 try{
                     media_player.setDisplayArea();
@@ -114,6 +115,7 @@ var channel_page={
                 height:'58.3vh',
                 width:'58.3vw'
             });
+            media_player.full_screen_state=0;
             that.full_screen_video=false;
             that.keys.focused_part="channel_selection";
             $('#live-channel-button-container').show();
@@ -479,6 +481,7 @@ var channel_page={
                 width:'58.3vw'
             });
             this.keys.focused_part="channel_selection";
+            media_player.full_screen_state=0;
             setTimeout(function () {
                 try{
                     media_player.setDisplayArea();
@@ -500,6 +503,7 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            media_player.full_screen_state=1;
             setTimeout(function () {
                 try{
                     media_player.setDisplayArea();

@@ -472,6 +472,7 @@ var guide_page={
                 height:'30vh',
                 width:'30vw'
             });
+            media_player.full_screen_state=0;
             $('#guide-video-information-wrapper').slideUp();
             clearTimeout(this.full_screen_timer);
             this.keys.focused_part="programme_selection";
@@ -484,6 +485,7 @@ var guide_page={
                 height:'100vh',
                 width:'100vw'
             });
+            media_player.full_screen_state=1;
             this.keys.focused_part="full_screen_part";
             $('#guide-video-information-wrapper').slideDown();
             clearTimeout(this.full_screen_timer);

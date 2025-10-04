@@ -190,6 +190,7 @@ var catchup_page={
                 height:'58.3vh',
                 width:'58.3vw'
             });
+            media_player.full_screen_state=0;
             $('#catchup-full-screen-information').hide();
             $('#catchup').find('.channel-information-container').show();
             this.keys.focused_part="date_program_selection"
@@ -202,6 +203,7 @@ var catchup_page={
                 height:'100vh',
                 width:'100vw'
             });
+            media_player.full_screen_state=1;
             catchup_page.full_screen_video=true;
             var date=this.dates[this.current_date_index];
             $('#catchup-full-screen-channel-name').html(

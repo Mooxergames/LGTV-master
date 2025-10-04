@@ -126,12 +126,8 @@ function initPlayer() {
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
                             webapis.avplay.play();
-                            try{
-                                if(current_route==='vod-series-player-video'){
-                                    that.full_screen_state=1;
-                                    webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                                }
-                            }catch (e) {
+                            if(current_route==='vod-series-player-video'){
+                                that.full_screen_state=1;
                             }
                             $('#'+that.parent_id).find('.video-total-time').text(that.formatTime(webapis.avplay.getDuration()/1000));
                             $('#'+that.parent_id).find('.video-error').hide();
@@ -237,50 +233,53 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
-                var top_position=$(this.videoObj).offset().top;
-                var left_position=$(this.videoObj).offset().left;
-                var width=parseInt($(this.videoObj).width())
-                var height=parseInt($(this.videoObj).height());
-                
-                var capabilities = this.detectTVCapabilities();
-                var avplayBaseWidth = capabilities.resolution.width;
-                var avplayBaseHeight = capabilities.resolution.height;
-                
-                var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
-                var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
-                
-                var scaledLeft = Math.round(left_position * ratioX);
-                var scaledTop = Math.round(top_position * ratioY);
-                var scaledWidth = Math.round(width * ratioX);
-                var scaledHeight = Math.round(height * ratioY);
-                
-                console.log('Original coordinates:', left_position, top_position, width, height);
-                console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
-                console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
-                
-                try {
-                    webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                    console.log('setDisplayRect successful');
-                } catch (e) {
-                    console.error('setDisplayArea error:', e.code, e.name, e.message);
+                if (this.full_screen_state === 1) {
+                    try {
+                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                        console.log('Fullscreen mode activated');
+                    } catch (e) {
+                        console.error('setDisplayMethod error:', e);
+                    }
+                } else {
+                    var top_position=$(this.videoObj).offset().top;
+                    var left_position=$(this.videoObj).offset().left;
+                    var width=parseInt($(this.videoObj).width())
+                    var height=parseInt($(this.videoObj).height());
+                    
+                    var capabilities = this.detectTVCapabilities();
+                    var avplayBaseWidth = capabilities.resolution.width;
+                    var avplayBaseHeight = capabilities.resolution.height;
+                    
+                    var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
+                    var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
+                    
+                    var scaledLeft = Math.round(left_position * ratioX);
+                    var scaledTop = Math.round(top_position * ratioY);
+                    var scaledWidth = Math.round(width * ratioX);
+                    var scaledHeight = Math.round(height * ratioY);
+                    
+                    console.log('Preview mode - Original coordinates:', left_position, top_position, width, height);
+                    console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
+                    console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                    console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
+                    
+                    try {
+                        webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                        console.log('setDisplayRect successful (preview mode)');
+                    } catch (e) {
+                        console.error('setDisplayRect error:', e.code, e.name, e.message);
+                    }
                 }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
             toggleScreenRatio:function(){
                 if(this.full_screen_state==1){
-                    try{
-                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO');
-                        this.full_screen_state=0;
-                    }catch (e) {
-                    }
+                    this.full_screen_state=0;
+                    this.setDisplayArea();
                 }else{
-                    try{
-                        webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                        this.full_screen_state=1;
-                    }catch (e) {
-                    }
+                    this.full_screen_state=1;
+                    this.setDisplayArea();
                 }
             },
             formatTime:function(seconds) {
