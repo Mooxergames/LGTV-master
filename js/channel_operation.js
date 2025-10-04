@@ -251,7 +251,16 @@ var channel_page={
     channelItemClick:function(index){
         var menus=this.menu_items;
         var stream_id=$(menus[index]).data('channel_id');
-        console.log('channelItemClick: stream_id=', stream_id, 'current_channel_id=', this.current_channel_id, 'full_screen_video=', this.full_screen_video);
+        var movie_info = getCurrentMovieFromId(stream_id, this.movies,'stream_id');
+        console.log('┌─────────────────────────────────────────────────────────┐');
+        console.log('│ channelItemClick');
+        console.log('├─────────────────────────────────────────────────────────┤');
+        console.log('  Selected Channel:', movie_info ? movie_info.name : 'UNKNOWN');
+        console.log('  stream_id:', stream_id);
+        console.log('  current_channel_id:', this.current_channel_id);
+        console.log('  full_screen_video:', this.full_screen_video);
+        console.log('└─────────────────────────────────────────────────────────┘');
+        
         if(this.current_channel_id==stream_id){
             console.log('channelItemClick: SAME CHANNEL - checking if should zoom');
             if(!this.full_screen_video){
@@ -553,7 +562,17 @@ var channel_page={
         }
     },
     showLiveChannelMovie:function(movie_id){
-        console.log('showLiveChannelMovie: START - movie_id=', movie_id, 'full_screen_video=', this.full_screen_video, 'media_player.full_screen_state=', media_player.full_screen_state);
+        var current_movie=getCurrentMovieFromId(movie_id, this.movies,'stream_id');
+        console.log('╔════════════════════════════════════════════════════════════╗');
+        console.log('║ showLiveChannelMovie: START');
+        console.log('╠════════════════════════════════════════════════════════════╣');
+        console.log('  Channel ID:', movie_id);
+        console.log('  Channel Name:', current_movie ? current_movie.name : 'NOT FOUND');
+        console.log('  Channel Num:', current_movie ? current_movie.num : 'N/A');
+        console.log('  full_screen_video:', this.full_screen_video);
+        console.log('  media_player.full_screen_state:', media_player.full_screen_state);
+        console.log('╚════════════════════════════════════════════════════════════╝');
+        
         var url
         if(settings.playlist_type==="xtreme")
             url=getMovieUrl(movie_id,'live','ts');
@@ -587,12 +606,14 @@ var channel_page={
         }catch (e) {
             console.log(e);
         }
-        var current_movie=getCurrentMovieFromId(movie_id, this.movies,'stream_id');
-        console.log('showLiveChannelMovie: Setting channel name to:', current_movie.num + ' : ' + current_movie.name);
+        
+        console.log('showLiveChannelMovie: Setting channel info bar - Name:', current_movie.num + ' : ' + current_movie.name);
         $('#full-screen-channel-name').html(
             current_movie.num+' : '+current_movie.name
         );
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
+        console.log('showLiveChannelMovie: Channel info HTML set to element #full-screen-channel-name');
+        console.log('showLiveChannelMovie: Element visibility:', $('#full-screen-channel-name').is(':visible'));
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
             LiveModel.addRecentOrFavouriteMovie(current_movie,'recent');   // add to recent live channels
