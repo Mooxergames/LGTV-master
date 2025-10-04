@@ -137,7 +137,13 @@ var vod_series_player={
         }
         try{
             media_player.init("vod-series-player-video","vod-series-player-page");
-            media_player.setDisplayArea();
+            setTimeout(function(){
+                try{
+                    media_player.setDisplayArea();
+                }catch(e){
+                    console.log(e);
+                }
+            }, 250);
         }catch (e) {
             console.log(e);
         }

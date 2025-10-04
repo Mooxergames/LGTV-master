@@ -186,9 +186,22 @@ function initPlayer() {
                 var left_position=$(this.videoObj).offset().left;
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
-                console.log(top_position,left_position,width,height);
-                // console.log(this.videoObj);
-                webapis.avplay.setDisplayRect(left_position,top_position,width,height);
+                
+                var avplayBaseWidth = 1920;
+                var avplayBaseHeight = 1080;
+                var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
+                var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
+                
+                var scaledLeft = Math.round(left_position * ratioX);
+                var scaledTop = Math.round(top_position * ratioY);
+                var scaledWidth = Math.round(width * ratioX);
+                var scaledHeight = Math.round(height * ratioY);
+                
+                console.log('Original:', left_position, top_position, width, height);
+                console.log('Scaled for 1920x1080:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                console.log('Ratio:', ratioX, ratioY);
+                
+                webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },

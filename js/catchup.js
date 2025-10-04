@@ -224,9 +224,9 @@ var catchup_page={
             try{
                 media_player.setDisplayArea();
             }catch (e) {
-
+                console.log('setDisplayArea error on catchup zoom:', e);
             }
-        },200)
+        },250)
     },
     showMovie:function(url){
         try{
@@ -239,7 +239,13 @@ var catchup_page={
         }
         try{
             media_player.init("catchup-page-video","catchup")
-            media_player.setDisplayArea();
+            setTimeout(function(){
+                try{
+                    media_player.setDisplayArea();
+                }catch(e){
+                    console.log(e);
+                }
+            }, 250);
         }catch (e) {
             console.log(e);
         }

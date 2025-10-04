@@ -212,7 +212,13 @@ function goHomePageWithMovieType(movie_type) {  // when clicking red button in s
         else{
             try{
                 media_player.init("home-page-video-preview",'home-page');
-                media_player.setDisplayArea();
+                setTimeout(function(){
+                    try{
+                        media_player.setDisplayArea();
+                    }catch(e){
+                        console.log(e);
+                    }
+                }, 250);
             }catch (e) {
             }
             if(home_page.preview_url){

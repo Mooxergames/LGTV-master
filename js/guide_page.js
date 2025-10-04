@@ -385,7 +385,13 @@ var guide_page={
         this.drawChannelProgrammes(this.current_category_index);
 
         media_player.init("guide-page-video","guide-page");
-        media_player.setDisplayArea()
+        setTimeout(function(){
+            try{
+                media_player.setDisplayArea();
+            }catch(e){
+                console.log(e);
+            }
+        }, 250);
         this.showChannelVideo();
         this.initiated=true;
     },
