@@ -269,9 +269,9 @@ var channel_page={
                 this.transitioning_to_fullscreen=true;
                 var that=this;
                 setTimeout(function(){
-                    console.log('channelItemClick: Clearing transitioning_to_fullscreen flag');
+                    console.log('channelItemClick: Clearing transitioning_to_fullscreen flag after 800ms');
                     that.transitioning_to_fullscreen=false;
-                }, 600);
+                }, 800);
                 this.zoomInOut();
             } else {
                 console.log('channelItemClick: Already fullscreen - doing nothing');
@@ -553,10 +553,13 @@ var channel_page={
             this.full_screen_video=true;
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
-            $('#full-screen-channel-name').slideDown(400);
+            console.log('zoomInOut() ZOOM IN: Showing channel name element');
+            $('#full-screen-channel-name').show();
+            $('#full-screen-channel-name').css('display', 'block');
+            var that = this;
             this.full_screen_timer=setTimeout(function(){
                 $('#full-screen-information').removeClass('visible');
-                $('#full-screen-channel-name').slideUp(400);
+                $('#full-screen-channel-name').fadeOut(400);
             },5000)
             this.keys.focused_part="full_screen";
         }
