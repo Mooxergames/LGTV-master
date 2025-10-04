@@ -37,6 +37,41 @@ var channel_page={
     rearrange_timeout:300,
     rearrange_origin_position:0,
     removed_favourite_ids:[],
+    ui_lock_until: 0,
+    display_area_timeout: null,
+    
+    lockUI: function(ms) {
+        ms = ms || 800;
+        this.ui_lock_until = Date.now() + ms;
+        console.log('🔒 UI LOCKED for ' + ms + 'ms until:', this.ui_lock_until);
+    },
+    
+    uiLocked: function() {
+        var locked = Date.now() < this.ui_lock_until;
+        if (locked) {
+            console.log('🔒 UI is LOCKED, remaining:', this.ui_lock_until - Date.now(), 'ms');
+        }
+        return locked;
+    },
+    
+    scheduleSetDisplayArea: function(callback, delay) {
+        delay = delay || 250;
+        console.log('📅 scheduleSetDisplayArea: delay=' + delay + 'ms, clearing previous timeout');
+        if (this.display_area_timeout) {
+            clearTimeout(this.display_area_timeout);
+            console.log('  ⚠️ CANCELLED previous setDisplayArea timeout');
+        }
+        var that = this;
+        this.display_area_timeout = setTimeout(function() {
+            console.log('⏰ scheduleSetDisplayArea: timeout fired, executing callback');
+            that.display_area_timeout = null;
+            try {
+                if (callback) callback();
+            } catch (e) {
+                console.log('❌ setDisplayArea error:', e);
+            }
+        }, delay);
+    },
     init:function (channel_id, full_screen) {
         console.log('╔══════════════════════════════════════════════════════════════════╗');
         console.log('║ CHANNEL_OPERATION.INIT() - ENTERING CATEGORY');
@@ -278,13 +313,10 @@ var channel_page={
             console.log('channelItemClick: SAME CHANNEL - checking if should zoom');
             if(!this.full_screen_video){
                 console.log('channelItemClick: Not fullscreen - ZOOMING IN');
+                this.keys.focused_part = "full_screen";
                 this.full_screen_video=true;
                 this.transitioning_to_fullscreen=true;
-                var that=this;
-                setTimeout(function(){
-                    console.log('channelItemClick: Clearing transitioning_to_fullscreen flag after 800ms');
-                    that.transitioning_to_fullscreen=false;
-                }, 800);
+                this.lockUI(800);
                 this.zoomInOut();
             } else {
                 console.log('channelItemClick: Already fullscreen - doing nothing');
@@ -524,12 +556,9 @@ var channel_page={
             console.log('full_screen_video:', this.full_screen_video);
             console.log('focused_part:', this.keys.focused_part);
             console.log('========================================');
-            setTimeout(function () {
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                    console.log('setDisplayArea error on zoom out:', e);
-                }
+            this.lockUI(400);
+            this.scheduleSetDisplayArea(function() {
+                media_player.setDisplayArea();
             }, 250);
             $('#full-screen-information').removeClass('visible');
             $('#full-screen-channel-name').hide();
@@ -562,13 +591,12 @@ var channel_page={
                 width:'100vw'
             });
             
-            setTimeout(function () {
-                console.log('zoomInOut() ZOOM IN setTimeout firing - calling setDisplayArea()');
-                try{
-                    media_player.setDisplayArea();
-                }catch (e) {
-                    console.log('setDisplayArea error on zoom in:', e);
-                }
+            var that = this;
+            this.scheduleSetDisplayArea(function() {
+                console.log('zoomInOut() ZOOM IN: setDisplayArea() executing');
+                media_player.setDisplayArea();
+                that.transitioning_to_fullscreen = false;
+                console.log('zoomInOut() ZOOM IN: transition complete, flag cleared');
             }, 250);
             
             $('#live_channels_home').find('.channel-information-container').hide();
@@ -633,12 +661,9 @@ var channel_page={
             console.log('showLiveChannelMovie: After init() - full_screen_state=', media_player.full_screen_state);
             if(media_player.full_screen_state !== 1){
                 console.log('showLiveChannelMovie: full_screen_state !== 1, scheduling setDisplayArea() for preview mode');
-                setTimeout(function(){
-                    try{
-                        media_player.setDisplayArea();
-                    }catch(e){
-                        console.log(e);
-                    }
+                var that = this;
+                this.scheduleSetDisplayArea(function() {
+                    media_player.setDisplayArea();
                 }, 250);
             } else {
                 console.log('showLiveChannelMovie: full_screen_state === 1, SKIPPING preview setDisplayArea()');
@@ -932,6 +957,11 @@ var channel_page={
         console.log('  transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
         console.log('  full_screen_video:', this.full_screen_video);
         console.log('═══════════════════════════════════════════════════════');
+        
+        if(this.uiLocked()){
+            console.log('handleMenuClick: 🔒 BLOCKED BY UI LOCK');
+            return;
+        }
         
         if(this.transitioning_to_fullscreen){
             console.log('handleMenuClick: *** BLOCKED BY DEBOUNCE FLAG ***');
