@@ -240,6 +240,7 @@ function initPlayer() {
             },
             setDisplayArea:function() {
                 console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
+                console.trace('Called from:');
                 if (this.full_screen_state === 1) {
                     try {
                         webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
