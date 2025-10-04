@@ -109,9 +109,16 @@ var channel_page={
             that.keys.focused_part="full_screen";
         }
         else{
+            $('#live_channels_home .player-container').css({
+                position:'relative',
+                height:'58.3vh',
+                width:'58.3vw'
+            });
             that.full_screen_video=false;
             that.keys.focused_part="channel_selection";
             $('#live-channel-button-container').show();
+            $('#live_channels_home').find('.channel-information-container').show();
+            $('#live_channels_home').find('.video-skin').show();
         }
         this.current_channel_id=current_movie.stream_id;
         this.hover_channel_id=current_movie.stream_id;

@@ -19,6 +19,18 @@ var catchup_page={
     init:function(movie, programmes){
         this.dates=[];
         this.programmes={};
+        this.full_screen_video=false;
+        
+        $('#catchup').find('.player-container').css({
+            position:'relative',
+            left:0,
+            top:0,
+            height:'58.3vh',
+            width:'58.3vw'
+        });
+        $('#catchup').find('.channel-information-container').show();
+        $('#catchup-full-screen-information').hide();
+        
         this.makeDateSortedProgramms(movie,programmes);
         $('#channel-image-container').find('img').attr("src",movie.stream_icon)
         $('#channel-name').text(movie.name);
