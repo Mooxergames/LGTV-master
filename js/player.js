@@ -257,6 +257,24 @@ function initPlayer() {
                     
                     if (that.full_screen_state === 1) {
                         console.log('FULLSCREEN: Using setDisplayRect(0, 0, 1920, 1080)');
+                        console.log('🔍 Video element computed style:');
+                        var videoEl = document.getElementById('channel-page-video');
+                        var computedStyle = window.getComputedStyle(videoEl);
+                        console.log('  position:', computedStyle.position);
+                        console.log('  left:', computedStyle.left);
+                        console.log('  top:', computedStyle.top);
+                        console.log('  width:', computedStyle.width);
+                        console.log('  height:', computedStyle.height);
+                        console.log('  classes:', videoEl.className);
+                        
+                        try {
+                            // Force fullscreen on the VIDEO ELEMENT first
+                            webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
+                            console.log('✅ Set display method to FULL_SCREEN');
+                        } catch (e) {
+                            console.log('⚠️ setDisplayMethod not supported:', e);
+                        }
+                        
                         try {
                             webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
                             console.log('✅ Fullscreen setDisplayRect successful');
