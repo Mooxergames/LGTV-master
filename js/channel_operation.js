@@ -561,7 +561,6 @@ var channel_page={
                 media_player.setDisplayArea();
             }, 250);
             $('#full-screen-information').removeClass('visible');
-            $('#full-screen-channel-name').hide();
             $('#live_channels_home').find('.channel-information-container').show();
             $('#live-channel-button-container').show();
             $('#live_channels_home').find('.video-skin').show();
@@ -607,30 +606,16 @@ var channel_page={
             $('#full-screen-information').addClass('visible');
             
             console.log('╔════════════════════════════════════════════════════════╗');
-            console.log('║ CHANNEL NAME VISIBILITY CHECK');
+            console.log('║ Showing fullscreen info bar');
             console.log('╠════════════════════════════════════════════════════════╣');
-            var $channelName = $('#full-screen-channel-name');
-            console.log('  Element exists:', $channelName.length > 0);
-            console.log('  Current HTML:', $channelName.html());
-            console.log('  Before show() - is visible:', $channelName.is(':visible'));
-            console.log('  Before show() - display CSS:', $channelName.css('display'));
-            console.log('  Before show() - visibility CSS:', $channelName.css('visibility'));
-            console.log('  Parent #full-screen-information classes:', $('#full-screen-information').attr('class'));
-            
-            $channelName.show();
-            $channelName.css({'display': 'block', 'visibility': 'visible', 'opacity': '1'});
-            
-            console.log('  After show() - is visible:', $channelName.is(':visible'));
-            console.log('  After show() - display CSS:', $channelName.css('display'));
-            console.log('  After show() - visibility CSS:', $channelName.css('visibility'));
-            console.log('  After show() - opacity CSS:', $channelName.css('opacity'));
+            console.log('  #full-screen-information will show with .visible class');
+            console.log('  Channel name is in #full-screen-channel-name-compact');
             console.log('╚════════════════════════════════════════════════════════╝');
             
             var that = this;
             this.full_screen_timer=setTimeout(function(){
-                console.log('Hiding channel name after 5 seconds');
+                console.log('Hiding fullscreen info bar after 5 seconds');
                 $('#full-screen-information').removeClass('visible');
-                $('#full-screen-channel-name').fadeOut(400);
             },5000)
         }
     },
@@ -677,25 +662,19 @@ var channel_page={
             console.log(e);
         }
         
-        var channelNameText = current_movie.num + ' : ' + current_movie.name;
         console.log('╔═══════════════════════════════════════════════════════════════╗');
         console.log('║ Setting Channel Info Bar');
         console.log('╠═══════════════════════════════════════════════════════════════╣');
-        console.log('  Channel Name Text:', channelNameText);
-        console.log('  Before setting HTML:');
-        var $elem = $('#full-screen-channel-name');
-        console.log('    Element exists:', $elem.length > 0);
-        console.log('    Current HTML:', $elem.html());
-        console.log('    Is visible:', $elem.is(':visible'));
-        console.log('    Display CSS:', $elem.css('display'));
+        console.log('  Channel Name:', current_movie.name);
+        console.log('  Channel Num:', current_movie.num);
         
-        $elem.html(channelNameText);
+        // Set channel name in the COMPACT header (new design)
+        $('#full-screen-channel-name-compact').html(current_movie.name);
+        $('#full-screen-channel-number').html(current_movie.num);
         $('#full-screen-channel-logo').attr('src',current_movie.stream_icon);
         
-        console.log('  After setting HTML:');
-        console.log('    New HTML:', $elem.html());
-        console.log('    Is visible:', $elem.is(':visible'));
-        console.log('    Display CSS:', $elem.css('display'));
+        console.log('  Set in #full-screen-channel-name-compact');
+        console.log('  Set channel number in #full-screen-channel-number');
         console.log('╚═══════════════════════════════════════════════════════════════╝');
         this.current_channel_id=movie_id;
         if(!LiveModel.checkForAdult(current_category)){
