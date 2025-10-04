@@ -261,15 +261,6 @@ function initPlayer() {
                 
                 try {
                     webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                    
-                    if (this.videoObj) {
-                        this.videoObj.style.left = '0px';
-                        this.videoObj.style.top = '0px';
-                        this.videoObj.style.width = width + 'px';
-                        this.videoObj.style.height = height + 'px';
-                        console.log('Object element style synchronized (relative to container)');
-                    }
-                    
                     console.log('setDisplayRect successful');
                 } catch (e) {
                     console.error('setDisplayArea error:', e.code, e.name, e.message);
