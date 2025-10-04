@@ -240,6 +240,7 @@ function initPlayer() {
             },
             setDisplayArea:function() {
                 console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
+                console.trace('Called from:');
                 
                 var capabilities = this.detectTVCapabilities();
                 var avplayBaseWidth = capabilities.resolution.width;
