@@ -542,13 +542,15 @@ var channel_page={
         }
         try{
             media_player.init("channel-page-video","channel-page");
-            setTimeout(function(){
-                try{
-                    media_player.setDisplayArea();
-                }catch(e){
-                    console.log(e);
-                }
-            }, 250);
+            if(media_player.full_screen_state !== 1){
+                setTimeout(function(){
+                    try{
+                        media_player.setDisplayArea();
+                    }catch(e){
+                        console.log(e);
+                    }
+                }, 250);
+            }
         }catch (e) {
             console.log(e);
         }
