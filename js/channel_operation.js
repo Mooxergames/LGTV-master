@@ -38,6 +38,7 @@ var channel_page={
     rearrange_origin_position:0,
     removed_favourite_ids:[],
     init:function (channel_id, full_screen) {
+        console.log('channel_operation.init: START - channel_id=', channel_id, 'full_screen=', full_screen, 'current full_screen_video=', this.full_screen_video, 'media_player.full_screen_state=', media_player.full_screen_state);
         this.is_drawing=false;
         $("#channel-page").show();
         var category=current_category;
@@ -250,18 +251,25 @@ var channel_page={
     channelItemClick:function(index){
         var menus=this.menu_items;
         var stream_id=$(menus[index]).data('channel_id');
+        console.log('channelItemClick: stream_id=', stream_id, 'current_channel_id=', this.current_channel_id, 'full_screen_video=', this.full_screen_video);
         if(this.current_channel_id==stream_id){
+            console.log('channelItemClick: SAME CHANNEL - checking if should zoom');
             if(!this.full_screen_video){
+                console.log('channelItemClick: Not fullscreen - ZOOMING IN');
                 this.full_screen_video=true;
                 this.transitioning_to_fullscreen=true;
                 var that=this;
                 setTimeout(function(){
+                    console.log('channelItemClick: Clearing transitioning_to_fullscreen flag');
                     that.transitioning_to_fullscreen=false;
                 }, 600);
                 this.zoomInOut();
+            } else {
+                console.log('channelItemClick: Already fullscreen - doing nothing');
             }
         }
         else{
+            console.log('channelItemClick: DIFFERENT CHANNEL - showing new channel, full_screen_state before=', media_player.full_screen_state);
             this.showLiveChannelMovie(stream_id);
             this.changeActiveChannel();
         }
@@ -489,6 +497,11 @@ var channel_page={
             });
             this.keys.focused_part="channel_selection";
             media_player.full_screen_state=0;
+            console.log('========================================');
+            console.log('zoomInOut() ZOOM OUT - set full_screen_state to 0');
+            console.log('full_screen_video:', this.full_screen_video);
+            console.log('focused_part:', this.keys.focused_part);
+            console.log('========================================');
             setTimeout(function () {
                 try{
                     media_player.setDisplayArea();
@@ -511,7 +524,12 @@ var channel_page={
                 width:'100vw'
             });
             media_player.full_screen_state=1;
-            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1, transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
+            console.log('========================================');
+            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1');
+            console.log('transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
+            console.log('full_screen_video:', this.full_screen_video);
+            console.log('focused_part:', this.keys.focused_part);
+            console.log('========================================');
             setTimeout(function () {
                 console.log('zoomInOut() ZOOM IN setTimeout firing - calling setDisplayArea()');
                 try{
@@ -535,6 +553,7 @@ var channel_page={
         }
     },
     showLiveChannelMovie:function(movie_id){
+        console.log('showLiveChannelMovie: START - movie_id=', movie_id, 'full_screen_video=', this.full_screen_video, 'media_player.full_screen_state=', media_player.full_screen_state);
         var url
         if(settings.playlist_type==="xtreme")
             url=getMovieUrl(movie_id,'live','ts');
@@ -545,8 +564,11 @@ var channel_page={
         }catch (e) {
         }
         try{
+            console.log('showLiveChannelMovie: Before init() - full_screen_state=', media_player.full_screen_state);
             media_player.init("channel-page-video","channel-page");
+            console.log('showLiveChannelMovie: After init() - full_screen_state=', media_player.full_screen_state);
             if(media_player.full_screen_state !== 1){
+                console.log('showLiveChannelMovie: full_screen_state !== 1, scheduling setDisplayArea() for preview mode');
                 setTimeout(function(){
                     try{
                         media_player.setDisplayArea();
@@ -554,6 +576,8 @@ var channel_page={
                         console.log(e);
                     }
                 }, 250);
+            } else {
+                console.log('showLiveChannelMovie: full_screen_state === 1, SKIPPING preview setDisplayArea()');
             }
         }catch (e) {
             console.log(e);
@@ -564,6 +588,7 @@ var channel_page={
             console.log(e);
         }
         var current_movie=getCurrentMovieFromId(movie_id, this.movies,'stream_id');
+        console.log('showLiveChannelMovie: Setting channel name to:', current_movie.num + ' : ' + current_movie.name);
         $('#full-screen-channel-name').html(
             current_movie.num+' : '+current_movie.name
         );
