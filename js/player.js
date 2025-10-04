@@ -259,11 +259,35 @@ function initPlayer() {
                 console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
                 console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
                 
+                var playerState = null;
+                var wasPlaying = false;
+                
                 try {
+                    playerState = webapis.avplay.getState();
+                    wasPlaying = (playerState === 'PLAYING');
+                    
+                    if (wasPlaying) {
+                        webapis.avplay.pause();
+                        console.log('Paused for display rect change');
+                    }
+                    
                     webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                    console.log('setDisplayRect successful');
+                    
+                    if (this.videoObj) {
+                        this.videoObj.style.left = left_position + 'px';
+                        this.videoObj.style.top = top_position + 'px';
+                        this.videoObj.style.width = width + 'px';
+                        this.videoObj.style.height = height + 'px';
+                    }
+                    
+                    console.log('setDisplayRect and object style updated');
+                    
+                    if (wasPlaying) {
+                        webapis.avplay.play();
+                        console.log('Resumed playback');
+                    }
                 } catch (e) {
-                    console.error('setDisplayRect error:', e.code, e.name, e.message);
+                    console.error('setDisplayArea error:', e.code, e.name, e.message);
                 }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
