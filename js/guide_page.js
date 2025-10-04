@@ -492,6 +492,13 @@ var guide_page={
             },5000);
         }
         this.is_full_screen=!this.is_full_screen;
+        setTimeout(function () {
+            try{
+                media_player.setDisplayArea();
+            }catch (e) {
+                console.log('setDisplayArea error on guide zoom:', e);
+            }
+        }, 250);
     },
     handleMenuUpDown:function(increment){
         var keys=this.keys;

@@ -90,6 +90,13 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
+            setTimeout(function () {
+                try{
+                    media_player.setDisplayArea();
+                }catch (e) {
+                    console.log('setDisplayArea error on zoom in:', e);
+                }
+            }, 250);
             that.full_screen_video=true;
             clearTimeout(that.full_screen_timer);
             $('#full-screen-information').addClass('visible');
