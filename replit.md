@@ -8,6 +8,20 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **2025-10-04: Enhanced Samsung Tizen TV Video Display System**
+  - **TV Capabilities Detection**: Added automatic detection of TV hardware capabilities
+    - Detects actual TV resolution using `tizen.tvwindow.getVideoResolution()` API
+    - Detects HDR support using `webapis.avinfo.isHdrTvSupport()`
+    - Identifies 4K (3840px) and 8K (7680px) UHD TVs
+    - Caches capabilities for performance optimization
+    - Fallback to 1920×1080 when APIs unavailable
+  - **Enhanced setDisplayArea() Implementation**:
+    - Uses actual TV resolution for coordinate scaling instead of hardcoded 1920×1080
+    - Added player state validation before setDisplayRect() calls
+    - Comprehensive WebAPIException error handling (codes 11, 9, etc.)
+    - Enhanced logging for debugging on real TV hardware
+  - **Modified Files**: `js/player.js` (detectTVCapabilities function, enhanced setDisplayArea)
+
 - **Removed duplicate Subtitle Settings from Settings menu** - Cleaned up the Settings menu by removing the redundant "Subtitle Settings" option since subtitle controls are already accessible directly from the video player. This simplifies the settings menu and prevents confusion with duplicate functionality.
 - **Fixed sort functionality and NEW badges** - Properly implemented sorting for the "all" category by rebuilding the aggregated movie list from all categories when changing sort order. Added NEW badge display to both the featured movies slider (home screen) and the grid view, showing badges on the first 10 items. Featured movies are pre-sorted by "added" date so they always show NEW badges, while grid items only show badges when sorted by "added".
 - **Optimized sort performance with lazy loading** - Fixed slow sorting issue when handling large movie collections (40k+ items) by sorting the already-loaded movie array instead of rebuilding from all categories. This works with the existing lazy loading system to provide instant sort response while only rendering visible items.

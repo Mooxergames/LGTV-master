@@ -18,6 +18,58 @@ function initPlayer() {
             reconnect_max_count: 20,
             url:'',
             id:'',
+            tv_capabilities: null,
+            detectTVCapabilities: function() {
+                if (this.tv_capabilities) {
+                    return this.tv_capabilities;
+                }
+                
+                var capabilities = {
+                    resolution: { width: 1920, height: 1080 },
+                    hdrSupport: false,
+                    uhd4k: false,
+                    uhd8k: false,
+                    apiVersion: 'unknown'
+                };
+                
+                try {
+                    if (typeof tizen !== 'undefined' && tizen.tvwindow) {
+                        var tvResolution = tizen.tvwindow.getVideoResolution();
+                        capabilities.resolution.width = tvResolution.width;
+                        capabilities.resolution.height = tvResolution.height;
+                        
+                        if (tvResolution.width >= 3840) {
+                            capabilities.uhd4k = true;
+                        }
+                        if (tvResolution.width >= 7680) {
+                            capabilities.uhd8k = true;
+                        }
+                        
+                        console.log('TV Resolution:', tvResolution.width + 'x' + tvResolution.height);
+                    }
+                } catch (e) {
+                    console.log('TVWindow API not available');
+                }
+                
+                try {
+                    if (typeof webapis !== 'undefined' && webapis.avinfo) {
+                        capabilities.apiVersion = webapis.avinfo.getVersion();
+                        
+                        try {
+                            capabilities.hdrSupport = webapis.avinfo.isHdrTvSupport();
+                            console.log('HDR Support:', capabilities.hdrSupport);
+                        } catch (e) {
+                            console.log('HDR detection not available');
+                        }
+                    }
+                } catch (e) {
+                    console.log('AvInfo API not available');
+                }
+                
+                this.tv_capabilities = capabilities;
+                console.log('TV Capabilities:', JSON.stringify(capabilities));
+                return capabilities;
+            },
             init:function(id, parent_id) {
                 this.id=id;
                 this.parent_id=parent_id;
@@ -34,6 +86,9 @@ function initPlayer() {
                 $('#'+parent_id).find('.subtitle-container').hide();
                 $('#' + parent_id).find('.video-reconnect-message').hide();
                 this.full_screen_state=0;
+                
+                this.detectTVCapabilities();
+                
                 try{
                     webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO');
                 }catch (e) {
@@ -187,8 +242,10 @@ function initPlayer() {
                 var width=parseInt($(this.videoObj).width())
                 var height=parseInt($(this.videoObj).height());
                 
-                var avplayBaseWidth = 1920;
-                var avplayBaseHeight = 1080;
+                var capabilities = this.detectTVCapabilities();
+                var avplayBaseWidth = capabilities.resolution.width;
+                var avplayBaseHeight = capabilities.resolution.height;
+                
                 var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
                 var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
                 
@@ -197,11 +254,32 @@ function initPlayer() {
                 var scaledWidth = Math.round(width * ratioX);
                 var scaledHeight = Math.round(height * ratioY);
                 
-                console.log('Original:', left_position, top_position, width, height);
-                console.log('Scaled for 1920x1080:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                console.log('Ratio:', ratioX, ratioY);
+                console.log('Original coordinates:', left_position, top_position, width, height);
+                console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
+                console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
                 
-                webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                try {
+                    var playerState = webapis.avplay.getState();
+                    console.log('Player state:', playerState);
+                    
+                    if (playerState === 'NONE' || playerState === 'IDLE') {
+                        console.warn('Player not ready (state: ' + playerState + '), skipping setDisplayRect');
+                        return;
+                    }
+                    
+                    webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                    console.log('setDisplayRect successful');
+                    
+                } catch (e) {
+                    if (e.code === 11) {
+                        console.error('INVALID_STATE_ERR: Player not in valid state for setDisplayRect');
+                    } else if (e.code === 9) {
+                        console.error('NOT_SUPPORTED_ERR: Operation not supported');
+                    } else {
+                        console.error('setDisplayRect error:', e.code, e.name, e.message);
+                    }
+                }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
             },
