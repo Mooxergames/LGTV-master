@@ -820,29 +820,35 @@ var channel_page={
         var keys=this.keys;
         if(keys.focused_part==="search_back_selection"){
             $(this.search_back_buttons[keys.search_back_selection]).trigger('click');
+            return;
         }
-        else if(keys.focused_part==="channel_selection"){  // if channel item clicked
+        if(keys.focused_part==="channel_selection"){  // if channel item clicked
             $(this.menu_items[keys.channel_selection]).trigger('click');
+            return;
         }
-        else if(keys.focused_part==="full_screen"){ // if full screen mode, if click ok button,                                                                // then show full screen information
+        if(keys.focused_part==="full_screen"){ // if full screen mode, if click ok button,                                                                // then show full screen information
             this.keys.focused_part="channel_selection";
             this.full_screen_video=false;
             this.zoomInOut();
+            return;
         }
-        else if(keys.focused_part==="search_selection"){
+        if(keys.focused_part==="search_selection"){
             var current_search_element=$('.search-item-wrapper')[keys.search_selection];
             $(current_search_element).trigger('click');
+            return;
         }
-        else if(keys.focused_part==="right_screen_part"){  // in
+        if(keys.focused_part==="right_screen_part"){  // in
             $(this.channel_action_items[keys.right_screen_part]).trigger('click');
+            return;
         }
-        else if(keys.focused_part==="operation_modal"){
+        if(keys.focused_part==="operation_modal"){
             var buttons=$('#channel-operation-modal').find('.modal-operation-menu-type-1');
             $(buttons[keys.operation_modal]).trigger('click');
             if(keys.operation_modal==0){   // if clicked fav icon, after removing modal, focus to channel
                 $('#channel-operation-modal').modal('hide');
                 this.hoverMenuItem(keys.channel_selection);
             }
+            return;
         }
     },
     handleMenusUpDown:function(increment) {
