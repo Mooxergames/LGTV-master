@@ -253,6 +253,11 @@ var channel_page={
         if(this.current_channel_id==stream_id){
             if(!this.full_screen_video){
                 this.full_screen_video=true;
+                this.transitioning_to_fullscreen=true;
+                var that=this;
+                setTimeout(function(){
+                    that.transitioning_to_fullscreen=false;
+                }, 600);
                 this.zoomInOut();
             }
         }
@@ -506,7 +511,7 @@ var channel_page={
                 width:'100vw'
             });
             media_player.full_screen_state=1;
-            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1');
+            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1, transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
             setTimeout(function () {
                 console.log('zoomInOut() ZOOM IN setTimeout firing - calling setDisplayArea()');
                 try{
@@ -519,11 +524,6 @@ var channel_page={
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
             this.full_screen_video=true;
-            this.transitioning_to_fullscreen=true;
-            var that = this;
-            setTimeout(function(){
-                that.transitioning_to_fullscreen=false;
-            }, 500);
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
@@ -833,8 +833,10 @@ var channel_page={
         }
         if(keys.focused_part==="full_screen"){ // if full screen mode, if click ok button,                                                                // then show full screen information
             if(this.transitioning_to_fullscreen){
+                console.log('handleMenuClick: Ignoring OK press - transition in progress');
                 return;
             }
+            console.log('handleMenuClick: Exiting fullscreen');
             this.keys.focused_part="channel_selection";
             this.full_screen_video=false;
             this.zoomInOut();
