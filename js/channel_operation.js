@@ -601,13 +601,15 @@ var channel_page={
             
             var that = this;
             
-            // Call setDisplayArea IMMEDIATELY after CSS change
+            // CRITICAL: Call setDisplayArea SYNCHRONOUSLY - no delay!
+            // Samsung AVPlay must receive setDisplayRect while video is playing
+            console.log('🔥 ZOOM IN: Calling setDisplayArea SYNCHRONOUSLY with full_screen_state:', media_player.full_screen_state);
+            media_player.setDisplayArea();
+            
             setTimeout(function() {
-                console.log('🔥 ZOOM IN: Calling setDisplayArea NOW with full_screen_state:', media_player.full_screen_state);
-                media_player.setDisplayArea();
                 that.transitioning_to_fullscreen = false;
-                console.log('🔥 ZOOM IN: setDisplayArea complete, transition flag cleared');
-            }, 50);
+                console.log('🔥 ZOOM IN: Cleared transitioning flag');
+            }, 100);
             
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
@@ -648,8 +650,11 @@ var channel_page={
         else if(settings.playlist_type==="type1")
             url=LiveModel.getMovieFromId(movie_id)['url'];
         try{
-            media_player.close();
+            if(media_player.state && media_player.state !== media_player.STATES.STOPPED){
+                media_player.close();
+            }
         }catch (e) {
+            console.log('close() error (ignored):', e);
         }
         try{
             console.log('showLiveChannelMovie: Before init() - full_screen_state=', media_player.full_screen_state);
