@@ -263,11 +263,11 @@ function initPlayer() {
                     webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
                     
                     if (this.videoObj) {
-                        this.videoObj.style.left = left_position + 'px';
-                        this.videoObj.style.top = top_position + 'px';
+                        this.videoObj.style.left = '0px';
+                        this.videoObj.style.top = '0px';
                         this.videoObj.style.width = width + 'px';
                         this.videoObj.style.height = height + 'px';
-                        console.log('Object element style synchronized');
+                        console.log('Object element style synchronized (relative to container)');
                     }
                     
                     console.log('setDisplayRect successful');
