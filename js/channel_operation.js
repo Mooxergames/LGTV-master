@@ -642,9 +642,13 @@ var channel_page={
         }
         try{
             console.log('showLiveChannelMovie: Before init() - full_screen_state=', media_player.full_screen_state);
+            console.log('showLiveChannelMovie: transitioning_to_fullscreen=', this.transitioning_to_fullscreen);
             media_player.init("channel-page-video","channel-page");
             console.log('showLiveChannelMovie: After init() - full_screen_state=', media_player.full_screen_state);
-            if(media_player.full_screen_state !== 1){
+            
+            if(this.transitioning_to_fullscreen){
+                console.log('showLiveChannelMovie: ⚠️ TRANSITIONING TO FULLSCREEN - skipping setDisplayArea, zoomInOut will handle it');
+            } else if(media_player.full_screen_state !== 1){
                 console.log('showLiveChannelMovie: full_screen_state !== 1, scheduling setDisplayArea() for preview mode');
                 var that = this;
                 this.scheduleSetDisplayArea(function() {
