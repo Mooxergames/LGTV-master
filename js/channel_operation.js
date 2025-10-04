@@ -506,7 +506,9 @@ var channel_page={
                 width:'100vw'
             });
             media_player.full_screen_state=1;
+            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1');
             setTimeout(function () {
+                console.log('zoomInOut() ZOOM IN setTimeout firing - calling setDisplayArea()');
                 try{
                     media_player.setDisplayArea();
                 }catch (e) {

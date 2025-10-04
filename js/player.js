@@ -71,6 +71,7 @@ function initPlayer() {
                 return capabilities;
             },
             init:function(id, parent_id) {
+                console.log('init() called - current full_screen_state:', this.full_screen_state);
                 this.id=id;
                 this.parent_id=parent_id;
                 this.STATES={
@@ -87,6 +88,9 @@ function initPlayer() {
                 $('#' + parent_id).find('.video-reconnect-message').hide();
                 if(typeof this.full_screen_state === 'undefined'){
                     this.full_screen_state=0;
+                    console.log('init() - full_screen_state was undefined, set to 0');
+                } else {
+                    console.log('init() - preserving full_screen_state:', this.full_screen_state);
                 }
                 
                 this.detectTVCapabilities();
@@ -235,10 +239,11 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
+                console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
                 if (this.full_screen_state === 1) {
                     try {
                         webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                        console.log('Fullscreen mode activated');
+                        console.log('Using FULL_SCREEN mode');
                     } catch (e) {
                         console.error('setDisplayMethod error:', e);
                     }
