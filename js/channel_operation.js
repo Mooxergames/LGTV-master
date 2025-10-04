@@ -549,6 +549,16 @@ var channel_page={
                 height:'58.3vh',
                 width:'58.3vw'
             });
+            
+            // Reset video element to position:absolute for preview mode
+            $('#channel-page-video').css({
+                position:'absolute',
+                left:0,
+                top:0,
+                width:'',
+                height:''
+            });
+            
             this.keys.focused_part="channel_selection";
             media_player.full_screen_state=0;
             console.log('========================================');
@@ -590,13 +600,24 @@ var channel_page={
                 width:'100vw'
             });
             
+            // CRITICAL: Set video element to position:fixed to escape container constraints
+            $('#channel-page-video').css({
+                position:'fixed',
+                left:0,
+                top:0,
+                width:'100vw',
+                height:'100vh'
+            });
+            
             var that = this;
-            this.scheduleSetDisplayArea(function() {
-                console.log('zoomInOut() ZOOM IN: setDisplayArea() executing');
+            
+            // Call setDisplayArea IMMEDIATELY after CSS change
+            setTimeout(function() {
+                console.log('🔥 ZOOM IN: Calling setDisplayArea NOW with full_screen_state:', media_player.full_screen_state);
                 media_player.setDisplayArea();
                 that.transitioning_to_fullscreen = false;
-                console.log('zoomInOut() ZOOM IN: transition complete, flag cleared');
-            }, 250);
+                console.log('🔥 ZOOM IN: setDisplayArea complete, transition flag cleared');
+            }, 50);
             
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
