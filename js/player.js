@@ -242,23 +242,28 @@ function initPlayer() {
                 console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
                 console.trace('Called from:');
                 
+                var that = this;
                 var capabilities = this.detectTVCapabilities();
                 var avplayBaseWidth = capabilities.resolution.width;
                 var avplayBaseHeight = capabilities.resolution.height;
                 
-                if (this.full_screen_state === 1) {
-                    console.log('FULLSCREEN: Using setDisplayRect(0, 0, 1920, 1080)');
-                    try {
-                        webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
-                        console.log('Fullscreen setDisplayRect successful');
-                    } catch (e) {
-                        console.error('Fullscreen setDisplayRect error:', e);
-                    }
-                } else {
-                    var top_position=$(this.videoObj).offset().top;
-                    var left_position=$(this.videoObj).offset().left;
-                    var width=parseInt($(this.videoObj).width())
-                    var height=parseInt($(this.videoObj).height());
+                // Use requestAnimationFrame to wait for CSS to apply
+                requestAnimationFrame(function() {
+                    console.log('🎨 requestAnimationFrame: Reading coordinates AFTER CSS applied');
+                    
+                    if (that.full_screen_state === 1) {
+                        console.log('FULLSCREEN: Using setDisplayRect(0, 0, 1920, 1080)');
+                        try {
+                            webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
+                            console.log('✅ Fullscreen setDisplayRect successful');
+                        } catch (e) {
+                            console.error('❌ Fullscreen setDisplayRect error:', e);
+                        }
+                    } else {
+                        var top_position=$(that.videoObj).offset().top;
+                        var left_position=$(that.videoObj).offset().left;
+                        var width=parseInt($(that.videoObj).width())
+                        var height=parseInt($(that.videoObj).height());
                     
                     var ratioX = avplayBaseWidth / window.document.documentElement.clientWidth;
                     var ratioY = avplayBaseHeight / window.document.documentElement.clientHeight;
@@ -272,15 +277,16 @@ function initPlayer() {
                     console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
                     console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
                     
-                    try {
-                        webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                        console.log('setDisplayRect successful (preview mode)');
-                    } catch (e) {
-                        console.error('setDisplayRect error:', e.code, e.name, e.message);
+                        try {
+                            webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
+                            console.log('✅ setDisplayRect successful (preview mode)');
+                        } catch (e) {
+                            console.error('❌ setDisplayRect error:', e.code, e.name, e.message);
+                        }
                     }
-                }
-
-                channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
+                    
+                    channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
+                });
             },
             toggleScreenRatio:function(){
                 if(this.full_screen_state==1){
