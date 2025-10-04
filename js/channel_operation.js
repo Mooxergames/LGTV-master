@@ -525,6 +525,22 @@ var channel_page={
             $('#live_channels_home').find('.video-skin').show();
         }
         else{
+            console.log('========================================');
+            console.log('zoomInOut() ZOOM IN START');
+            console.log('  transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
+            console.log('  full_screen_video (before):', this.full_screen_video);
+            console.log('  focused_part (before):', this.keys.focused_part);
+            console.log('========================================');
+            
+            this.keys.focused_part="full_screen";
+            this.full_screen_video=true;
+            media_player.full_screen_state=1;
+            
+            console.log('zoomInOut() ZOOM IN: Updated flags IMMEDIATELY');
+            console.log('  focused_part (after):', this.keys.focused_part);
+            console.log('  full_screen_video (after):', this.full_screen_video);
+            console.log('  full_screen_state:', media_player.full_screen_state);
+            
             $('#live_channels_home .player-container').css({
                 position:'fixed',
                 left:0,
@@ -532,13 +548,7 @@ var channel_page={
                 height:'100vh',
                 width:'100vw'
             });
-            media_player.full_screen_state=1;
-            console.log('========================================');
-            console.log('zoomInOut() ZOOM IN - set full_screen_state to 1');
-            console.log('transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
-            console.log('full_screen_video:', this.full_screen_video);
-            console.log('focused_part:', this.keys.focused_part);
-            console.log('========================================');
+            
             setTimeout(function () {
                 console.log('zoomInOut() ZOOM IN setTimeout firing - calling setDisplayArea()');
                 try{
@@ -547,21 +557,40 @@ var channel_page={
                     console.log('setDisplayArea error on zoom in:', e);
                 }
             }, 250);
+            
             $('#live_channels_home').find('.channel-information-container').hide();
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
-            this.full_screen_video=true;
+            
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
-            console.log('zoomInOut() ZOOM IN: Showing channel name element');
-            $('#full-screen-channel-name').show();
-            $('#full-screen-channel-name').css('display', 'block');
+            
+            console.log('╔════════════════════════════════════════════════════════╗');
+            console.log('║ CHANNEL NAME VISIBILITY CHECK');
+            console.log('╠════════════════════════════════════════════════════════╣');
+            var $channelName = $('#full-screen-channel-name');
+            console.log('  Element exists:', $channelName.length > 0);
+            console.log('  Current HTML:', $channelName.html());
+            console.log('  Before show() - is visible:', $channelName.is(':visible'));
+            console.log('  Before show() - display CSS:', $channelName.css('display'));
+            console.log('  Before show() - visibility CSS:', $channelName.css('visibility'));
+            console.log('  Parent #full-screen-information classes:', $('#full-screen-information').attr('class'));
+            
+            $channelName.show();
+            $channelName.css({'display': 'block', 'visibility': 'visible', 'opacity': '1'});
+            
+            console.log('  After show() - is visible:', $channelName.is(':visible'));
+            console.log('  After show() - display CSS:', $channelName.css('display'));
+            console.log('  After show() - visibility CSS:', $channelName.css('visibility'));
+            console.log('  After show() - opacity CSS:', $channelName.css('opacity'));
+            console.log('╚════════════════════════════════════════════════════════╝');
+            
             var that = this;
             this.full_screen_timer=setTimeout(function(){
+                console.log('Hiding channel name after 5 seconds');
                 $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').fadeOut(400);
             },5000)
-            this.keys.focused_part="full_screen";
         }
     },
     showLiveChannelMovie:function(movie_id){
@@ -871,6 +900,18 @@ var channel_page={
         }
     },
     handleMenuClick:function(){
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('handleMenuClick START');
+        console.log('  focused_part:', this.keys.focused_part);
+        console.log('  transitioning_to_fullscreen:', this.transitioning_to_fullscreen);
+        console.log('  full_screen_video:', this.full_screen_video);
+        console.log('═══════════════════════════════════════════════════════');
+        
+        if(this.transitioning_to_fullscreen){
+            console.log('handleMenuClick: *** BLOCKED BY DEBOUNCE FLAG ***');
+            return;
+        }
+        
         var keys=this.keys;
         if(keys.focused_part==="search_back_selection"){
             $(this.search_back_buttons[keys.search_back_selection]).trigger('click');
