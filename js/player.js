@@ -132,6 +132,10 @@ function initPlayer() {
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
                             webapis.avplay.play();
+                            
+                            console.log('🎬 Video started playing - applying display area with full_screen_state:', that.full_screen_state);
+                            that.setDisplayArea();
+                            
                             if(current_route==='vod-series-player-video'){
                                 that.full_screen_state=1;
                             }
