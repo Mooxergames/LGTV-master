@@ -4,6 +4,7 @@ var channel_page={
     hover_channel_id:0,
     full_screen_video:false,
     full_screen_timer:null,
+    transitioning_to_fullscreen:false,
     progressbar_timer:null,
     player:null,
     channel_number_timer:null,
@@ -518,14 +519,19 @@ var channel_page={
             $('#live-channel-button-container').hide();
             $('#live_channels_home').find('.video-skin').hide();
             this.full_screen_video=true;
+            this.transitioning_to_fullscreen=true;
+            var that = this;
+            setTimeout(function(){
+                that.transitioning_to_fullscreen=false;
+            }, 500);
             clearTimeout(this.full_screen_timer);
             $('#full-screen-information').addClass('visible');
             $('#full-screen-channel-name').slideDown(400);
-            var that = this;
             this.full_screen_timer=setTimeout(function(){
                 $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
+            this.keys.focused_part="full_screen";
         }
     },
     showLiveChannelMovie:function(movie_id){
@@ -826,6 +832,9 @@ var channel_page={
             return;
         }
         if(keys.focused_part==="full_screen"){ // if full screen mode, if click ok button,                                                                // then show full screen information
+            if(this.transitioning_to_fullscreen){
+                return;
+            }
             this.keys.focused_part="channel_selection";
             this.full_screen_video=false;
             this.zoomInOut();
