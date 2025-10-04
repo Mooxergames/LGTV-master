@@ -250,9 +250,11 @@ var channel_page={
         var menus=this.menu_items;
         var stream_id=$(menus[index]).data('channel_id');
         if(this.current_channel_id==stream_id){
-            this.full_screen_video=true;
-            this.zoomInOut();
-            this.keys.focused_part="full_screen";
+            if(!this.full_screen_video){
+                this.full_screen_video=true;
+                this.zoomInOut();
+                this.keys.focused_part="full_screen";
+            }
         }
         else{
             this.showLiveChannelMovie(stream_id);

@@ -85,7 +85,9 @@ function initPlayer() {
                 this.videoObj = document.getElementById(id);
                 $('#'+parent_id).find('.subtitle-container').hide();
                 $('#' + parent_id).find('.video-reconnect-message').hide();
-                this.full_screen_state=0;
+                if(typeof this.full_screen_state === 'undefined'){
+                    this.full_screen_state=0;
+                }
                 
                 this.detectTVCapabilities();
                 
