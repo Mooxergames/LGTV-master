@@ -260,25 +260,10 @@ function initPlayer() {
                 console.log('Scale ratio:', ratioX.toFixed(3), ratioY.toFixed(3));
                 
                 try {
-                    var playerState = webapis.avplay.getState();
-                    console.log('Player state:', playerState);
-                    
-                    if (playerState === 'NONE' || playerState === 'IDLE') {
-                        console.warn('Player not ready (state: ' + playerState + '), skipping setDisplayRect');
-                        return;
-                    }
-                    
                     webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
                     console.log('setDisplayRect successful');
-                    
                 } catch (e) {
-                    if (e.code === 11) {
-                        console.error('INVALID_STATE_ERR: Player not in valid state for setDisplayRect');
-                    } else if (e.code === 9) {
-                        console.error('NOT_SUPPORTED_ERR: Operation not supported');
-                    } else {
-                        console.error('setDisplayRect error:', e.code, e.name, e.message);
-                    }
+                    console.error('setDisplayRect error:', e.code, e.name, e.message);
                 }
 
                 channel_page.toggleFavoriteAndRecentBottomOptionVisbility();
