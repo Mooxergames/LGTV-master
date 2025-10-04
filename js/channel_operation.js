@@ -550,14 +550,9 @@ var channel_page={
                 width:'58.3vw'
             });
             
-            // Reset video element to position:absolute for preview mode
-            $('#channel-page-video').css({
-                position:'absolute',
-                left:0,
-                top:0,
-                width:'',
-                height:''
-            });
+            // Reset video element for preview mode
+            $('#channel-page-video').removeClass('video-fullscreen');
+            $('#channel-page-video-lg').removeClass('video-fullscreen');
             
             this.keys.focused_part="channel_selection";
             media_player.full_screen_state=0;
@@ -600,14 +595,9 @@ var channel_page={
                 width:'100vw'
             });
             
-            // CRITICAL: Set video element to position:fixed to escape container constraints
-            $('#channel-page-video').css({
-                position:'fixed',
-                left:0,
-                top:0,
-                width:'100vw',
-                height:'100vh'
-            });
+            // CRITICAL: Add fullscreen class to escape container constraints
+            $('#channel-page-video').addClass('video-fullscreen');
+            $('#channel-page-video-lg').addClass('video-fullscreen');
             
             var that = this;
             
