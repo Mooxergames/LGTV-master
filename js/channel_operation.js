@@ -526,7 +526,6 @@ var channel_page={
                 $('#full-screen-information').removeClass('visible');
                 $('#full-screen-channel-name').slideUp(400);
             },5000)
-            this.keys.focused_part="full_screen";
         }
     },
     showLiveChannelMovie:function(movie_id){
