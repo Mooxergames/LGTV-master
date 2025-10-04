@@ -253,7 +253,6 @@ var channel_page={
             if(!this.full_screen_video){
                 this.full_screen_video=true;
                 this.zoomInOut();
-                this.keys.focused_part="full_screen";
             }
         }
         else{
