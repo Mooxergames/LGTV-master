@@ -140,7 +140,7 @@
     top:0 !important;
     width:100vw !important;
     height:100vh !important;
-    z-index: 1000;
+    z-index: 500 !important; /* Below subtitles (z-index: 1000) */
 }
 #live_channels_home .channel-information-container{
     margin-top:20px;
