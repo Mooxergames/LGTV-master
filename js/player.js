@@ -256,19 +256,10 @@ function initPlayer() {
                     console.log('🎨 requestAnimationFrame: Reading coordinates AFTER CSS applied');
                     
                     if (that.full_screen_state === 1) {
-                        console.log('FULLSCREEN: Using setDisplayRect(0, 0, 1920, 1080)');
-                        console.log('🔍 Video element computed style:');
-                        var videoEl = document.getElementById('channel-page-video');
-                        var computedStyle = window.getComputedStyle(videoEl);
-                        console.log('  position:', computedStyle.position);
-                        console.log('  left:', computedStyle.left);
-                        console.log('  top:', computedStyle.top);
-                        console.log('  width:', computedStyle.width);
-                        console.log('  height:', computedStyle.height);
-                        console.log('  classes:', videoEl.className);
+                        console.log('FULLSCREEN MODE: Using detected TV resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
                         
                         try {
-                            // Force fullscreen on the VIDEO ELEMENT first
+                            // CRITICAL: Force fullscreen display mode
                             webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
                             console.log('✅ Set display method to FULL_SCREEN');
                         } catch (e) {
@@ -276,12 +267,21 @@ function initPlayer() {
                         }
                         
                         try {
+                            // Use detected resolution (works on 1080p, 4K, 8K)
                             webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
                             console.log('✅ Fullscreen setDisplayRect successful');
                         } catch (e) {
                             console.error('❌ Fullscreen setDisplayRect error:', e);
                         }
                     } else {
+                        // PREVIEW MODE: Reset display mode to prevent zoomed preview bug
+                        try {
+                            webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_AUTO_ASPECT_RATIO');
+                            console.log('✅ Reset display mode to AUTO_ASPECT_RATIO for preview');
+                        } catch (e) {
+                            console.log('⚠️ setDisplayMethod reset not supported:', e);
+                        }
+                        
                         var top_position=$(that.videoObj).offset().top;
                         var left_position=$(that.videoObj).offset().left;
                         var width=parseInt($(that.videoObj).width())
