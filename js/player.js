@@ -347,8 +347,10 @@ function initPlayer() {
                     },
                     oncurrentplaytime: function(currentTime) {
                         that.current_time=currentTime;
-                        if(current_route==='vod-series-player-video')
+                        if(current_route==='vod-series-player-video') {
                             vod_series_player.current_time=currentTime/1000;
+                            SrtOperation.timeChange(currentTime/1000); // Convert ms to seconds
+                        }
                         $('#'+that.parent_id).find('.video-error').hide();
                         var duration =  webapis.avplay.getDuration();
                         if (duration > 0) {
