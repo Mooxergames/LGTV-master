@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **2025-10-07: CRITICAL SUBTITLE BUG FIX - Cleared Persistent Subtitles When Switching Episodes**
+  - **Root Cause Identified**: When switching between series episodes directly from the player (using next/previous buttons or episode grid), old subtitles from the previous episode would persist and display incorrectly on the new episode
+  - **Bug Analysis**: Samsung TV's `media_player.close()` function (line 213 in player.js) was missing subtitle cleanup, while the browser/HTML5 version (line 642) properly called `SrtOperation.deStruct()` - this discrepancy caused subtitle persistence only on Samsung devices
+  - **Fix Implemented**: Added `SrtOperation.deStruct()` and `this.subtitles=[]` to Samsung's close() function to properly clear subtitle data when closing the player
+  - **Impact**: Now when users switch between episodes (via next/previous controls or episode selection), subtitles are completely cleared and only the new episode's subtitles will display
+  - **Modified Files**: `js/player.js` (Samsung close() function with subtitle cleanup)
+  - **Testing**: Verified subtitle clearing works correctly when switching episodes in series player on Samsung Tizen TVs
+
 - **2025-10-06: CRITICAL FIX - Universal Fullscreen Video Display for All Samsung Tizen Devices**
   - **Root Cause Identified**: Video appearing in top-left corner with black remainder was caused by CSS `position:absolute` overriding inline styles AND missing Samsung AVPlay fullscreen API call
   - **Multi-Layer Solution Implemented**:

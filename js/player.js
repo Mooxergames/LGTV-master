@@ -216,6 +216,8 @@ function initPlayer() {
                     webapis.avplay.close();
                 }catch (e) {
                 }
+                SrtOperation.deStruct();
+                this.subtitles=[];
                 $(this.parent_id).find('.video-error').hide();
                 this.reconnect_count = 0;
                 clearTimeout(this.reconnect_timer);
