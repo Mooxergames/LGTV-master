@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **2025-10-07: Fixed Resolution Display Showing "undefined" on Player Bar**
+  - **Root Cause**: Samsung's `getCurrentStreamInfo()` API was returning Width/Height as undefined, and the code was displaying "undefined * undefined" without validation
+  - **Fix Implemented**: Added proper validation to check if `extra_info.Width` and `extra_info.Height` exist before displaying resolution
+  - **Behavior Now**: If Samsung API doesn't provide valid resolution values, the display keeps the default text instead of showing "undefined"
+  - **Modified Files**: `js/player.js` (added Width/Height validation on line 162)
+
 - **2025-10-07: CRITICAL BUG FIX - Resume Watching Now Works for Series Episodes**
   - **Root Cause Identified**: Development mode debug code was overriding actual video duration/current_time with fake values (100/100), causing the resume save logic to always delete instead of save progress
   - **Bug Impact**: Episodes would NEVER appear in "Resume Watching" category because progress was always deleted instead of saved

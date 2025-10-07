@@ -156,8 +156,10 @@ function initPlayer() {
                                     var stream_info=webapis.avplay.getCurrentStreamInfo();
                                     if(typeof stream_info[0]!='undefined'){
                                         var extra_info=JSON.parse(stream_info[0].extra_info);
-                                        var stream_summary=extra_info.Width+' * '+extra_info.Height;
-                                        $('.video-resolution').text(stream_summary);
+                                        if(extra_info && extra_info.Width && extra_info.Height){
+                                            var stream_summary=extra_info.Width+' * '+extra_info.Height;
+                                            $('.video-resolution').text(stream_summary);
+                                        }
                                     }
                                 }catch (e) {
                                 }
