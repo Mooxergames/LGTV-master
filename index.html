@@ -1598,7 +1598,7 @@
                 <div class="modal-header modal-header-bg-img-1">
                     <h5 class="modal-title modal-title-text-2 text-center" data-word_code="subtitle_settings">Subtitle Settings</h5>
                 </div>
-                <div class="modal-body modal-body-bg-img-1 p-20" style="padding:20px 20px; max-height: 70vh; overflow-y: auto;">
+                <div class="modal-body modal-body-bg-img-1 p-20" style="padding:20px 20px;">
                     <!-- Live Preview Area -->
                     <div id="subtitle-preview-container">
                         <div class="subtitle-preview-background">
@@ -1673,40 +1673,6 @@
                             <div class="subtitle-color-button" data-text="green" onclick="home_page.changeSubtitleTextColor('green')" onmouseenter="home_page.hoverSubtitleOption(13)">
                                 <div class="color-preview green-text"></div>
                                 <span data-word_code="green">Green</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="subtitle-setting-section">
-                        <h6 class="subtitle-setting-title" data-word_code="subtitle_timing">Subtitle Timing</h6>
-                        <div class="subtitle-timing-controls">
-                            <div class="timing-display">
-                                <span id="subtitle-timing-offset" class="timing-offset-value">0.0s</span>
-                            </div>
-                            <div class="timing-buttons">
-                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(-0.5)" onmouseenter="home_page.hoverSubtitleOption(16)">
-                                    <i class="fas fa-minus"></i>
-                                    <span>-0.5s</span>
-                                </div>
-                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(-0.1)" onmouseenter="home_page.hoverSubtitleOption(17)">
-                                    <i class="fas fa-minus"></i>
-                                    <span>-0.1s</span>
-                                </div>
-                                <div class="timing-button reset-button" onclick="home_page.resetSubtitleTiming()" onmouseenter="home_page.hoverSubtitleOption(18)">
-                                    <i class="fas fa-undo"></i>
-                                    <span data-word_code="reset">Reset</span>
-                                </div>
-                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(0.1)" onmouseenter="home_page.hoverSubtitleOption(19)">
-                                    <i class="fas fa-plus"></i>
-                                    <span>+0.1s</span>
-                                </div>
-                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(0.5)" onmouseenter="home_page.hoverSubtitleOption(20)">
-                                    <i class="fas fa-plus"></i>
-                                    <span>+0.5s</span>
-                                </div>
-                            </div>
-                            <div class="timing-description">
-                                <small>Adjust subtitle synchronization (+ advance / - delay)</small>
                             </div>
                         </div>
                     </div>
