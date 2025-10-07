@@ -89,8 +89,7 @@
     top:0;
     width:100vw;
     height:100vh;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.88);
     display:none;
     z-index: 9999;
 }
@@ -104,8 +103,8 @@
     background: linear-gradient(135deg, #1a1a2e 0%, #252538 100%);
     padding: 30px 20px;
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 .search-input-container{
     font-size: 0;
@@ -176,16 +175,15 @@
     font-size: 25px;
     padding: 15px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.3s ease;
+    transition: color 0.2s ease, background-color 0.2s ease;
     border-radius: 8px;
     margin-bottom: 5px;
+    border-left: 4px solid transparent;
 }
 .search-item-wrapper.active, .search-item-wrapper:hover {
     color: #fff;
-    background: linear-gradient(90deg, rgba(1, 215, 251, 0.15) 0%, rgba(1, 215, 251, 0.05) 100%);
-    border-left: 4px solid #01d7fb;
-    transform: translateX(5px);
-    padding-left: 16px;
+    background: rgba(1, 215, 251, 0.12);
+    border-left-color: #01d7fb;
 }
 
 .favourite-badge {
