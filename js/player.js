@@ -44,11 +44,8 @@ function initPlayer() {
                         if (tvResolution.width >= 7680) {
                             capabilities.uhd8k = true;
                         }
-                        
-                        console.log('TV Resolution:', tvResolution.width + 'x' + tvResolution.height);
                     }
                 } catch (e) {
-                    console.log('TVWindow API not available');
                 }
                 
                 try {
@@ -57,21 +54,16 @@ function initPlayer() {
                         
                         try {
                             capabilities.hdrSupport = webapis.avinfo.isHdrTvSupport();
-                            console.log('HDR Support:', capabilities.hdrSupport);
                         } catch (e) {
-                            console.log('HDR detection not available');
                         }
                     }
                 } catch (e) {
-                    console.log('AvInfo API not available');
                 }
                 
                 this.tv_capabilities = capabilities;
-                console.log('TV Capabilities:', JSON.stringify(capabilities));
                 return capabilities;
             },
             init:function(id, parent_id) {
-                console.log('init() called - current full_screen_state:', this.full_screen_state);
                 this.id=id;
                 this.parent_id=parent_id;
                 this.STATES={
@@ -88,9 +80,6 @@ function initPlayer() {
                 $('#' + parent_id).find('.video-reconnect-message').hide();
                 if(typeof this.full_screen_state === 'undefined'){
                     this.full_screen_state=0;
-                    console.log('init() - full_screen_state was undefined, set to 0');
-                } else {
-                    console.log('init() - preserving full_screen_state:', this.full_screen_state);
                 }
                 
                 this.detectTVCapabilities();
@@ -103,7 +92,6 @@ function initPlayer() {
                 this.reconnect_count = 0;
             },
             playAsync:function(url){
-                console.log(url);
                 this.url=url;
                 $('#'+this.parent_id).find('.video-error').hide();
 
@@ -122,18 +110,15 @@ function initPlayer() {
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_BYTE", 1000); // 5 is in seconds
                     // webapis.avplay.setBufferingParam("PLAYER_BUFFER_FOR_PLAY","PLAYER_BUFFER_SIZE_IN_SECOND", 4); // 5 is in seconds
 
-                    console.log('here trying to open');
                     webapis.avplay.prepareAsync(
                         function(){
                             that.reconnect_count = 0;
                             $('#' + that.parent_id).find('.video-reconnect-message').hide();
-                            console.log('here video loaded');
                             $('#'+that.parent_id).find('.video-error').hide();
                             $('#'+that.parent_id).find('.video-loader').hide();
                             that.state = that.STATES.PLAYING;
                             webapis.avplay.play();
                             
-                            console.log('🎬 Video started playing - applying display area with full_screen_state:', that.full_screen_state);
                             that.setDisplayArea();
                             
                             if(current_route==='vod-series-player-video'){
@@ -166,7 +151,6 @@ function initPlayer() {
                             }
                         },
                         function(e){
-                            console.log('video loading failed',e);
                             $('.video-loader').hide();
                             $('#'+that.parent_id).find('.video-error').show();
                             if (that.reconnect_count < that.reconnect_max_count)
@@ -174,13 +158,11 @@ function initPlayer() {
                         }
                     );
                 }catch(e){
-                    console.log('video loading failed',e);
                     $('.video-loader').hide();
                     $('#'+that.parent_id).find('.video-error').show();
                     if (that.reconnect_count < that.reconnect_max_count)
                         that.tryReconnect();
                 }
-                // console.log((new Date).getTime()/1000);
             },
             play:function(){
                 if (this.state === this.STATES.STOPPED) {
@@ -191,7 +173,6 @@ function initPlayer() {
                 try{
                     webapis.avplay.play();
                 }catch(e){
-                    console.log(e);
                 }
             },
             pause:function() {
@@ -199,7 +180,6 @@ function initPlayer() {
                 try{
                     webapis.avplay.pause();
                 }catch(e){
-                    console.log(e);
                 }
             },
             stop:function() {
@@ -230,7 +210,6 @@ function initPlayer() {
                     return;
                 clearTimeout(this.reconnect_timer);
                 var reconnect_count=this.reconnect_count + 1;
-                console.log("here reconnecting", this.reconnect_count);
                 if (reconnect_count >= this.reconnect_max_count) {
                     $('#' + this.parent_id).find('.video-reconnect-message').hide();
                     return;
@@ -247,9 +226,6 @@ function initPlayer() {
                 }, 4000)
             },
             setDisplayArea:function() {
-                console.log('setDisplayArea called - full_screen_state:', this.full_screen_state);
-                console.trace('Called from:');
-                
                 var that = this;
                 var capabilities = this.detectTVCapabilities();
                 var avplayBaseWidth = capabilities.resolution.width;
@@ -257,25 +233,17 @@ function initPlayer() {
                 
                 // Use requestAnimationFrame to wait for CSS to apply
                 requestAnimationFrame(function() {
-                    console.log('🎨 requestAnimationFrame: Reading coordinates AFTER CSS applied');
-                    
                     if (that.full_screen_state === 1) {
-                        console.log('FULLSCREEN MODE: Using detected TV resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
-                        
                         try {
                             // CRITICAL: Force fullscreen display mode
                             webapis.avplay.setDisplayMethod('PLAYER_DISPLAY_MODE_FULL_SCREEN');
-                            console.log('✅ Set display method to FULL_SCREEN');
                         } catch (e) {
-                            console.log('⚠️ setDisplayMethod not supported:', e);
                         }
                         
                         try {
                             // Use detected resolution (works on 1080p, 4K, 8K)
                             webapis.avplay.setDisplayRect(0, 0, avplayBaseWidth, avplayBaseHeight);
-                            console.log('✅ Fullscreen setDisplayRect successful');
                         } catch (e) {
-                            console.error('❌ Fullscreen setDisplayRect error:', e);
                         }
                     } else {
                         // PREVIEW MODE: Just set coordinates, don't change display mode
@@ -292,15 +260,9 @@ function initPlayer() {
                     var scaledWidth = Math.round(width * ratioX);
                     var scaledHeight = Math.round(height * ratioY);
                     
-                    console.log('Preview mode - Original coordinates:', left_position, top_position, width, height);
-                    console.log('AVPlay base resolution:', avplayBaseWidth + 'x' + avplayBaseHeight);
-                    console.log('Scaled coordinates:', scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                    
                         try {
                             webapis.avplay.setDisplayRect(scaledLeft, scaledTop, scaledWidth, scaledHeight);
-                            console.log('✅ setDisplayRect successful (preview mode)');
                         } catch (e) {
-                            console.error('❌ setDisplayRect error:', e.code, e.name, e.message);
                         }
                     }
                     
@@ -412,7 +374,6 @@ function initPlayer() {
                 var default_track_text=kind==="TEXT" ? "Subtitle " : "Audio Track ";
                 try{
                     var totalTrackInfo=webapis.avplay.getTotalTrackInfo();
-                    console.log(kind, totalTrackInfo);
                     for(var i=0; i<totalTrackInfo.length;i++)
                     {
                         try{
@@ -438,14 +399,11 @@ function initPlayer() {
                                 }
                             }
                         }catch (e) {
-                            console.log(kind, e);
                         }
                     }
-                    // console.log(kind, result);
                 }catch (e) {
 
                 }
-                console.log(result);
                 return result;
             },
             setSubtitleOrAudioTrack:function(kind, index){
@@ -519,12 +477,10 @@ function initPlayer() {
                 var videoObj=this.videoObj;
                 var that=this;
                 this.videoObj.addEventListener("error", function(e) {
-                    console.log('error',e);
                     $('#'+that.parent_id).find('.video-loader').show();
                     $('#'+that.parent_id).find('.video-error').show();
                 });
                 this.videoObj.addEventListener("canplay", function(e) {
-                    console.log("Can play")
                     $('#'+that.parent_id).find('.video-error').hide();
                     // console.log('Video can start, but not sure it will play through.');
                 });
@@ -577,7 +533,6 @@ function initPlayer() {
                     // $('#'+this.parent_id).find('.video-error').show();
                 });
                 this.videoObj.addEventListener('stalled', function(event){
-                    console.log('Failed to fetch data, but trying.');
                     // $('#'+this.parent_id).find('.video-error').show();
                 });
                 this.videoObj.addEventListener('ended', function(event){
@@ -593,7 +548,6 @@ function initPlayer() {
                 // });
             },
             playAsync:function(url){
-                console.log(url);
                 if(url){
                     try{
                         this.videoObj.pause();
@@ -623,7 +577,6 @@ function initPlayer() {
                 try{
                     this.videoObj.play();
                 }catch(e){
-                    console.log(e);
                 }
                 if(SrtOperation.srt.length>0)  // if has subtitles
                     SrtOperation.stopped=false;
@@ -674,14 +627,12 @@ function initPlayer() {
                     temps=media_player.videoObj.textTracks.length > 0 ? media_player.videoObj.textTracks : {};
                 }else
                     temps=media_player.videoObj.audioTracks.length>0 ? media_player.videoObj.audioTracks : {};
-                console.log(temps);
                 if(Object.keys(temps).length>0){
                     Object.keys(temps).map(function (key,index) {
                         if(typeof temps[key]=='object' && temps[key]!=null)
                             totalTrackInfo.push(temps[key]);
                     })
                 }
-                console.log(totalTrackInfo);
                 return totalTrackInfo;
             },
             setSubtitleOrAudioTrack:function(kind, index){

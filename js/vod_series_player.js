@@ -128,7 +128,6 @@ var vod_series_player={
                 else
                     this.resume_time=0;
             }catch (e) {
-                console.log(e);
             }
         }
         try{
@@ -141,16 +140,13 @@ var vod_series_player={
                 try{
                     media_player.setDisplayArea();
                 }catch(e){
-                    console.log(e);
                 }
             }, 250);
         }catch (e) {
-            console.log(e);
         }
         try{
             media_player.playAsync(url);
         }catch (e) {
-            console.log(e);
         }
         this.timeOut=setTimeout(function(){
             that.hideControlBar();
@@ -230,7 +226,6 @@ var vod_series_player={
         try{
             media_player.close();
         }catch(e){
-            console.log(e);
         }
         $('#'+media_player.parent_id).find('.video-error').hide();
         $('#'+media_player.parent_id).find('.subtitle-container').text('');
@@ -419,7 +414,6 @@ var vod_series_player={
 
             $('#'+media_player.parent_id).find('.video-loader').show();
             this.seek_timer=setTimeout(function () {
-                console.log(newTime);
                 webapis.avplay.seekTo(newTime*1000);
                 setTimeout(function () {
                     try{
@@ -663,7 +657,6 @@ var vod_series_player={
     showSubtitleAudioModal:function(kind){
         this.hideControlBar();
         var keys=this.keys;
-        console.log(keys.focused_part,'in subtitle audio modal');
         if(keys.focused_part!="subtitle_audio_selection_modal")
             keys.prev_focus=keys.focused_part;
         try{
@@ -733,7 +726,6 @@ var vod_series_player={
                             that.subtitle_loaded = true;
                             $('#subtitle-loader-container').hide();
                             that.showEmptySubtitleMessage(kind);
-                            console.error('Enhanced subtitle workflow error:', error);
                         }
                     );
                 } else {
@@ -975,7 +967,6 @@ var vod_series_player={
         try{
             stream_summary = media_player.videoObj.videoWidth + '*' + media_player.videoObj.videoHeight;
         }catch (e) {
-            console.log(e);
         }
         $('#vod-video-info-subwrapper2').text(stream_summary);
     },
@@ -1088,7 +1079,6 @@ var vod_series_player={
                 },
                 function(error) {
                     // Error callback
-                    console.error('Subtitle loading error:', error);
                     showToast("Error", "Failed to load subtitle");
                 }
             );
@@ -1099,7 +1089,6 @@ var vod_series_player={
             try{
                 media_player.setSubtitleOrAudioTrack("AUDIO",parseInt(this.current_audio_track_index))
             }catch(e){
-                console.error('Audio track selection error:', e);
             }
         }
     },
