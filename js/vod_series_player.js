@@ -250,14 +250,6 @@ var vod_series_player={
                 dt=5;
             }
             var movie=this.current_movie;
-            // if(environment==='develop'){ // to test saving video time
-            //     duration=10000;
-            //     current_time=4000;
-            // }
-            if(environment==='develop'){ // to test removing video time
-                duration=100;
-                current_time=100;
-            }
             if(duration-current_time>=dt){
                 if(this.current_movie_type==='movies')
                 {

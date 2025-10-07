@@ -8,6 +8,14 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+- **2025-10-07: CRITICAL BUG FIX - Resume Watching Now Works for Series Episodes**
+  - **Root Cause Identified**: Development mode debug code was overriding actual video duration/current_time with fake values (100/100), causing the resume save logic to always delete instead of save progress
+  - **Bug Impact**: Episodes would NEVER appear in "Resume Watching" category because progress was always deleted instead of saved
+  - **Save Logic**: Resume is saved only if at least 5 seconds of video remains unwatched (duration - current_time >= 5 seconds)
+  - **Fix Implemented**: Removed development mode override in `js/vod_series_player.js` (lines 257-260) that was blocking all resume saves
+  - **Result**: Series episodes now correctly save watch progress and appear in "Resume Watching" category after exiting the player
+  - **Modified Files**: `js/vod_series_player.js` (removed development mode override)
+
 - **2025-10-07: CRITICAL SUBTITLE BUG FIX - Cleared Persistent Subtitles When Switching Episodes**
   - **Root Cause Identified**: When switching between series episodes directly from the player (using next/previous buttons or episode grid), old subtitles from the previous episode would persist and display incorrectly on the new episode
   - **Bug Analysis**: Samsung TV's `media_player.close()` function (line 213 in player.js) was missing subtitle cleanup, while the browser/HTML5 version (line 642) properly called `SrtOperation.deStruct()` - this discrepancy caused subtitle persistence only on Samsung devices
