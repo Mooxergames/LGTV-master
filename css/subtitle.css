@@ -834,4 +834,77 @@
     color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+}/* Subtitle Timing Controls */
+.subtitle-timing-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+}
+
+.timing-display {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: 2px solid #01d7fb;
+    box-shadow: 0 4px 15px rgba(1, 215, 251, 0.2);
+}
+
+.timing-offset-value {
+    font-size: 32px;
+    font-weight: 600;
+    color: #01d7fb;
+    letter-spacing: 1px;
+}
+
+.timing-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.timing-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #2d2d2d;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.timing-button:hover,
+.timing-button.active {
+    background: linear-gradient(135deg, #01d7fb 0%, #0099cc 100%);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(1, 215, 251, 0.4);
+}
+
+.timing-button.reset-button {
+    background: #444;
+}
+
+.timing-button.reset-button:hover {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5555 100%);
+}
+
+.timing-button i {
+    font-size: 18px;
+}
+
+.timing-description {
+    color: #999;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 5px;
 }

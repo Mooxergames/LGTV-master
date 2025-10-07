@@ -1677,6 +1677,40 @@
                         </div>
                     </div>
                     
+                    <div class="subtitle-setting-section">
+                        <h6 class="subtitle-setting-title" data-word_code="subtitle_timing">Subtitle Timing</h6>
+                        <div class="subtitle-timing-controls">
+                            <div class="timing-display">
+                                <span id="subtitle-timing-offset" class="timing-offset-value">0.0s</span>
+                            </div>
+                            <div class="timing-buttons">
+                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(-0.5)" onmouseenter="home_page.hoverSubtitleOption(16)">
+                                    <i class="fas fa-minus"></i>
+                                    <span>-0.5s</span>
+                                </div>
+                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(-0.1)" onmouseenter="home_page.hoverSubtitleOption(17)">
+                                    <i class="fas fa-minus"></i>
+                                    <span>-0.1s</span>
+                                </div>
+                                <div class="timing-button reset-button" onclick="home_page.resetSubtitleTiming()" onmouseenter="home_page.hoverSubtitleOption(18)">
+                                    <i class="fas fa-undo"></i>
+                                    <span data-word_code="reset">Reset</span>
+                                </div>
+                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(0.1)" onmouseenter="home_page.hoverSubtitleOption(19)">
+                                    <i class="fas fa-plus"></i>
+                                    <span>+0.1s</span>
+                                </div>
+                                <div class="timing-button" onclick="home_page.adjustSubtitleTiming(0.5)" onmouseenter="home_page.hoverSubtitleOption(20)">
+                                    <i class="fas fa-plus"></i>
+                                    <span>+0.5s</span>
+                                </div>
+                            </div>
+                            <div class="timing-description">
+                                <small>Adjust subtitle synchronization (+ advance / - delay)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Action Buttons -->
                     <div class="modal-button-wrapper subtitle-modal-buttons">
                         <div class="btn-wrapper-1">

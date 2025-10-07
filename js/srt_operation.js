@@ -5,6 +5,7 @@ var SrtOperation={
     srt:[],
     stopped:false,
     subtitle_shown:false,
+    timing_offset:0,
     init: function (subtitle, current_time) {
         
         // Same seconds logic as Samsung - simple and direct
@@ -69,14 +70,17 @@ var SrtOperation={
             return;
         }
         
+        // Apply timing offset to sync subtitles
+        var adjusted_time = current_time + this.timing_offset;
+        
         // Track video time for real backward seek detection
         var previous_time = this.last_video_time || 0;
-        var is_real_backward_seek = current_time < (previous_time - 1.0); // 1 second tolerance for normal playback jitter
-        this.last_video_time = current_time;
+        var is_real_backward_seek = adjusted_time < (previous_time - 1.0); // 1 second tolerance for normal playback jitter
+        this.last_video_time = adjusted_time;
         
         var srt_index = this.current_srt_index;
         if(srt_index >= this.srt.length || srt_index < 0) {
-            srt_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            srt_index = this.findIndex(adjusted_time, 0, this.srt.length - 1);
             this.current_srt_index = Math.max(0, srt_index);
             return;
         }
@@ -85,17 +89,17 @@ var SrtOperation={
         
         
         // **SHOW SUBTITLE**: Current time within subtitle range - same timing as Samsung
-        if(current_time >= srt_item.startSeconds && current_time < srt_item.endSeconds) {
+        if(adjusted_time >= srt_item.startSeconds && adjusted_time < srt_item.endSeconds) {
             if(!this.subtitle_shown) {
                 this.showSubtitle(srt_item.text);
                 this.subtitle_shown = true;
             }
         }
         // **HIDE SUBTITLE**: Time passed subtitle end - handle progression
-        else if(current_time >= srt_item.endSeconds) {
+        else if(adjusted_time >= srt_item.endSeconds) {
             var next_srt_item = this.srt[srt_index + 1];
             
-            if(next_srt_item && current_time < next_srt_item.startSeconds) {
+            if(next_srt_item && adjusted_time < next_srt_item.startSeconds) {
                 // Gap between subtitles - hide current and advance index
                 if(this.subtitle_shown) {
                     this.hideSubtitle();
@@ -103,7 +107,7 @@ var SrtOperation={
                 }
                 // FIX: Advance to next subtitle index to avoid getting stuck
                 this.current_srt_index = srt_index + 1;
-            } else if(next_srt_item && current_time >= next_srt_item.startSeconds && current_time < next_srt_item.endSeconds) {
+            } else if(next_srt_item && adjusted_time >= next_srt_item.startSeconds && adjusted_time < next_srt_item.endSeconds) {
                 // Show next subtitle
                 this.showSubtitle(next_srt_item.text);
                 this.current_srt_index += 1;
@@ -114,17 +118,17 @@ var SrtOperation={
                     this.hideSubtitle();
                     this.subtitle_shown = false;
                 }
-                var new_index = this.findIndex(current_time, 0, this.srt.length - 1);
+                var new_index = this.findIndex(adjusted_time, 0, this.srt.length - 1);
                 this.current_srt_index = new_index;
             }
         }
         // **BACKWARDS SEEK**: Only detect REAL backward seeks, not gaps between subtitles  
-        else if(current_time < srt_item.startSeconds && is_real_backward_seek) {
+        else if(adjusted_time < srt_item.startSeconds && is_real_backward_seek) {
             if(this.subtitle_shown) {
                 this.hideSubtitle();
                 this.subtitle_shown = false;
             }
-            var new_index = this.findIndex(current_time, 0, this.srt.length - 1);
+            var new_index = this.findIndex(adjusted_time, 0, this.srt.length - 1);
             this.current_srt_index = new_index;
         }
         // **GAP HANDLING**: Video time before subtitle start but no real backward seek
@@ -315,5 +319,7 @@ var SrtOperation={
         this.hideSubtitle();
         this.current_srt_index = 0;
         this.subtitle_shown = false;
+        this.timing_offset = 0;
+        $('#subtitle-timing-offset').text('0.0s');
     }
 }

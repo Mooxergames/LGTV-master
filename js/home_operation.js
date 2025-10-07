@@ -1986,5 +1986,36 @@ var home_page={
                     this.goBack();
             }
         }
+    },
+    adjustSubtitleTiming: function(offset) {
+        SrtOperation.timing_offset += offset;
+        SrtOperation.timing_offset = Math.round(SrtOperation.timing_offset * 10) / 10;
+        $('#subtitle-timing-offset').text(SrtOperation.timing_offset.toFixed(1) + 's');
+    },
+    resetSubtitleTiming: function() {
+        SrtOperation.timing_offset = 0;
+        $('#subtitle-timing-offset').text('0.0s');
+    },
+    changeSubtitleSize: function(size) {
+        $('.subtitle-option-button[data-size]').removeClass('active');
+        $('.subtitle-option-button[data-size="' + size + '"]').addClass('active');
+    },
+    changeSubtitleBgColor: function(color) {
+        $('.subtitle-color-button[data-bg]').removeClass('active');
+        $('.subtitle-color-button[data-bg="' + color + '"]').addClass('active');
+    },
+    changeSubtitleTextColor: function(color) {
+        $('.subtitle-color-button[data-text]').removeClass('active');
+        $('.subtitle-color-button[data-text="' + color + '"]').addClass('active');
+    },
+    saveSubtitleSettings: function() {
+        $('#subtitle-settings-modal').modal('hide');
+    },
+    cancelSubtitleSettings: function() {
+        SrtOperation.timing_offset = 0;
+        $('#subtitle-timing-offset').text('0.0s');
+        $('#subtitle-settings-modal').modal('hide');
+    },
+    hoverSubtitleOption: function(index) {
     }
 }
