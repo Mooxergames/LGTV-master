@@ -778,7 +778,12 @@ var home_page={
         doms_translated.map(function (index, item) {
             var word_code=$(item).data('word_code');
             if(typeof current_words[word_code]!='undefined'){
-                $(item).text(current_words[word_code]);
+                var content = current_words[word_code];
+                if(content.includes('<br>') || content.includes('<') && content.includes('>')){
+                    $(item).html(content);
+                } else {
+                    $(item).text(content);
+                }
             }
         })
     },
