@@ -760,7 +760,7 @@ var channel_page={
     },
     toggleRearrangeMode:function(condition){
         var keys=this.keys;
-        if(current_category.category_id!=='favourite' || keys.focused_part!="channel_selection")
+        if(keys.focused_part!="channel_selection")
             return;
         if(this.rearrange_mode){
             this.rearrange_mode=false;
