@@ -760,8 +760,7 @@ var channel_page={
     },
     toggleRearrangeMode:function(condition){
         var keys=this.keys;
-        if(keys.focused_part!="channel_selection")
-            return;
+        
         if(this.rearrange_mode){
             this.rearrange_mode=false;
             $(this.prev_dom).removeClass('rearrange');
@@ -769,15 +768,15 @@ var channel_page={
         }
         if(!condition)
             return;
-        var keys=this.keys;
-        if(keys.focused_part==='channel_selection'){
-            this.rearrange_mode=true;
-            $(this.prev_dom).addClass('rearrange');
-            var real_prev_selection=0;
-            if(keys.focused_part==='channel_selection')
-                real_prev_selection=keys.channel_selection;
-            this.rearrange_origin_position=real_prev_selection;
+        
+        if(keys.focused_part!=="channel_selection"){
+            this.hoverMenuItem(keys.channel_selection);
         }
+        
+        this.rearrange_mode=true;
+        $(this.prev_dom).addClass('rearrange');
+        var real_prev_selection=keys.channel_selection;
+        this.rearrange_origin_position=real_prev_selection;
     },
     changeChannelDomContent:function(targetElement, channel, index){
         $(targetElement).find('.channel-number').text(channel.num);
