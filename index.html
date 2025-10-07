@@ -745,15 +745,22 @@
                         </div>
                     </div>
                     <div id="live-channel-button-container">
-                        <button id="live-channel-catch-button" class="btn channel-action-btn"
+                        <button id="live-channel-reorder-button" class="btn channel-action-btn"
                             onmouseenter="channel_page.hoverChannelActionBtns(0)"
+                            onclick="channel_page.toggleRearrangeMode(true)"
+                            data-word_code="reorder"
+                        >
+                            Reorder
+                        </button>
+                        <button id="live-channel-catch-button" class="btn channel-action-btn"
+                            onmouseenter="channel_page.hoverChannelActionBtns(1)"
                             onclick="channel_page.catchUpChannel()"
                             data-word_code="catch_up"
                         >
                             Catch
                         </button>
                         <button id="live-channel-favourite-button" class="btn channel-action-btn" data-action="add"
-                            onmouseenter="channel_page.hoverChannelActionBtns(1)"
+                            onmouseenter="channel_page.hoverChannelActionBtns(2)"
                             onclick="channel_page.addOrRemoveFav()"
                             data-word_code="add_to_favorite"
                         >

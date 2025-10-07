@@ -429,7 +429,7 @@ var channel_page={
     changeFavouriteButton:function(current_menu){
         var movie_id=$(current_menu).data('channel_id');
         var movie=getCurrentMovieFromId(movie_id,this.movies,'stream_id');
-        var action_buttons=[$('.channel-action-btn')[1],$('#channel-operation-modal').find('.modal-operation-menu-type-1')[0]];
+        var action_buttons=[$('.channel-action-btn')[2],$('#channel-operation-modal').find('.modal-operation-menu-type-1')[0]];
         if(movie!=null){
             if(!LiveModel.favourite_ids.includes(movie.stream_id)){
                 $(action_buttons).text("Add Fav");
@@ -1153,8 +1153,8 @@ var channel_page={
                     this.hoverMenuItem(keys.channel_selection);
                     return;
                 }
-                if(keys.right_screen_part>1)
-                    keys.right_screen_part=1;
+                if(keys.right_screen_part>2)
+                    keys.right_screen_part=2;
                 this.hoverChannelActionBtns(keys.right_screen_part);
                 break;
         }
