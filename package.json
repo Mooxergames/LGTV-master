@@ -1,6 +1,6 @@
 {
   "name": "lgtv-master",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "FLIX Iptv LGTV",
   "main": "index.js",
   "scripts": {
